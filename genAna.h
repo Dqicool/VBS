@@ -149,7 +149,10 @@ float getTotalPt(vector<float> particle1_px_py_pz,
 }
 
 float getY(vector <float> particle_px_py_pz, float particle_energy){
-    auto ret = (1/2) * TMath::Log((particle_energy + particle_px_py_pz[2]) / (particle_energy - particle_px_py_pz[2]));
+    float tmp1 = (particle_energy + particle_px_py_pz[2]);
+    float tmp2 = (particle_energy - particle_px_py_pz[2]);
+    float tmp3 = TMath::Log(tmp1/tmp2);
+    float ret = tmp3 / 2;
     return ret;
 }
 
@@ -172,7 +175,7 @@ vector<float> getCombinedPxPyPzWithInd(vector<float> *px_py_pz, vector<int> ind 
 float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
     float ret = 0;
     for (int i = 0; i<ind.size(); i++){
-        ret += energy[i];
+        ret += energy[ind[i]];
     }
     return ret;
 }
