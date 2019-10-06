@@ -7,6 +7,8 @@
 #include "vector"
 #include <TMath.h>
 #include <iostream>
+#include <string.h>
+#define Z_MASS 91.1876
 using namespace std;
 
 float getTheta(float particle_eta){
@@ -36,7 +38,7 @@ float getEnergy(float particle_m,
 }
 
 float getMass(vector<float> particle_energy, 
-                vector<float> * particle_px_py_pz){
+                std::vector<std::vector<float>> particle_px_py_pz){
     float energy = 0;
     float px = 0;
     float py = 0;
@@ -51,7 +53,7 @@ float getMass(vector<float> particle_energy,
 }
 
 float getMassWithInd(vector<float> particle_energy, 
-                    vector<float> * particle_px_py_pz, 
+                    std::vector<std::vector<float>> particle_px_py_pz, 
                     vector<int> ind){
     float energy = 0;
     float px = 0;
@@ -103,6 +105,15 @@ vector<int> getMaxSec(vector<float> vec){
     return ret;
 }
 
+int findLowestNum(vector<float> vec){
+    int size = vec.size();
+    int ret = 0;
+    for (int i = 1; i<size; i++){
+        if (vec[ret] > vec[i]) ret = i;
+    }
+    return ret;
+}
+
 vector<int> getLeptonPeerInd(vector<int> lepton_particleID, 
                              vector<int> lepton_charge){
     vector<int> ret;
@@ -130,15 +141,18 @@ vector<int> getLeptonPeerInd(vector<int> lepton_particleID,
     return ret;
 }
 
-int closestMassSelect(vector<float> particle_mass, float target_mass){
-    float minind = 0;
-    for (int i = 1; i < particle_mass.size(); i++)
-    {
-        if (TMath::Power(particle_mass[minind]-target_mass, 2) > TMath::Power(particle_mass[i]-target_mass, 2))
-        {
-            minind = i;
+vector<int> closestMassSelect(vector<vector<float>> particle_mass, float target_mass){
+    int minind1 = 0;
+    int minind2 = 0;
+    for (int i = 0; i < particle_mass.size(); i++){
+        for (int j = 0; j < particle_mass[i].size(); j++){
+            if (TMath::Power(particle_mass[minind1][minind2]-target_mass, 2) > TMath::Power(particle_mass[i][j]-target_mass, 2)){
+                minind1 = i;
+                minind2 = j;
+            }
         }
     }
+    vector<int> minind{minind1,minind2};
     return minind;
 }
 
@@ -156,7 +170,7 @@ float getY(vector <float> particle_px_py_pz, float particle_energy){
     return ret;
 }
 
-vector<float> getCombinedPxPyPzWithInd(vector<float> *px_py_pz, vector<int> ind ){
+vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz, vector<int> ind ){
     vector <float> ret;
     float px = 0;
     float py = 0;
@@ -178,6 +192,40 @@ float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
         ret += energy[ind[i]];
     }
     return ret;
+}
+
+vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID, 
+                                                  vector<float> lepton_charge){
+    vector<vector<vector<int>>> ret;
+    int size = lepton_charge.size();
+    for (int i = 0; i < size-1; i++){
+        for(int j = i+1; j < size; j++){
+            if (lepton_particleID[i] == lepton_particleID[j] && ((lepton_charge[i] - lepton_charge[j])*(lepton_charge[i] - lepton_charge[j]))>2){
+                for (int k = i+1; k < size-1; k++){
+                    for (int l = k+1; l<size; l++){
+                        if (l != j && k != j){
+                            if (lepton_particleID[k] == lepton_particleID[l] && ((lepton_charge[k] - lepton_charge[l])*(lepton_charge[k] - lepton_charge[l]))>2){
+                                vector<int> tmp1{i,j};
+                                vector<int> tmp2{k,l};
+                                vector<vector<int>> tmp{tmp1,tmp2};
+                                ret.push_back(tmp);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+char * intToChar(int a){
+        char ret1 = (char)(a/10 + 48);
+        char ret2 = (char)((a - 10*(a/10)) +48);
+        char tmp1[2] = {ret1,'\0'};
+        char tmp2[2] = {ret2,'\0'};
+        char* ret = strcat(tmp1, tmp2); 
+        return ret;
 }
 
 #endif
