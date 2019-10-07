@@ -1,0 +1,61 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "c++ build active file",
+            "command": "/usr/bin/c++",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-pthread",
+                "-std=c++11",
+                "-m64",
+                "-I/usr/share/root/include",
+                "-L/usr/share/root/lib", 
+                "-lCore",
+                "-lImt",
+                "-lRIO", 
+                "-lNet", 
+                "-lHist", 
+                "-lGraf", 
+                "-lGraf3d", 
+                "-lGpad", 
+                "-lROOTVecOps", 
+                "-lTree", 
+                "-lTreePlayer",
+                "-lRint", 
+                "-lPostscript", 
+                "-lMatrix", 
+                "-lPhysics", 
+                "-lMathCore", 
+                "-lThread", 
+                "-lMultiProc", 
+                "-lROOTDataFrame", 
+                "-pthread", 
+                "-lm", 
+                "-ldl", 
+                "-rdynamic"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "g++-7 build active file",
+            "command": "/usr/bin/g++-7",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            }
+        }
+    ],
+    "version": "2.0.0"
+}
