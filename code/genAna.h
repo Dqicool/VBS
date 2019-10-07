@@ -145,10 +145,20 @@ vector<int> closestMassSelect(vector<vector<float>> particle_mass, float target_
     int minind1 = 0;
     int minind2 = 0;
     for (int i = 0; i < particle_mass.size(); i++){
-        for (int j = 0; j < particle_mass[i].size(); j++){
-            if (TMath::Power(particle_mass[minind1][minind2]-target_mass, 2) > TMath::Power(particle_mass[i][j]-target_mass, 2)){
+        for (int j = 0; j < 2; j++){
+            auto m11 = TMath::Power(particle_mass[minind1][minind2]-target_mass, 2);
+            auto m21 = TMath::Power(particle_mass[i][j]-target_mass, 2);
+            if (m11 > m21){
                 minind1 = i;
                 minind2 = j;
+            }
+            else if (m11 == m21 && i != minind1){
+                auto m12 = TMath::Power(particle_mass[minind1][!(bool)minind2]-target_mass, 2);
+                auto m22 = TMath::Power(particle_mass[i][!(bool)j]-target_mass, 2);
+                if (m12 > m22){
+                    minind1 = i;
+                    minind2 = j;
+                }
             }
         }
     }
