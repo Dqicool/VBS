@@ -64,7 +64,7 @@
         "hs_analysis.C": "cpp",
         "bitset": "cpp"
     },
-    "git.ignoredRepositories": [
-        "*.root"
-    ]
+    "files.exclude": {
+        "**/.gitignore": true
+    }
 }

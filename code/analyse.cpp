@@ -185,44 +185,7 @@ void analysis(char* in_file, char* out_histo, char* out_tree)
                                 Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"});
     //save tree
         ana.Snapshot("out_tree", out_tree, {"jj_m","j1_pt","j2_pt","j3_pt","j1_y","j2_y","jj_delta_y","jj_product_y","z1_m","z2_m","z1_pt","z2_pt","z1_y","z2_y","llll_m","llll_pt","zzjj_rel_pt"});
-    //book histos
-        auto h_jj_m = ana.Histo1D({"jj_m","",400,0,1e6},"jj_m");
-        auto h_j3_pt = ana.Histo1D({"j3_pt","",400,0,1e6},"j3_pt");
-        auto h_j1_y = ana.Histo1D({"j1_y","",400,-5,5},"j1_y");
-        auto h_j2_y = ana.Histo1D({"j2_y","",400,-5,5},"j2_y");
-        auto h_jj_delta_y = ana.Histo1D({"jj_delta_y","",400,-10,10},"jj_delta_y");
-        auto h_jj_product_y = ana.Histo1D({"jj_product_y","",400,-20,20},"jj_product_y");
-        auto h_j1_pt = ana.Histo1D({"j1_pt","",400,0,1e6},"j1_pt");
-        auto h_j2_pt = ana.Histo1D({"j2_pt","",400,0,1e6},"j2_pt");
-        auto h_z1_pt = ana.Histo1D({"z1_pt","",400,0,1e6},"z1_pt");
-        auto h_z2_pt = ana.Histo1D({"z2_pt","",400,0,1e6},"z2_pt");
-        auto h_z1_m = ana.Histo1D({"z1_m","",400,0,3e5},"z1_m");
-        auto h_z2_m = ana.Histo1D({"z2_m","",400,0,3e5},"z2_m");
-        auto h_z1_y = ana.Histo1D({"z1_y","",400,-5,5},"z1_y");
-        auto h_z2_y = ana.Histo1D({"z2_y","",400,-5,5},"z2_y");
-        auto h_llll_m = ana.Histo1D({"llll_m","",400,0,1e6},"llll_m");
-        auto h_llll_pt = ana.Histo1D({"llll_pt","",400,0,1e6},"llll_pt");
-        auto h_zzjj_rel_pt = ana.Histo1D({"zzjj_rel_pt","",400,0,1},"zzjj_rel_pt");
-    //Write histos
-        TFile* out=new TFile(out_histo,"RECREATE");
-        h_jj_m->Write();
-        h_j3_pt->Write();
-        h_j1_y->Write();
-        h_j2_y->Write();
-        h_jj_delta_y->Write();
-        h_jj_product_y->Write();
-        h_j1_pt->Write();
-        h_j2_pt->Write();
-        h_z1_pt->Write();
-        h_z2_pt->Write();
-        h_z1_m->Write();
-        h_z2_m->Write();
-        h_z1_y->Write();
-        h_z2_y->Write();
-        h_llll_m->Write();
-        h_llll_pt->Write();
-        h_zzjj_rel_pt->Write();
-        out->Close();
+
 }
 
 int main(int argc, char** argv)
