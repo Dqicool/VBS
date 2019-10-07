@@ -1,23 +1,42 @@
+#include <iostream>
+#include <cstdlib>
+#include <pthread.h>
 
-// MPhys Project 2019-20 Vector Boson Scattering at the ATLAS experiment
-//
-// Harriet Watson     Superivosr: Andrew Pilkington
-// Lab partner: Dong Qichen
-//
-// 01/10/19
-//
-// Based on the basic version of the skeleton code provided by Matteo, PhD student
-
-#include <TH1.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <TCanvas.h>
-#include "vector"
-#include<iostream>
 using namespace std;
 
+#define NUM_THREADS 5
 
-int main(){
-    vector<float> tester{4,2,3,23,5,254,7,8};
-    cout<<findLowest(tester)<<endl;
+struct thread_data {
+   int  thread_id;
+   char *message;
+};
+
+void *PrintHello(void *threadarg) {
+   struct thread_data *my_data;
+   my_data = (struct thread_data *) threadarg;
+
+   cout << "Thread ID : " << my_data->thread_id ;
+   cout << " Message : " << my_data->message << endl;
+
+   pthread_exit(NULL);
+}
+
+int main () {
+   pthread_t threads[NUM_THREADS];
+   struct thread_data td[NUM_THREADS];
+   int rc;
+   int i;
+
+   for( i = 0; i < NUM_THREADS; i++ ) {
+      cout <<"main() : creating thread, " << i << endl;
+      td[i].thread_id = i;
+      td[i].message = "This is message";
+      rc = pthread_create(&threads[i], NULL, PrintHello, (void *)&td[i]);
+      
+      if (rc) {
+         cout << "Error:unable to create thread," << rc << endl;
+         exit(-1);
+      }
+   }
+   pthread_exit(NULL);
 }
