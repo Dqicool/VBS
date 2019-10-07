@@ -2,7 +2,7 @@
 #include <ROOT/RDataFrame.hxx>
 #include <TLorentzVector.h>
 
-void analysis(char* in_file, char* out_histo, char* out_tree)
+void analysis(char* in_file, char* out_tree)
 {
     ROOT::EnableImplicitMT();
     ROOT::RDataFrame frame("SM4L_Nominal",in_file);
@@ -185,13 +185,12 @@ void analysis(char* in_file, char* out_histo, char* out_tree)
                                 Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"});
     //save tree
         ana.Snapshot("out_tree", out_tree, {"jj_m","j1_pt","j2_pt","j3_pt","j1_y","j2_y","jj_delta_y","jj_product_y","z1_m","z2_m","z1_pt","z2_pt","z1_y","z2_y","llll_m","llll_pt","zzjj_rel_pt"});
-
 }
 
 int main(int argc, char** argv)
 {
     char* in_file = argv[1];
-    char* out_histo = argv[2];
-    char* out_tree = argv[3];
-    analysis(in_file, out_histo, out_tree);
+    char* out_tree = argv[2];
+    analysis(in_file, out_tree);
+    
 }
