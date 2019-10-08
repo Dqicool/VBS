@@ -146,7 +146,7 @@ void analysis(char* in_file, char* out_tree)
                 return  zzjj_sys_pt / zzjj_scaler_sum_pt;
             };
     //cut
-        auto cutted_frame = frame.Filter("lepton_pt.size() >=4 && jet_pt.size() >= 2");
+        auto cutted_frame = frame.Filter("lepton_pt.size() >=6 && jet_pt.size() >= 2");
     //analyse
         auto ana = cutted_frame.Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
                                 Define("jet_px_py_pz",jet_px_py_pz, {"jet_eta","jet_pt","jet_phi"}).

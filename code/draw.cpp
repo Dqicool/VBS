@@ -128,7 +128,7 @@ void draw()
         TCanvas *c4 = new TCanvas("c4","",600,400);
         #ifdef DRAW_1
             h_f1_llll_m->SetLineColor(kBlue);
-            h_f1_llll_m->GetXaxis()->SetTitle("z2_m");
+            h_f1_llll_m->GetXaxis()->SetTitle("llll_m");
             h_f1_llll_m->Draw();
         #endif
         #ifdef DRAW_2
@@ -140,6 +140,70 @@ void draw()
             h_f3_llll_m->Draw("same");
         #endif
 		c4->SaveAs("/mnt/MainShare/Projects/Qichen/VBS/plots/llll_m.pdf");
+
+        TCanvas *c5 = new TCanvas("c5","",600,400);
+        #ifdef DRAW_1
+            h_f1_j3_pt->SetLineColor(kBlue);
+            h_f1_j3_pt->GetXaxis()->SetTitle("j3_pt_m");
+            h_f1_j3_pt->Draw();
+        #endif
+        #ifdef DRAW_2
+            h_f2_j3_pt->SetLineColor(kRed);
+            h_f2_j3_pt->Draw("same");
+        #endif
+        #ifdef DRAW_3
+            h_f3_j3_pt->SetLineColor(kGreen);
+            h_f3_j3_pt->Draw("same");
+        #endif
+		c5->SaveAs("/mnt/MainShare/Projects/Qichen/VBS/plots/j3_pt.pdf");
+
+        TCanvas *c6 = new TCanvas("c6","",600,400);
+        #ifdef DRAW_1
+            h_f1_j2_pt->SetLineColor(kBlue);
+            h_f1_j2_pt->GetXaxis()->SetTitle("j2_pt");
+            h_f1_j2_pt->Draw();
+        #endif
+        #ifdef DRAW_2
+            h_f2_j2_pt->SetLineColor(kRed);
+            h_f2_j2_pt->Draw("same");
+        #endif
+        #ifdef DRAW_3
+            h_f3_j2_pt->SetLineColor(kGreen);
+            h_f3_j2_pt->Draw("same");
+        #endif
+		c6->SaveAs("/mnt/MainShare/Projects/Qichen/VBS/plots/j2_pt.pdf");
+
+        TCanvas *c7 = new TCanvas("c7","",600,400);
+        #ifdef DRAW_1
+            h_f1_j1_y->SetLineColor(kBlue);
+            h_f1_j1_y->GetXaxis()->SetTitle("j1_y");
+            h_f1_j1_y->Draw();
+        #endif
+        #ifdef DRAW_2
+            h_f2_j1_y->SetLineColor(kRed);
+            h_f2_j1_y->Draw("same");
+        #endif
+        #ifdef DRAW_3
+            h_f3_j1_y->SetLineColor(kGreen);
+            h_f3_j1_y->Draw("same");
+        #endif
+		c7->SaveAs("/mnt/MainShare/Projects/Qichen/VBS/plots/j1_y.pdf");
+
+        TCanvas *c8 = new TCanvas("c8","",600,400);
+        #ifdef DRAW_1
+            h_f1_j2_y->SetLineColor(kBlue);
+            h_f1_j2_y->GetXaxis()->SetTitle("j2_y");
+            h_f1_j2_y->Draw();
+        #endif
+        #ifdef DRAW_2
+            h_f2_j2_y->SetLineColor(kRed);
+            h_f2_j2_y->Draw("same");
+        #endif
+        #ifdef DRAW_3
+            h_f3_j2_y->SetLineColor(kGreen);
+            h_f3_j2_y->Draw("same");
+        #endif
+		c8->SaveAs("/mnt/MainShare/Projects/Qichen/VBS/plots/j2_y.pdf");
 }
 #ifndef __CINT__
 int main(){draw();}
