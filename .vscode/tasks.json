@@ -8,7 +8,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}",
+                "${fileDirname}/../targets/${fileBasenameNoExtension}.o",
                 "-pthread",
                 "-std=c++11",
                 "-m64",

@@ -1,6 +1,4 @@
 #include "genAna.h"
-#include <ROOT/RDataFrame.hxx>
-#include <TLorentzVector.h>
 
 void analysis(char* in_file, char* out_tree)
 {
@@ -191,6 +189,5 @@ int main(int argc, char** argv)
 {
     char* in_file = argv[1];
     char* out_tree = argv[2];
-    analysis(in_file, out_tree);
-    
+    analysis(in_file, out_tree);    
 }

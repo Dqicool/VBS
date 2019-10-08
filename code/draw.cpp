@@ -1,13 +1,6 @@
-#include <TH1.h>
-#include <TFile.h>
-#include <TTree.h>
+
 #include <TCanvas.h>
-#include "vector"
-#include <TMath.h>
-#include <iostream>
-#include <string.h>
 #include <ROOT/RDataFrame.hxx>
-#include <TLorentzVector.h>
 #define DRAW_1
 #define DRAW_2
 #define DRAW_3

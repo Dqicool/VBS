@@ -8,11 +8,13 @@
 #include <TMath.h>
 #include <iostream>
 #include <string.h>
+#include <ROOT/RDataFrame.hxx>
+#include <TLorentzVector.h>
 #define Z_MASS 91.1876
 using namespace std;
 
 float getTheta(float particle_eta){
-        return (2 * TMath::TanH(TMath::Exp(particle_eta)));
+        return (2 * TMath::ATan(TMath::Exp(-particle_eta)));
 }
 
 float getTotalP(float particle_pt,
