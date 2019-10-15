@@ -182,7 +182,7 @@ void analysis(char* in_file, char* out_anaed_tree)
                                 Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
                                 Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"});
     //save tree
-        ana.Snapshot("out_tree", out_anaed_tree, {"jj_m","j1_pt","j2_pt","j3_pt","j1_y","j2_y","jj_delta_y","jj_product_y","z1_m","z2_m","z1_pt","z2_pt","z1_y","z2_y","llll_m","llll_pt","zzjj_rel_pt"});
+        ana.Snapshot("out_anaed_tree", out_anaed_tree, {"jj_m","j1_pt","j2_pt","j3_pt","j1_y","j2_y","jj_delta_y","jj_product_y","z1_m","z2_m","z1_pt","z2_pt","z1_y","z2_y","llll_m","llll_pt","zzjj_rel_pt"});
 }
 
 int main(int argc, char** argv)
@@ -190,5 +190,5 @@ int main(int argc, char** argv)
     char* in_file = argv[1];
     char* out_anaed_tree = argv[2];
     char* out_unfold_tree = argv[3];
-    analysis(in_file, out_anaed_tree);    
+    analysis(in_file, out_anaed_tree);
 }
