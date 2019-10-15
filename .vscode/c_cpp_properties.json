@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "/usr/share/root/include",
                 "/usr/include/c++/7",
-                "/usr/include/x86_64-linux-gnu/c++/7"
+                "/usr/include/x86_64-linux-gnu/c++/7",
+                "/usr/share/root/RooUnfold/src"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
