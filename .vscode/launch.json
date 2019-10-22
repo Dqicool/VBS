@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
@@ -29,6 +30,20 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/../targets/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "c++ build active file",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Compile dummy",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/targets/clear",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

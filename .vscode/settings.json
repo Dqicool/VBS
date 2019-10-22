@@ -62,7 +62,8 @@
         "typeinfo": "cpp",
         "my_analysis.C": "cpp",
         "hs_analysis.C": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "*.icc": "cpp"
     },
     "files.exclude": {
         "**/.gitignore": true

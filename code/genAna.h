@@ -10,6 +10,7 @@
 #include <string.h>
 #include <ROOT/RDataFrame.hxx>
 #include <TLorentzVector.h>
+#include <TChain.h>
 #define Z_MASS 91.1876
 using namespace std;
 
@@ -26,7 +27,7 @@ vector<float> getPxPyPz(float particle_pt,
                              float particle_eta,
                              float particle_phi){
     std::vector<float> particle_px_py_pz;
-    float particle_total_p = getTotalP(particle_pt,particle_eta);
+    //float particle_total_p = getTotalP(particle_pt,particle_eta);
     particle_px_py_pz.push_back(particle_pt * TMath::Sin(particle_phi));
     particle_px_py_pz.push_back(particle_pt * TMath::Cos(particle_phi));
     particle_px_py_pz.push_back(particle_pt * TMath::SinH(particle_eta));
@@ -45,7 +46,7 @@ float getMass(vector<float> particle_energy,
     float px = 0;
     float py = 0;
     float pz = 0;
-    for (int i = 0; i<particle_energy.size(); i++){
+    for (uint i = 0; i<particle_energy.size(); i++){
         energy += particle_energy[i];
         px += particle_px_py_pz[i][0];
         py += particle_px_py_pz[i][1];
@@ -61,7 +62,7 @@ float getMassWithInd(vector<float> particle_energy,
     float px = 0;
     float py = 0;
     float pz = 0;
-    for (int i = 0; i<ind.size(); i++){
+    for (uint i = 0; i<ind.size(); i++){
         energy += particle_energy[ind[i]];
         px += particle_px_py_pz[ind[i]][0];
         py += particle_px_py_pz[ind[i]][1];
@@ -119,9 +120,9 @@ int findLowestNum(vector<float> vec){
 vector<int> getLeptonPeerInd(vector<int> lepton_particleID, 
                              vector<int> lepton_charge){
     vector<int> ret;
-    for (int i = 0; i<lepton_charge.size(); i++ )
+    for (uint i = 0; i<lepton_charge.size(); i++ )
     {
-        for (int j = i+1; j<lepton_charge.size(); j++)
+        for (uint j = i+1; j<lepton_charge.size(); j++)
         {
             if(lepton_particleID[i] == lepton_particleID[j] && lepton_charge[i] != lepton_charge[j])
             {
@@ -146,7 +147,7 @@ vector<int> getLeptonPeerInd(vector<int> lepton_particleID,
 vector<int> closestMassSelect(vector<vector<float>> particle_mass, float target_mass){
     int minind1 = 0;
     int minind2 = 0;
-    for (int i = 0; i < particle_mass.size(); i++){
+    for (uint i = 0; i < particle_mass.size(); i++){
         for (int j = 0; j < 2; j++){
             auto m11 = TMath::Power(particle_mass[minind1][minind2]-target_mass, 2);
             auto m21 = TMath::Power(particle_mass[i][j]-target_mass, 2);
@@ -154,7 +155,7 @@ vector<int> closestMassSelect(vector<vector<float>> particle_mass, float target_
                 minind1 = i;
                 minind2 = j;
             }
-            else if (m11 == m21 && i != minind1){
+            else if (m11 == m21 && (int)i != minind1){
                 auto m12 = TMath::Power(particle_mass[minind1][!(bool)minind2]-target_mass, 2);
                 auto m22 = TMath::Power(particle_mass[i][!(bool)j]-target_mass, 2);
                 if (m12 > m22){
@@ -187,7 +188,7 @@ vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz,
     float px = 0;
     float py = 0;
     float pz = 0;
-    for (int i = 0; i<ind.size(); i++){
+    for (uint i = 0; i<ind.size(); i++){
         px += px_py_pz[ind[i]][0];
         py += px_py_pz[ind[i]][1];
         pz += px_py_pz[ind[i]][2];
@@ -200,7 +201,7 @@ vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz,
 
 float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
     float ret = 0;
-    for (int i = 0; i<ind.size(); i++){
+    for (uint i = 0; i<ind.size(); i++){
         ret += energy[ind[i]];
     }
     return ret;

@@ -1,14 +1,18 @@
 #include "genAna.h"
 
-void analysis(char* in_file, char* out_anaed_tree)
+#define debug
+void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
 {
+
     ROOT::EnableImplicitMT();
-    ROOT::RDataFrame frame("SM4L_Nominal",in_file);
+    ROOT::RDataFrame dframe("SM4L_Nominal", {in_file1, in_file2, in_file3});
+    ROOT::RDataFrame mframe("MetaDataTree",  {in_file1, in_file2, in_file3});
+
     //lambdas
         //Jets
             auto jet_energy = [](std::vector<float> jet_m, std::vector<float> jet_eta, std::vector<float> jet_pt){
                 std::vector<float> ret; 
-                for(int j=0;j<jet_pt.size();j++)
+                for(uint j=0;j<jet_pt.size();j++)
                 {
                     ret.push_back(getEnergy((jet_m)[j], (jet_eta)[j], (jet_pt)[j]));
                 }
@@ -16,7 +20,7 @@ void analysis(char* in_file, char* out_anaed_tree)
             };
             auto jet_px_py_pz = [](std::vector<float> jet_eta, std::vector<float> jet_pt, std::vector<float> jet_phi){
                 std::vector<std::vector<float>>  jet_px_py_pz;
-                for(int j=0;j<jet_pt.size();j++)
+                for(uint j=0;j<jet_pt.size();j++)
                 {
                     jet_px_py_pz.push_back(getPxPyPz((jet_pt)[j], (jet_eta)[j], (jet_phi)[j]));
                 }
@@ -59,7 +63,7 @@ void analysis(char* in_file, char* out_anaed_tree)
         //z
             auto lepton_energy = [](std::vector<float> lepton_m, std::vector<float> lepton_eta, std::vector<float> lepton_pt){
                 std::vector<float> ret; 
-                for(int j=0;j<lepton_pt.size();j++)
+                for(uint j=0;j<lepton_pt.size();j++)
                 {
                     ret.push_back(getEnergy((lepton_m)[j], (lepton_eta)[j], (lepton_pt)[j]));
                 }
@@ -67,7 +71,7 @@ void analysis(char* in_file, char* out_anaed_tree)
             };
             auto lepton_px_py_pz = [](std::vector<float> lepton_eta, std::vector<float> lepton_pt, std::vector<float> lepton_phi){
                 std::vector<std::vector<float>>  lepton_px_py_pz;
-                for(int j=0;j<lepton_pt.size();j++)
+                for(uint j=0;j<lepton_pt.size();j++)
                 {
                     lepton_px_py_pz.push_back(getPxPyPz((lepton_pt)[j], (lepton_eta)[j], (lepton_phi)[j]));
                 }
@@ -78,7 +82,7 @@ void analysis(char* in_file, char* out_anaed_tree)
             };
             auto lepton_pair_m = [](std::vector<std::vector<std::vector<int>>> lepton_pair_index, std::vector<float> lepton_energy, std::vector<std::vector<float>> lepton_px_py_pz){
                 std::vector<std::vector<float>>  lepton_pair_m;
-                for (int k = 0; k < lepton_pair_index.size(); k++)
+                for (uint k = 0; k < lepton_pair_index.size(); k++)
                 {
                     std::vector<float> tmp;
                     tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][0]));
@@ -145,10 +149,42 @@ void analysis(char* in_file, char* out_anaed_tree)
                 float zzjj_sys_pt = TMath::Sqrt(TMath::Power(zzjj_sys_px_py_pz[0],2) + TMath::Power(zzjj_sys_px_py_pz[1],2));
                 return  zzjj_sys_pt / zzjj_scaler_sum_pt;
             };
-    //cut
-        auto cutted_frame = frame.Filter("lepton_pt.size() >=4 && jet_pt.size() >= 2");
+        //working point
+            auto baseline = [](std::vector<float> lepton_pt, std::vector<float> jet_pt, char passReco_SR){
+                auto ret = lepton_pt.size() >=4 && jet_pt.size() >= 2 && passReco_SR>0;
+                return ret;
+            };
+            auto signalReg = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
+                auto ret = j1_pt > 100e3 &&
+                            j2_pt > 60e3 &&
+                            llll_m > 150e3 &&
+                            jj_m > 200e3 &&
+                            jj_product_y < 0 &&
+                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
+                            zzjj_rel_pt < 0.2 &&
+                            (z1_m > 62e3 || z1_m < 122e3) &&
+                            (z2_m > 62e3 || z2_m < 122e3) &&
+                            jet_n == 2;
+                return ret;
+            };
+            auto controlReg = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
+                auto ret = j1_pt > 100e3 &&
+                            j2_pt > 60e3 &&
+                            llll_m > 150e3 &&
+                            jj_m > 200e3 &&
+                            jj_product_y < 0 &&
+                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
+                            zzjj_rel_pt < 0.2 &&
+                            (z1_m > 62e3 || z1_m < 122e3) &&
+                            (z2_m > 62e3 || z2_m < 122e3) &&
+                            jet_n > 2;
+                return ret;
+            };
+    //cut to baseline
+        //auto base_dframe = dframe.Filter(baseline, {"lepton_pt","jet_pt", "passReco_SR"});
     //analyse
-        auto ana = cutted_frame.Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
+        auto ana = dframe.Filter(baseline, {"lepton_pt","jet_pt", "passReco_SR"}).
+                                Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
                                 Define("jet_px_py_pz",jet_px_py_pz, {"jet_eta","jet_pt","jet_phi"}).
                                 Define("j1_j2_index", j1_j2_index, {"jet_pt"}).
                                 Define("j1_y", j1_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
@@ -180,15 +216,30 @@ void analysis(char* in_file, char* out_anaed_tree)
                                 Define("llll_px_py_pz",llll_px_py_pz, {"lepton_px_py_pz","llll_index"}).
                                 Define("llll_m", llll_m, {"lepton_energy", "lepton_px_py_pz", "llll_index"}).
                                 Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
-                                Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"});
+                                Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"}).
+                                Define("SR_flag", signalReg,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
+                                Define("CR_flag", controlReg,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"});
+        //auto inc_lumi = mframe.Sum("prwLuminosity").GetValue();
     //save tree
-        ana.Snapshot("out_anaed_tree", out_anaed_tree, {"jj_m","j1_pt","j2_pt","j3_pt","j1_y","j2_y","jj_delta_y","jj_product_y","z1_m","z2_m","z1_pt","z2_pt","z1_y","z2_y","llll_m","llll_pt","zzjj_rel_pt"});
+        ana.Snapshot("SM4L_Nominal", out_anaed_tree);
 }
-
+#ifndef debug
 int main(int argc, char** argv)
 {
-    char* in_file = argv[1];
-    char* out_anaed_tree = argv[2];
-    char* out_unfold_tree = argv[3];
-    analysis(in_file, out_anaed_tree);
+    char* in_file1 = argv[1];
+    char* in_file2 = argv[2];
+    char* in_file3 = argv[3];
+    char* out_tree = argv[4];
+
+    analysis(in_file1, in_file2, in_file3, out_tree);
 }
+#else
+int main()
+{
+    char* in_file1 = "data/Sherpa_222_NNPDF30NNLO/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r9364_p3654.root";
+    char* in_file2 = "data/Sherpa_222_NNPDF30NNLO/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r10724_p3654.root";
+    char* in_file3 = "data/Sherpa_222_NNPDF30NNLO/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r10201_p3654.root";
+    char* out_tree  = "output/debug.root";
+    analysis(in_file1, in_file2, in_file3, out_tree);
+}
+#endif
