@@ -1,12 +1,13 @@
 #include "genAna.h"
 
-#define debug
+//#define debug
+#define MT
 void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
 {
-
+    #ifdef MT
     ROOT::EnableImplicitMT();
+    #endif
     ROOT::RDataFrame dframe("SM4L_Nominal", {in_file1, in_file2, in_file3});
-    ROOT::RDataFrame mframe("MetaDataTree",  {in_file1, in_file2, in_file3});
 
     //lambdas
         //Jets
@@ -149,12 +150,26 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                 float zzjj_sys_pt = TMath::Sqrt(TMath::Power(zzjj_sys_px_py_pz[0],2) + TMath::Power(zzjj_sys_px_py_pz[1],2));
                 return  zzjj_sys_pt / zzjj_scaler_sum_pt;
             };
+            auto centrarity = [](vector<vector<float>> jet_px_py_pz, vector<float> jet_energy, vector<int> j1_j2_index,
+                                  vector<float> z1_px_py_pz, vector<float> z2_px_py_pz, float z1_energy, float z2_energy,
+                                  float jj_delta_y){
+                auto jj_energy = jet_energy[j1_j2_index[0]]+jet_energy[j1_j2_index[1]];
+                std::vector<float> jj_px_py_pz;
+                for (int i=0;i<3;i++){
+                    jj_px_py_pz.push_back(jet_px_py_pz[j1_j2_index[0]][i]+jet_px_py_pz[j1_j2_index[1]][i]);
+                }
+                auto zz_energy = z1_energy+z2_energy;
+                std::vector<float> zz_px_py_pz = {z1_px_py_pz[0]+z2_px_py_pz[0], z1_px_py_pz[1]+z2_px_py_pz[1], z1_px_py_pz[2]+z2_px_py_pz[2]};
+                auto jj_y = getY(jj_px_py_pz, jj_energy);
+                auto zz_y = getY(zz_px_py_pz, zz_energy);
+                return TMath::Abs((jj_y - zz_y) / jj_delta_y);
+            };
         //working point
             auto baseline = [](std::vector<float> lepton_pt, std::vector<float> jet_pt, char passReco_SR){
                 auto ret = lepton_pt.size() >=4 && jet_pt.size() >= 2 && passReco_SR>0;
                 return ret;
             };
-            auto signalReg = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
+            auto signalRegJN = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
                 auto ret = j1_pt > 100e3 &&
                             j2_pt > 60e3 &&
                             llll_m > 150e3 &&
@@ -167,7 +182,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                             jet_n == 2;
                 return ret;
             };
-            auto controlReg = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
+            auto controlRegJN = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
                 auto ret = j1_pt > 100e3 &&
                             j2_pt > 60e3 &&
                             llll_m > 150e3 &&
@@ -180,8 +195,33 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                             jet_n > 2;
                 return ret;
             };
-    //cut to baseline
-        //auto base_dframe = dframe.Filter(baseline, {"lepton_pt","jet_pt", "passReco_SR"});
+            auto signalRegCT = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, float centrarity){
+                auto ret = j1_pt > 100e3 &&
+                            j2_pt > 60e3 &&
+                            llll_m > 150e3 &&
+                            jj_m > 200e3 &&
+                            jj_product_y < 0 &&
+                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
+                            zzjj_rel_pt < 0.2 &&
+                            (z1_m > 62e3 || z1_m < 122e3) &&
+                            (z2_m > 62e3 || z2_m < 122e3) &&
+                            centrarity<0.4;
+                return ret;
+            };
+            auto controlRegCT = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, float centrarity){
+                auto ret = j1_pt > 100e3 &&
+                            j2_pt > 60e3 &&
+                            llll_m > 150e3 &&
+                            jj_m > 200e3 &&
+                            jj_product_y < 0 &&
+                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
+                            zzjj_rel_pt < 0.2 &&
+                            (z1_m > 62e3 || z1_m < 122e3) &&
+                            (z2_m > 62e3 || z2_m < 122e3) &&
+                            centrarity>0.4;
+                return ret;
+            };
+
     //analyse
         auto ana = dframe.Filter(baseline, {"lepton_pt","jet_pt", "passReco_SR"}).
                                 Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
@@ -217,11 +257,63 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                                 Define("llll_m", llll_m, {"lepton_energy", "lepton_px_py_pz", "llll_index"}).
                                 Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
                                 Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"}).
-                                Define("SR_flag", signalReg,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
-                                Define("CR_flag", controlReg,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"});
-        //auto inc_lumi = mframe.Sum("prwLuminosity").GetValue();
+                                Define("centrarity", centrarity, {"jet_px_py_pz", "jet_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
+                                Define("SRJN_flag", signalRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
+                                Define("CRJN_flag", controlRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
+                                Define("SRCT_flag", signalRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"}).
+                                Define("CRCT_flag", controlRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"});
+
     //save tree
-        ana.Snapshot("SM4L_Nominal", out_anaed_tree);
+        auto hehe = ana.GetColumnNames();
+        hehe.erase(hehe.begin(),hehe.begin()+38);
+        hehe.push_back("jet_energy");
+        hehe.push_back("j1_y");
+        hehe.push_back("j2_y");
+        hehe.push_back("jj_m");
+        hehe.push_back("j3_pt");
+        hehe.push_back("jj_delta_y");
+        hehe.push_back("jj_product_y");
+        hehe.push_back("j1_pt");
+        hehe.push_back("j2_pt");
+        hehe.push_back("lepton_energy");
+        hehe.push_back("z1_energy");
+        hehe.push_back("z2_energy");
+        hehe.push_back("z1_pt");
+        hehe.push_back("z2_pt");
+        hehe.push_back("z1_m");
+        hehe.push_back("z2_m");
+        hehe.push_back("z1_y");
+        hehe.push_back("z2_y");
+        hehe.push_back("llll_m");
+        hehe.push_back("zzjj_rel_pt");
+        hehe.push_back("centrarity");
+        hehe.push_back("SRJN_flag");
+        hehe.push_back("CRJN_flag");
+        hehe.push_back("SRCT_flag");
+        hehe.push_back("CRCT_flag");
+        ana.Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
+}
+void meta(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
+{
+    TChain chain("MetaDataTree");
+    chain.Add(in_file1);
+    chain.Add(in_file2);
+    chain.Add(in_file3);
+    double lumi = 0;
+    double totlumi = 0;
+    chain.SetBranchAddress("prwLuminosity", &lumi);
+    auto nent = chain.GetEntries();
+    for (Long64_t i = 0; i < nent; i++)
+    {
+        chain.GetEntry(i);
+        totlumi += lumi;
+    }
+    TTree outtree("totallumi", "");
+    outtree.Branch("sumlumi", &totlumi);
+    outtree.Fill();
+    TFile* out = TFile::Open(out_anaed_tree,"update");
+    outtree.Write();
+    out->Close();
 }
 #ifndef debug
 int main(int argc, char** argv)
@@ -232,14 +324,26 @@ int main(int argc, char** argv)
     char* out_tree = argv[4];
 
     analysis(in_file1, in_file2, in_file3, out_tree);
+    meta(in_file1, in_file2, in_file3, out_tree);
+    cout<<out_tree<<"\t ......done"<<endl;
 }
 #else
 int main()
 {
-    char* in_file1 = "data/Sherpa_222_NNPDF30NNLO/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r9364_p3654.root";
-    char* in_file2 = "data/Sherpa_222_NNPDF30NNLO/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r10724_p3654.root";
-    char* in_file3 = "data/Sherpa_222_NNPDF30NNLO/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r10201_p3654.root";
-    char* out_tree  = "output/debug.root";
-    analysis(in_file1, in_file2, in_file3, out_tree);
+    char* in_file1 = "data/sig/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10201_r10210_p3654.root";
+    char* in_file2 = "data/sig/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r9364_r9315_p3654.root";
+    char* in_file3 = "data/sig/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10724_r10726_p3654.root";
+    char* out_tree1  = "output/debug/364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.root";
+    analysis(in_file1, in_file2, in_file3, out_tree1);
+    meta(in_file1, in_file2, in_file3, out_tree1);
+    cout<<out_tree1<<"\t\t\t done"<<endl;
+
+    char* in_file4 = "data/bkg/QCDggZZ/mc16_13TeV.345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.deriv.DAOD_HIGG2D1.e6213_s3126_r9364_p3654.root";
+    char* in_file5 = "data/bkg/QCDggZZ/mc16_13TeV.345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.deriv.DAOD_HIGG2D1.e6213_s3126_r10201_p3654.root";
+    char* in_file6 = "data/bkg/QCDggZZ/mc16_13TeV.345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.deriv.DAOD_HIGG2D1.e6213_s3126_r10724_p3654.root";
+    char* out_tree2  = "output/debug/345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.root";    
+    analysis(in_file4, in_file5, in_file6, out_tree2);
+    meta(in_file4, in_file5, in_file6, out_tree2);
+    cout<<out_tree2<<"\t\t\t done"<<endl;
 }
 #endif
