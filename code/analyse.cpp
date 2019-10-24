@@ -165,10 +165,6 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                 return TMath::Abs((jj_y - zz_y) / jj_delta_y);
             };
         //working point
-            auto baseline = [](std::vector<float> lepton_pt, std::vector<float> jet_pt, char passReco_SR){
-                auto ret = lepton_pt.size() >=4 && jet_pt.size() >= 2 && passReco_SR>0;
-                return ret;
-            };
             auto signalRegJN = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
                 auto ret = j1_pt > 100e3 &&
                             j2_pt > 60e3 &&
@@ -218,50 +214,49 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                             zzjj_rel_pt < 0.2 &&
                             (z1_m > 62e3 || z1_m < 122e3) &&
                             (z2_m > 62e3 || z2_m < 122e3) &&
-                            centrarity>0.4;
+                            centrarity>=0.4;
                 return ret;
             };
 
     //analyse
-        auto ana = dframe.Filter(baseline, {"lepton_pt","jet_pt", "passReco_SR"}).
-                                Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
-                                Define("jet_px_py_pz",jet_px_py_pz, {"jet_eta","jet_pt","jet_phi"}).
-                                Define("j1_j2_index", j1_j2_index, {"jet_pt"}).
-                                Define("j1_y", j1_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
-                                Define("j2_y", j2_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
-                                Define("jj_m", jj_m, {"jet_energy", "jet_px_py_pz", "j1_j2_index"}).
-                                Define("j3_pt", j3_pt, {"jet_energy","jet_pt"}).
-                                Define("jj_delta_y",jj_delta_y, {"j1_y","j2_y"}).
-                                Define("jj_product_y",jj_product_y,{"j1_y","j2_y"}).
-                                Define("j1_pt", j1_pt, {"jet_pt","j1_j2_index"}).
-                                Define("j2_pt", j2_pt, {"jet_pt","j1_j2_index"}).
-                                Define("lepton_energy",lepton_energy,{"lepton_m","lepton_eta","lepton_pt"}).
-                                Define("lepton_px_py_pz",lepton_px_py_pz, {"lepton_eta","lepton_pt","lepton_phi"}).
-                                Define("lepton_pair_index",lepton_pair_index, {"lepton_particleID","lepton_charge"}).
-                                Define("lepton_pair_m",lepton_pair_m,{"lepton_pair_index", "lepton_energy", "lepton_px_py_pz"}).
-                                Define("m_z1_ind",m_z1_ind, {"lepton_pair_m"}).
-                                Define("z1_index",z1_index, {"lepton_pair_index","m_z1_ind"}).
-                                Define("z2_index",z2_index,  {"lepton_pair_index","m_z1_ind"}).
-                                Define("z1_px_py_pz",z_px_py_pz,{"lepton_px_py_pz", "z1_index"}).
-                                Define("z2_px_py_pz",z_px_py_pz,{"lepton_px_py_pz", "z2_index"}).
-                                Define("z1_energy", z_energy, {"lepton_energy", "z1_index"}).
-                                Define("z2_energy", z_energy, {"lepton_energy", "z2_index"}).
-                                Define("z1_pt",z_pt,{"lepton_px_py_pz", "z1_index"}).
-                                Define("z2_pt",z_pt,{"lepton_px_py_pz", "z2_index"}).
-                                Define("z1_m", z1_m, {"lepton_pair_m", "m_z1_ind"}).
-                                Define("z2_m", z2_m, {"lepton_pair_m", "m_z1_ind"}).
-                                Define("z1_y", z_y, {"z1_px_py_pz", "z1_energy"}).
-                                Define("z2_y", z_y, {"z2_px_py_pz", "z2_energy"}).
-                                Define("llll_index",llll_index,{"z1_index","z2_index"}).
-                                Define("llll_px_py_pz",llll_px_py_pz, {"lepton_px_py_pz","llll_index"}).
-                                Define("llll_m", llll_m, {"lepton_energy", "lepton_px_py_pz", "llll_index"}).
-                                Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
-                                Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"}).
-                                Define("centrarity", centrarity, {"jet_px_py_pz", "jet_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
-                                Define("SRJN_flag", signalRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
-                                Define("CRJN_flag", controlRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
-                                Define("SRCT_flag", signalRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"}).
-                                Define("CRCT_flag", controlRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"});
+        auto ana = dframe.Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
+                        Define("jet_px_py_pz",jet_px_py_pz, {"jet_eta","jet_pt","jet_phi"}).
+                        Define("j1_j2_index", j1_j2_index, {"jet_pt"}).
+                        Define("j1_y", j1_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
+                        Define("j2_y", j2_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
+                        Define("jj_m", jj_m, {"jet_energy", "jet_px_py_pz", "j1_j2_index"}).
+                        Define("j3_pt", j3_pt, {"jet_energy","jet_pt"}).
+                        Define("jj_delta_y",jj_delta_y, {"j1_y","j2_y"}).
+                        Define("jj_product_y",jj_product_y,{"j1_y","j2_y"}).
+                        Define("j1_pt", j1_pt, {"jet_pt","j1_j2_index"}).
+                        Define("j2_pt", j2_pt, {"jet_pt","j1_j2_index"}).
+                        Define("lepton_energy",lepton_energy,{"lepton_m","lepton_eta","lepton_pt"}).
+                        Define("lepton_px_py_pz",lepton_px_py_pz, {"lepton_eta","lepton_pt","lepton_phi"}).
+                        Define("lepton_pair_index",lepton_pair_index, {"lepton_particleID","lepton_charge"}).
+                        Define("lepton_pair_m",lepton_pair_m,{"lepton_pair_index", "lepton_energy", "lepton_px_py_pz"}).
+                        Define("m_z1_ind",m_z1_ind, {"lepton_pair_m"}).
+                        Define("z1_index",z1_index, {"lepton_pair_index","m_z1_ind"}).
+                        Define("z2_index",z2_index,  {"lepton_pair_index","m_z1_ind"}).
+                        Define("z1_px_py_pz",z_px_py_pz,{"lepton_px_py_pz", "z1_index"}).
+                        Define("z2_px_py_pz",z_px_py_pz,{"lepton_px_py_pz", "z2_index"}).
+                        Define("z1_energy", z_energy, {"lepton_energy", "z1_index"}).
+                        Define("z2_energy", z_energy, {"lepton_energy", "z2_index"}).
+                        Define("z1_pt",z_pt,{"lepton_px_py_pz", "z1_index"}).
+                        Define("z2_pt",z_pt,{"lepton_px_py_pz", "z2_index"}).
+                        Define("z1_m", z1_m, {"lepton_pair_m", "m_z1_ind"}).
+                        Define("z2_m", z2_m, {"lepton_pair_m", "m_z1_ind"}).
+                        Define("z1_y", z_y, {"z1_px_py_pz", "z1_energy"}).
+                        Define("z2_y", z_y, {"z2_px_py_pz", "z2_energy"}).
+                        Define("llll_index",llll_index,{"z1_index","z2_index"}).
+                        Define("llll_px_py_pz",llll_px_py_pz, {"lepton_px_py_pz","llll_index"}).
+                        Define("llll_m", llll_m, {"lepton_energy", "lepton_px_py_pz", "llll_index"}).
+                        Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
+                        Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"}).
+                        Define("centrarity", centrarity, {"jet_px_py_pz", "jet_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
+                        Define("SRJN_flag", signalRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
+                        Define("CRJN_flag", controlRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
+                        Define("SRCT_flag", signalRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"}).
+                        Define("CRCT_flag", controlRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"});
 
     //save tree
         auto hehe = ana.GetColumnNames();
@@ -293,28 +288,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
         hehe.push_back("CRCT_flag");
         ana.Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
 }
-void meta(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
-{
-    TChain chain("MetaDataTree");
-    chain.Add(in_file1);
-    chain.Add(in_file2);
-    chain.Add(in_file3);
-    double lumi = 0;
-    double totlumi = 0;
-    chain.SetBranchAddress("prwLuminosity", &lumi);
-    auto nent = chain.GetEntries();
-    for (Long64_t i = 0; i < nent; i++)
-    {
-        chain.GetEntry(i);
-        totlumi += lumi;
-    }
-    TTree outtree("totallumi", "");
-    outtree.Branch("sumlumi", &totlumi);
-    outtree.Fill();
-    TFile* out = TFile::Open(out_anaed_tree,"update");
-    outtree.Write();
-    out->Close();
-}
+
 #ifndef debug
 int main(int argc, char** argv)
 {
@@ -324,7 +298,6 @@ int main(int argc, char** argv)
     char* out_tree = argv[4];
 
     analysis(in_file1, in_file2, in_file3, out_tree);
-    meta(in_file1, in_file2, in_file3, out_tree);
     cout<<out_tree<<"\t ......done"<<endl;
 }
 #else

@@ -241,4 +241,25 @@ char * intToChar(int a){
         return ret;
 }
 
+Color_t str2Color(std::string s){
+    Color_t ret=0;
+    if (s == "kWhite") {ret=kWhite;}
+    else if (s == "kBlack") {ret=kBlack;}
+    else if (s == "kGray") {ret=kGray;}
+    else if (s == "kRed") {ret=kRed;}
+    else if (s == "kGreen") {ret=kGreen;}
+    else if (s == "kBlue") {ret=kBlue;}
+    else if (s == "kYellow") {ret=kYellow;}
+    else if (s == "kMagenta") {ret=kMagenta;}
+    else if (s == "kCyan") {ret=kCyan;}
+    else if (s == "kOrange") {ret=kOrange;}
+    else if (s == "kSpring") {ret=kSpring;}
+    else if (s == "kTeal") {ret=kTeal;}
+    else if (s == "kAzure") {ret=kAzure;}
+    else if (s == "kViolet") {ret=kViolet;}
+    else if (s == "kPink") {ret=kPink;}
+    else {return -1;}
+    return ret;
+}
+
 #endif

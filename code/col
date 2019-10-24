@@ -1,0 +1,15 @@
+bkg EWTriBoson with color kRed
+
+bkg QCDggZZ with color kGreen
+
+bkg QCDZZjj with color kBlue
+
+bkg sinBoson with color kYellow
+
+bkg ttbar with color kMagenta
+
+bkg WZlllv with color kCyan
+
+sig with color kOrange
+
+sig with color kOrange
