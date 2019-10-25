@@ -1,3 +1,5 @@
+//saving histogram as 
+
 //#define debug
 #include <TCanvas.h>
 #include <ROOT/RDataFrame.hxx>
@@ -18,7 +20,10 @@ void draw(const char* in_file, const char* out_histo)
         auto h_mjj_crjn = crjnf.Histo1D({"h_mjj_crjn","",20,2e5,2e6},"jj_m","NormWeight");
         auto h_mjj_srct = srctf.Histo1D({"h_mjj_srct","",20,2e5,2e6},"jj_m","NormWeight");
         auto h_mjj_crct = crctf.Histo1D({"h_mjj_crct","",20,2e5,2e6},"jj_m","NormWeight");
-
+        h_mjj_srjn->Scale(1/3);
+        h_mjj_crjn->Scale(1/3);
+        h_mjj_srct->Scale(1/3);
+        h_mjj_crct->Scale(1/3);
     //save
         TFile* out = TFile::Open(out_histo,"recreate");
         h_mjj_srjn->Write();

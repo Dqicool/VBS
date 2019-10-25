@@ -28,10 +28,16 @@ void stackFirst(const char* in_file, const char* out_file,Color_t col)
     h_mjj_srct->SetMarkerColor(col);
     h_mjj_srjn->SetMarkerColor(col);
 
+    h_mjj_crct->SetFillColor(col);
+    h_mjj_crjn->SetFillColor(col);
+    h_mjj_srct->SetFillColor(col);
+    h_mjj_crjn->SetFillColor(col);
+
     mjj_crct_stack->Add(h_mjj_crct);
     mjj_crjn_stack->Add(h_mjj_crjn);
     mjj_srct_stack->Add(h_mjj_srct);
     mjj_srjn_stack->Add(h_mjj_srjn);
+
     TFile * out = TFile::Open(out_file, "recreate");
     mjj_crct_stack->Write();
     mjj_crjn_stack->Write();

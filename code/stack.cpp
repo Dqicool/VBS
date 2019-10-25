@@ -25,6 +25,11 @@ void stack(const char* in_file, const char* out_file, Color_t col)
     h_mjj_crjn->SetMarkerColor(col);
     h_mjj_srct->SetMarkerColor(col);
     h_mjj_srjn->SetMarkerColor(col);
+
+    h_mjj_crct->SetFillColor(col);
+    h_mjj_crjn->SetFillColor(col);
+    h_mjj_srct->SetFillColor(col);
+    h_mjj_crjn->SetFillColor(col);
     
     mjj_crct_stack->Add(h_mjj_crct);
     mjj_crjn_stack->Add(h_mjj_crjn);
