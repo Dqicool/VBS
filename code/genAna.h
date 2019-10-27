@@ -229,6 +229,7 @@ vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID,
             }
         }
     }
+    cout<<ret.size();
     return ret;
 }
 
@@ -260,6 +261,31 @@ Color_t str2Color(std::string s){
     else if (s == "kPink") {ret=kPink;}
     else {return -1;}
     return ret;
+}
+
+int nJetInBetween(vector<vector<float>> jet_px_py_pz, vector<float> jet_energy, vector<int> j1_j2_index)
+{
+    int njb = 0;
+    if (jet_energy.size() <= 2){}
+    else
+    {
+        
+        auto njet = jet_energy.size();
+        auto j1_y =  getY(jet_px_py_pz[j1_j2_index[0]], jet_energy[j1_j2_index[0]]);
+        auto j2_y =  getY(jet_px_py_pz[j1_j2_index[1]], jet_energy[j1_j2_index[1]]);
+        for(uint i=0;i<njet;i++)
+        {
+            if ((int)i != j1_j2_index[0] && (int)i != j1_j2_index[1])
+            {
+                auto jcandi_y = getY(jet_px_py_pz[i], jet_energy[i]);
+                if ((jcandi_y < j1_y && jcandi_y > j2_y) || (jcandi_y > j1_y && jcandi_y < j2_y))
+                {
+                    njb++;
+                }
+            }
+        }
+    }
+    return njb;
 }
 
 #endif

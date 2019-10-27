@@ -41,16 +41,6 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
             auto jj_m = [](std::vector<float> jet_energy, std::vector<std::vector<float>> jet_px_py_pz, std::vector<int> j1_j2_index){
                         return getMassWithInd(jet_energy, jet_px_py_pz, j1_j2_index);
             };
-            auto j3_pt = [](std::vector<float> jet_energy, std::vector<float> jet_pt){
-                float j3_pt;
-                if (jet_energy.size() > 2)
-                {
-                    int j3_index = findLowestNum(jet_energy);
-                    j3_pt = jet_pt[j3_index];
-                }
-                else j3_pt = -1000;
-                return j3_pt;
-            };
             auto jj_delta_y = [](float j1_y, float j2_y){
                 return j1_y-j2_y;
             };
@@ -167,57 +157,29 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                 return TMath::Abs((jj_y - zz_y) / jj_delta_y);
             };
         //working point
-            auto signalRegJN = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
-                auto ret = j1_pt > 100e3 &&
-                            j2_pt > 60e3 &&
+            auto pass_cut = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m){
+                auto ret =  j1_pt > 60e3 &&
+                            j2_pt > 40e3 &&
                             llll_m > 150e3 &&
                             jj_m > 200e3 &&
                             jj_product_y < 0 &&
-                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
+                            (jj_delta_y > 1.5 || jj_delta_y < -1.5) &&
                             zzjj_rel_pt < 0.2 &&
-                            (z1_m > 62e3 || z1_m < 122e3) &&
-                            (z2_m > 62e3 || z2_m < 122e3) &&
-                            jet_n == 2;
+                            (z1_m > 72e3 && z1_m < 112e3) &&
+                            (z2_m > 72e3 && z2_m < 112e3);
                 return ret;
             };
-            auto controlRegJN = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, int jet_n){
-                auto ret = j1_pt > 100e3 &&
-                            j2_pt > 60e3 &&
-                            llll_m > 150e3 &&
-                            jj_m > 200e3 &&
-                            jj_product_y < 0 &&
-                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
-                            zzjj_rel_pt < 0.2 &&
-                            (z1_m > 62e3 || z1_m < 122e3) &&
-                            (z2_m > 62e3 || z2_m < 122e3) &&
-                            jet_n > 2;
-                return ret;
+            auto pass_SR= [](bool pass_cut, int njet_inbetween, float centrarity){
+                return pass_cut && (njet_inbetween == 0) && (centrarity<0.4);
             };
-            auto signalRegCT = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, float centrarity){
-                auto ret = j1_pt > 100e3 &&
-                            j2_pt > 60e3 &&
-                            llll_m > 150e3 &&
-                            jj_m > 200e3 &&
-                            jj_product_y < 0 &&
-                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
-                            zzjj_rel_pt < 0.2 &&
-                            (z1_m > 62e3 || z1_m < 122e3) &&
-                            (z2_m > 62e3 || z2_m < 122e3) &&
-                            centrarity<0.4;
-                return ret;
+            auto pass_CT_no_JN = [](bool pass_cut, int njet_inbetween, float centrarity){
+                return pass_cut && (njet_inbetween > 0) && (centrarity<0.4);
             };
-            auto controlRegCT = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m, float centrarity){
-                auto ret = j1_pt > 100e3 &&
-                            j2_pt > 60e3 &&
-                            llll_m > 150e3 &&
-                            jj_m > 200e3 &&
-                            jj_product_y < 0 &&
-                            (jj_delta_y > 1.5 || jj_delta_y < 1.5) &&
-                            zzjj_rel_pt < 0.2 &&
-                            (z1_m > 62e3 || z1_m < 122e3) &&
-                            (z2_m > 62e3 || z2_m < 122e3) &&
-                            centrarity>=0.4;
-                return ret;
+            auto pass_no_CT_JN = [](bool pass_cut, int njet_inbetween, float centrarity){
+                return pass_cut && (njet_inbetween == 0) && (centrarity >= 0.4);
+            };
+            auto pass_no_CT_no_JN = [](bool pass_cut, int njet_inbetween, float centrarity){
+                return pass_cut && (njet_inbetween > 0) && (centrarity >= 0.4);
             };
             
 
@@ -228,7 +190,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                         Define("j1_y", j1_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
                         Define("j2_y", j2_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
                         Define("jj_m", jj_m, {"jet_energy", "jet_px_py_pz", "j1_j2_index"}).
-                        Define("j3_pt", j3_pt, {"jet_energy","jet_pt"}).
+                        Define("njet_inbetween",nJetInBetween,{"jet_px_py_pz", "jet_energy", "j1_j2_index"}).
                         Define("jj_delta_y",jj_delta_y, {"j1_y","j2_y"}).
                         Define("jj_product_y",jj_product_y,{"j1_y","j2_y"}).
                         Define("j1_pt", j1_pt, {"jet_pt","j1_j2_index"}).
@@ -256,19 +218,20 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                         Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
                         Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"}).
                         Define("centrarity", centrarity, {"jet_px_py_pz", "jet_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
-                        Define("SRJN_flag", signalRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
-                        Define("CRJN_flag", controlRegJN,{"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "jet_n"}).
-                        Define("SRCT_flag", signalRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"}).
-                        Define("CRCT_flag", controlRegCT, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m",  "centrarity"});
+                        Define("pass_cut", pass_cut, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m"}).
+                        Define("pass_SR", pass_SR,{"pass_cut", "njet_inbetween", "centrarity"}).
+                        Define("pass_CT_NJN", pass_CT_no_JN,{"pass_cut", "njet_inbetween", "centrarity"}).
+                        Define("pass_NCT_JN", pass_no_CT_JN, {"pass_cut", "njet_inbetween", "centrarity"}).
+                        Define("pass_NCT_NJN", pass_no_CT_no_JN, {"pass_cut", "njet_inbetween", "centrarity"});
 
     //save tree
         auto hehe = ana.GetColumnNames();
-        hehe.erase(hehe.begin(),hehe.begin()+38);
+        hehe.erase(hehe.begin(),hehe.begin()+39);
         hehe.push_back("jet_energy");
         hehe.push_back("j1_y");
         hehe.push_back("j2_y");
         hehe.push_back("jj_m");
-        hehe.push_back("j3_pt");
+        hehe.push_back("njet_inbetween");
         hehe.push_back("jj_delta_y");
         hehe.push_back("jj_product_y");
         hehe.push_back("j1_pt");
@@ -285,10 +248,12 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
         hehe.push_back("llll_m");
         hehe.push_back("zzjj_rel_pt");
         hehe.push_back("centrarity");
-        hehe.push_back("SRJN_flag");
-        hehe.push_back("CRJN_flag");
-        hehe.push_back("SRCT_flag");
-        hehe.push_back("CRCT_flag");
+        hehe.push_back("pass_cut");
+        hehe.push_back("pass_SR");
+        hehe.push_back("pass_NCT_JN");
+        hehe.push_back("pass_CT_NJN");
+        hehe.push_back("pass_NCT_NJN");
+
         ana.Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
 }
 
@@ -301,25 +266,15 @@ int main(int argc, char** argv)
     char* out_tree = argv[4];
 
     analysis(in_file1, in_file2, in_file3, out_tree);
-    cout<<out_tree<<"\t ......done"<<endl;
+    //cout<<out_tree<<"\t ......done"<<endl;
 }
 #else
 int main()
 {
-    char* in_file1 = "data/sig/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10201_r10210_p3654.root";
-    char* in_file2 = "data/sig/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r9364_r9315_p3654.root";
-    char* in_file3 = "data/sig/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10724_r10726_p3654.root";
-    char* out_tree1  = "output/debug/364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.root";
+    char* in_file1 = "data/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r10201_p3652.root";
+    char* in_file2 = "data/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r10724_p3652.root";
+    char* in_file3 = "data/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r9364_p3652.root";
+    char* out_tree1  = "output/dbg/aaa.root";
     analysis(in_file1, in_file2, in_file3, out_tree1);
-    meta(in_file1, in_file2, in_file3, out_tree1);
-    cout<<out_tree1<<"\t\t\t done"<<endl;
-
-    char* in_file4 = "data/bkg/QCDggZZ/mc16_13TeV.345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.deriv.DAOD_HIGG2D1.e6213_s3126_r9364_p3654.root";
-    char* in_file5 = "data/bkg/QCDggZZ/mc16_13TeV.345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.deriv.DAOD_HIGG2D1.e6213_s3126_r10201_p3654.root";
-    char* in_file6 = "data/bkg/QCDggZZ/mc16_13TeV.345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.deriv.DAOD_HIGG2D1.e6213_s3126_r10724_p3654.root";
-    char* out_tree2  = "output/debug/345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.root";    
-    analysis(in_file4, in_file5, in_file6, out_tree2);
-    meta(in_file4, in_file5, in_file6, out_tree2);
-    cout<<out_tree2<<"\t\t\t done"<<endl;
 }
 #endif

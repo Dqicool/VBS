@@ -1,7 +1,13 @@
+//event selection and weight normalisation
+
 #include"genAna.h"
+using namespace std;
+//#define debug
+
 int main()
 {
-    const char* col= "kBlue";
-    cout<<"aaaaaaaaaaaaaaaaaaaaa"<<endl;
-    cout<<str2Color(col);
+    std::vector<int> id{1,1,1,3};
+    std::vector<float> ch{1,1,-1,-1};
+    auto aa = getLeptonPairInd(id,ch);
+    cout<<aa.size()<<endl;
 }

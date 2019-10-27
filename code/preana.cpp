@@ -16,11 +16,13 @@ void preAna(const char* infile ,const char* outfile, double lumi)
     auto proWeight = [&](double weight){
         return weight/lumi;
     };
-    auto baseline = [](std::vector<float> lepton_pt, std::vector<float> jet_pt, char passReco_any){
-        auto ret = lepton_pt.size() >=4 && jet_pt.size() >= 2 && passReco_any>0;
-        return ret;
+    auto baseline = [](std::vector<float> lepton_pt, std::vector<float> jet_pt, char passReco_SR){
+
+        bool ret1 = lepton_pt.size() >=4 && jet_pt.size() >= 2;
+        bool ret2 = (bool)passReco_SR;
+        return ret1 && ret2;
     };
-    auto d2 = d.Filter(baseline, {"lepton_pt","jet_pt", "passReco_any"});
+    auto d2 = d.Filter(baseline, {"lepton_pt","jet_pt", "passReco_SR"});
     auto d3= d2.Define("NormWeight", proWeight, {"weight"});
                 //Define("NormfidWeight", proWeight, {"fid_weight"});
     

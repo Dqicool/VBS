@@ -3,44 +3,54 @@
 //#define debug
 void stack(const char* in_file, const char* out_file, Color_t col)
 {
+    TH1::SetDefaultSumw2();
     TFile * out = TFile::Open(out_file, "read");
 
-    THStack* mjj_crct_stack = (THStack*)out->Get("mjj_crct_stack");
-    THStack* mjj_crjn_stack = (THStack*)out->Get("mjj_crjn_stack");
-    THStack* mjj_srct_stack = (THStack*)out->Get("mjj_srct_stack");
-    THStack* mjj_srjn_stack = (THStack*)out->Get("mjj_srjn_stack");
+    THStack* mjj_sr_stack = (THStack*)out->Get("mjj_sr_stack");
+    THStack* mjj_ct_njn_stack = (THStack*)out->Get("mjj_ct_njn_stack");
+    THStack* mjj_nct_jn_stack = (THStack*)out->Get("mjj_nct_jn_stack");
+    THStack* mjj_nct_njn_stack = (THStack*)out->Get("mjj_nct_njn_stack");
     
     TFile* in = TFile::Open(in_file, "read");
-    TH1D * h_mjj_crct = (TH1D* )in->Get("h_mjj_crct");
-    TH1D * h_mjj_crjn = (TH1D* )in->Get("h_mjj_crjn");
-    TH1D * h_mjj_srct = (TH1D* )in->Get("h_mjj_srct");
-    TH1D * h_mjj_srjn = (TH1D* )in->Get("h_mjj_srjn");
+
+    TH1D * h_mjj_sr = (TH1D* )in->Get("h_mjj_sr");
+    TH1D * h_mjj_ct_njn = (TH1D* )in->Get("h_mjj_ct_njn");
+    TH1D * h_mjj_nct_jn = (TH1D* )in->Get("h_mjj_nct_jn");
+    TH1D * h_mjj_nct_njn = (TH1D* )in->Get("h_mjj_nct_njn");
+
+
     //cout<<col<<endl;
-    h_mjj_crct->SetLineColor(col);
-    h_mjj_crjn->SetLineColor(col);
-    h_mjj_srct->SetLineColor(col);
-    h_mjj_srjn->SetLineColor(col);
 
-    h_mjj_crct->SetMarkerColor(col);
-    h_mjj_crjn->SetMarkerColor(col);
-    h_mjj_srct->SetMarkerColor(col);
-    h_mjj_srjn->SetMarkerColor(col);
+    h_mjj_sr->SetFillColor(col);
+    h_mjj_nct_njn->SetFillColor(col);
+    h_mjj_nct_jn->SetFillColor(col);
+    h_mjj_ct_njn->SetFillColor(col);
 
-    h_mjj_crct->SetFillColor(col);
-    h_mjj_crjn->SetFillColor(col);
-    h_mjj_srct->SetFillColor(col);
-    h_mjj_crjn->SetFillColor(col);
+    h_mjj_sr->SetLineColor(col);
+    h_mjj_nct_njn->SetLineColor(col);
+    h_mjj_nct_jn->SetLineColor(col);
+    h_mjj_ct_njn->SetLineColor(col);
+
+    h_mjj_sr->SetMarkerColor(col);
+    h_mjj_nct_njn->SetMarkerColor(col);
+    h_mjj_nct_jn->SetMarkerColor(col);
+    h_mjj_ct_njn->SetMarkerColor(col);
     
-    mjj_crct_stack->Add(h_mjj_crct);
-    mjj_crjn_stack->Add(h_mjj_crjn);
-    mjj_srct_stack->Add(h_mjj_srct);
-    mjj_srjn_stack->Add(h_mjj_srjn);
+    mjj_sr_stack->Add(h_mjj_sr);
+    mjj_ct_njn_stack->Add(h_mjj_ct_njn);
+    mjj_nct_jn_stack->Add(h_mjj_nct_jn);
+    mjj_nct_njn_stack->Add(h_mjj_nct_njn);
+
+
     out->ReOpen("update");
     out->Delete("*;*");
-    mjj_crct_stack->Write();
-    mjj_crjn_stack->Write();
-    mjj_srct_stack->Write();
-    mjj_srjn_stack->Write();
+    
+    mjj_sr_stack->Write();
+    mjj_ct_njn_stack->Write();
+    mjj_nct_jn_stack->Write();
+    mjj_nct_njn_stack->Write();
+
+
     in->Close();
     out->Close();
     
@@ -51,7 +61,7 @@ int main(int argc, char** argv)
     const char* in_file = argv[1];
     const char* out_file = argv[2];
     auto col = str2Color(argv[3]);
-    stack(in_file, out_file,col);
+    stack(in_file, out_file, col);
 }
 #else
 int main()
