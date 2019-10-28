@@ -1,5 +1,5 @@
-#ifndef GEN_ANA
-#define GEN_ANA
+#ifndef __GEN_ANA__
+#define __GEN_ANA__
 #include <TH1.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -229,7 +229,7 @@ vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID,
             }
         }
     }
-    cout<<ret.size();
+    //std::cout<<ret.size()<<std::endl;
     return ret;
 }
 

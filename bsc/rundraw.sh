@@ -4,7 +4,7 @@
     OUT='/output/histo_out/999_all/'
 
     rm -rf $OUT/../*
-    mkdir $VBSHOME$OUT
+    mkdir -p $VBSHOME$OUT
     i=1
     for entry in `ls $VBSHOME$DATA`; do
         echo [$i] $entry

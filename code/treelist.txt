@@ -1,0 +1,21 @@
+lepton      
+    std::vector<float> lepton_pt, 
+    std::vector<float> lepton_eta, 
+    std::vector<float> lepton_d0sig, 
+    std::vector<float> lepton_z0sinTheta, 
+    std::vector<int> lepton_particleID,
+    std::vector<char> lepton_isLoose,
+    std::vector<char> lepton_isTight,
+    std::vector<float> lepton_d0raw,
+    std::vector<float> lepton_charge,
+    std::vector<float> lepton_m,
+    std::vector<float> lepton_phi,
+    int * lepton_n
+
+jet
+    std::vector<float> jet_Jvt, 
+    std::vector<float> jet_pt, 
+    std::vector<float> jet_eta, 
+    std::vector<float> jet_m,
+    std::vector<float> jet_phi,
+    int * jet_n

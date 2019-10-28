@@ -69,5 +69,31 @@
     },
     "files.exclude": {
         "**/.gitignore": true
-    }
+    },
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.colorTheme": "Material Theme Palenight High Contrast",
+    "window.zoomLevel": 0,
+    "editor.cursorStyle": "block",
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": true,
+    "terminal.integrated.fontFamily": "Iosevka",
+    "editor.fontFamily": "Iosevka, Iosevka, Iosevka, iosevka",
+    "editor.fontSize": 12,
+    "workbench.iconTheme": "material-icon-theme",
+    "files.autoSave": "onFocusChange",
+    "explorer.openEditors.visible": 0,
+    "terminal.integrated.fontSize": 12,
+    "explorer.confirmDragAndDrop": false,
+    "remote.SSH.defaultForwardedPorts": [],
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "editor.minimap.enabled": false,
+    "terminal.integrated.shell.linux": "/bin/zsh",
+    "git.ignoreLegacyWarning": true,
+    "python.linting.pylintArgs": [
+        "--generated-members=numpy.* ,torch.*"
+    ],
+    "python.linting.pylintEnabled": false,
+    "python.linting.pylamaEnabled": true
 }

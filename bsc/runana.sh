@@ -65,7 +65,7 @@
     TRIB=$FOL/003_triboson/
     REST=$FOL/005_rest/
     WZ3L=$FOL/002_WZlvlll/
-    LN='ln -s'
+    LN='ln -S'
 
     rm -rf $VBSHOME$VBSF
     rm -rf $VBSHOME$QQ4L

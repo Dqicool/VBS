@@ -184,40 +184,41 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
             
 
     //analyse
-        auto ana = dframe.Define("jet_energy",jet_energy,{"jet_m","jet_eta","jet_pt"}).
-                        Define("jet_px_py_pz",jet_px_py_pz, {"jet_eta","jet_pt","jet_phi"}).
-                        Define("j1_j2_index", j1_j2_index, {"jet_pt"}).
-                        Define("j1_y", j1_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
-                        Define("j2_y", j2_y, {"jet_px_py_pz","jet_energy","j1_j2_index"}).
-                        Define("jj_m", jj_m, {"jet_energy", "jet_px_py_pz", "j1_j2_index"}).
-                        Define("njet_inbetween",nJetInBetween,{"jet_px_py_pz", "jet_energy", "j1_j2_index"}).
+        auto ana = dframe.Define("jet_pass_energy",jet_energy,{"jet_pass_m","jet_pass_eta","jet_pass_pt"}).
+                        Define("jet_pass_px_py_pz",jet_px_py_pz, {"jet_pass_eta","jet_pass_pt","jet_pass_phi"}).
+                        Define("j1_j2_index", j1_j2_index, {"jet_pass_pt"}).
+                        Define("j1_y", j1_y, {"jet_pass_px_py_pz","jet_pass_energy","j1_j2_index"}).
+                        Define("j2_y", j2_y, {"jet_pass_px_py_pz","jet_pass_energy","j1_j2_index"}).
+                        Define("jj_m", jj_m, {"jet_pass_energy", "jet_pass_px_py_pz", "j1_j2_index"}).
+                        Define("njet_inbetween",nJetInBetween,{"jet_pass_px_py_pz", "jet_pass_energy", "j1_j2_index"}).
                         Define("jj_delta_y",jj_delta_y, {"j1_y","j2_y"}).
                         Define("jj_product_y",jj_product_y,{"j1_y","j2_y"}).
-                        Define("j1_pt", j1_pt, {"jet_pt","j1_j2_index"}).
-                        Define("j2_pt", j2_pt, {"jet_pt","j1_j2_index"}).
-                        Define("lepton_energy",lepton_energy,{"lepton_m","lepton_eta","lepton_pt"}).
-                        Define("lepton_px_py_pz",lepton_px_py_pz, {"lepton_eta","lepton_pt","lepton_phi"}).
-                        Define("lepton_pair_index",lepton_pair_index, {"lepton_particleID","lepton_charge"}).
-                        Define("lepton_pair_m",lepton_pair_m,{"lepton_pair_index", "lepton_energy", "lepton_px_py_pz"}).
-                        Define("m_z1_ind",m_z1_ind, {"lepton_pair_m"}).
-                        Define("z1_index",z1_index, {"lepton_pair_index","m_z1_ind"}).
-                        Define("z2_index",z2_index,  {"lepton_pair_index","m_z1_ind"}).
-                        Define("z1_px_py_pz",z_px_py_pz,{"lepton_px_py_pz", "z1_index"}).
-                        Define("z2_px_py_pz",z_px_py_pz,{"lepton_px_py_pz", "z2_index"}).
-                        Define("z1_energy", z_energy, {"lepton_energy", "z1_index"}).
-                        Define("z2_energy", z_energy, {"lepton_energy", "z2_index"}).
-                        Define("z1_pt",z_pt,{"lepton_px_py_pz", "z1_index"}).
-                        Define("z2_pt",z_pt,{"lepton_px_py_pz", "z2_index"}).
-                        Define("z1_m", z1_m, {"lepton_pair_m", "m_z1_ind"}).
-                        Define("z2_m", z2_m, {"lepton_pair_m", "m_z1_ind"}).
+                        Define("j1_pt", j1_pt, {"jet_pass_pt","j1_j2_index"}).
+                        Define("j2_pt", j2_pt, {"jet_pass_pt","j1_j2_index"}).
+                        Define("lepton_pass_energy",lepton_energy,{"lepton_pass_m","lepton_pass_eta","lepton_pass_pt"}).
+                        Define("lepton_pass_px_py_pz",lepton_px_py_pz, {"lepton_pass_eta","lepton_pass_pt","lepton_pass_phi"}).
+                        Define("lepton_pass_pair_index",lepton_pair_index, {"lepton_pass_particleID","lepton_pass_charge"}).
+                        Filter("lepton_pass_pair_index.size() >= 1").
+                        Define("lepton_pass_pair_m",lepton_pair_m,{"lepton_pass_pair_index", "lepton_pass_energy", "lepton_pass_px_py_pz"}).
+                        Define("m_z1_ind",m_z1_ind, {"lepton_pass_pair_m"}).
+                        Define("z1_index",z1_index, {"lepton_pass_pair_index","m_z1_ind"}).
+                        Define("z2_index",z2_index,  {"lepton_pass_pair_index","m_z1_ind"}).
+                        Define("z1_px_py_pz",z_px_py_pz,{"lepton_pass_px_py_pz", "z1_index"}).
+                        Define("z2_px_py_pz",z_px_py_pz,{"lepton_pass_px_py_pz", "z2_index"}).
+                        Define("z1_energy", z_energy, {"lepton_pass_energy", "z1_index"}).
+                        Define("z2_energy", z_energy, {"lepton_pass_energy", "z2_index"}).
+                        Define("z1_pt",z_pt,{"lepton_pass_px_py_pz", "z1_index"}).
+                        Define("z2_pt",z_pt,{"lepton_pass_px_py_pz", "z2_index"}).
+                        Define("z1_m", z1_m, {"lepton_pass_pair_m", "m_z1_ind"}).
+                        Define("z2_m", z2_m, {"lepton_pass_pair_m", "m_z1_ind"}).
                         Define("z1_y", z_y, {"z1_px_py_pz", "z1_energy"}).
                         Define("z2_y", z_y, {"z2_px_py_pz", "z2_energy"}).
                         Define("llll_index",llll_index,{"z1_index","z2_index"}).
-                        Define("llll_px_py_pz",llll_px_py_pz, {"lepton_px_py_pz","llll_index"}).
-                        Define("llll_m", llll_m, {"lepton_energy", "lepton_px_py_pz", "llll_index"}).
+                        Define("llll_px_py_pz",llll_px_py_pz, {"lepton_pass_px_py_pz","llll_index"}).
+                        Define("llll_m", llll_m, {"lepton_pass_energy", "lepton_pass_px_py_pz", "llll_index"}).
                         Define("llll_pt",llll_pt,{"llll_px_py_pz"}).
-                        Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_px_py_pz","j1_j2_index"}).
-                        Define("centrarity", centrarity, {"jet_px_py_pz", "jet_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
+                        Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_pass_px_py_pz","j1_j2_index"}).
+                        Define("centrarity", centrarity, {"jet_pass_px_py_pz", "jet_pass_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
                         Define("pass_cut", pass_cut, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m"}).
                         Define("pass_SR", pass_SR,{"pass_cut", "njet_inbetween", "centrarity"}).
                         Define("pass_CT_NJN", pass_CT_no_JN,{"pass_cut", "njet_inbetween", "centrarity"}).
@@ -227,7 +228,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
     //save tree
         auto hehe = ana.GetColumnNames();
         hehe.erase(hehe.begin(),hehe.begin()+39);
-        hehe.push_back("jet_energy");
+        hehe.push_back("jet_pass_energy");
         hehe.push_back("j1_y");
         hehe.push_back("j2_y");
         hehe.push_back("jj_m");
@@ -236,7 +237,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
         hehe.push_back("jj_product_y");
         hehe.push_back("j1_pt");
         hehe.push_back("j2_pt");
-        hehe.push_back("lepton_energy");
+        hehe.push_back("lepton_pass_energy");
         hehe.push_back("z1_energy");
         hehe.push_back("z2_energy");
         hehe.push_back("z1_pt");
@@ -271,9 +272,9 @@ int main(int argc, char** argv)
 #else
 int main()
 {
-    char* in_file1 = "data/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r10201_p3652.root";
-    char* in_file2 = "data/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r10724_p3652.root";
-    char* in_file3 = "data/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r9364_p3652.root";
+    char* in_file1 = "output/preAna_out/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r10201_p3652.root";
+    char* in_file2 = "output/preAna_out/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r10724_p3652.root";
+    char* in_file3 = "output/preAna_out/005_rest/mc16_13TeV.344295.Sherpa_Zee_4lMassFilter40GeV8GeV.NTUP_SM4l.r9364_p3652.root";
     char* out_tree1  = "output/dbg/aaa.root";
     analysis(in_file1, in_file2, in_file3, out_tree1);
 }
