@@ -1,13 +1,14 @@
 #include"genAna.h"
 #include<THStack.h>
 #include<TList.h>
+#include"histoProp.h"
 int main()
 {
     TH1::SetDefaultSumw2();
-    TH1D * h_inc_mjj_sr = new TH1D("h_inc_mjj_sr","",20,2e5,2e6);
-    TH1D * h_inc_mjj_ct_njn = new TH1D("h_inc_mjj_ct_njn","",20,2e5,2e6);
-    TH1D * h_inc_mjj_nct_jn = new TH1D("h_inc_mjj_nct_jn","",20,2e5,2e6);
-    TH1D * h_inc_mjj_nct_njn = new TH1D("h_inc_mjj_nct_njn","",20,2e5,2e6);
+    TH1D * h_inc_mjj_sr = new TH1D("h_inc_mjj_sr","",NBIN,XMIN,XMAX);
+    TH1D * h_inc_mjj_ct_njn = new TH1D("h_inc_mjj_ct_njn","",NBIN,XMIN,XMAX);
+    TH1D * h_inc_mjj_nct_jn = new TH1D("h_inc_mjj_nct_jn","",NBIN,XMIN,XMAX);
+    TH1D * h_inc_mjj_nct_njn = new TH1D("h_inc_mjj_nct_njn","",NBIN,XMIN,XMAX);
 
     TFile * in = TFile::Open("output/stack_out/mjj_stack.root","read");
     THStack* mjj_sr_stack = (THStack*)in->Get("mjj_sr_stack");
@@ -44,12 +45,12 @@ int main()
         h_inc_mjj_sr->SetLineColor(kBlack);
         h_inc_mjj_sr->SetFillColor(kBlack);
         h_inc_mjj_sr->SetFillStyle(3017);
-        h_inc_mjj_sr->SetAxisRange(0,50e-6,"Y");
+        h_inc_mjj_sr->SetAxisRange(0,YMAX,"Y");
         h_inc_mjj_sr->Draw("E2");
 
         mjj_sr_stack->Draw("hist,same");
         h_inc_mjj_sr->Draw("E2,same");
-
+        cout<<h_inc_mjj_sr->Integral()<<endl;
     c1.SaveAs("plots/mjj_sr_stack.png");
 
     TCanvas c2("c2","",1200,800);
@@ -57,7 +58,7 @@ int main()
         h_inc_mjj_ct_njn->SetLineColor(kBlack);
         h_inc_mjj_ct_njn->SetFillColor(kBlack);
         h_inc_mjj_ct_njn->SetFillStyle(3017);
-        h_inc_mjj_ct_njn->SetAxisRange(0,50e-6,"Y");
+        h_inc_mjj_ct_njn->SetAxisRange(0,YMAX,"Y");
         h_inc_mjj_ct_njn->Draw("E2");
 
         mjj_ct_njn_stack->Draw("hist,same");
@@ -66,7 +67,7 @@ int main()
     c2.SaveAs("plots/mjj_ct_njn_stack.png");
 
     TCanvas c3("c3","",1200,800);
-        h_inc_mjj_nct_jn->SetAxisRange(0,50e-6,"Y");
+        h_inc_mjj_nct_jn->SetAxisRange(0,YMAX,"Y");
         h_inc_mjj_nct_jn->SetMarkerColor(kBlack);
         h_inc_mjj_nct_jn->SetLineColor(kBlack);
         h_inc_mjj_nct_jn->SetFillColor(kBlack);
@@ -81,7 +82,7 @@ int main()
 
     TCanvas c4("c4","",1200,800);
 
-        h_inc_mjj_nct_njn->SetAxisRange(0,50e-6,"Y");
+        h_inc_mjj_nct_njn->SetAxisRange(0,YMAX,"Y");
         h_inc_mjj_nct_njn->SetMarkerColor(kBlack);
         h_inc_mjj_nct_njn->SetLineColor(kBlack);
         h_inc_mjj_nct_njn->SetFillColor(kBlack);

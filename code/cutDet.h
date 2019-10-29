@@ -11,20 +11,25 @@ std::vector<int> lepSel(std::vector<float> lepton_pt,
 {
     std::vector<int> letpon_pass_ind;
     auto siz = lepton_pt.size();
+
     for (uint i = 0;i < siz; i++)
     {
-        if(lepton_particleID[i] == 11){
-            if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && TMath::Abs(lepton_d0sig[i] < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
-                letpon_pass_ind.push_back(i);
-            }
-        }
-        else if(lepton_particleID[i] == 13)
+        //if (lepton_isLoose[i] == 0)
         {
-            if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.7 && TMath::Abs(lepton_d0sig[i] < 3) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
-                letpon_pass_ind.push_back(i);
+            if(lepton_particleID[i] == 11){
+                if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && TMath::Abs(lepton_d0sig[i] < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
+                    letpon_pass_ind.push_back(i);
+                }
+            }
+            else if(lepton_particleID[i] == 13)
+            {
+                if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.7 && TMath::Abs(lepton_d0sig[i] < 3) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
+                    letpon_pass_ind.push_back(i);
+                }
             }
         }
     }
+    
     return letpon_pass_ind;
 }
 
@@ -72,5 +77,19 @@ std::vector<int> ipass_property(std::vector<int> index, std::vector<int> iproper
 
 int passN(std::vector<int> index){
     return (int)index.size();
+}
+
+bool leptonPtSel(std::vector<float> lepton_pt, std::vector<int> lepton_pass_ind){
+    bool ret = 0;
+    std::vector<float> lep_pass_pt;
+    auto siz = lepton_pass_ind.size();
+    if (siz >= 4){
+        for(uint i = 0; i< siz; i++){
+            lep_pass_pt.push_back(lepton_pt[(lepton_pass_ind[i])]);
+        }
+        sort(lep_pass_pt.begin(), lep_pass_pt.end(), greater<float>());
+        ret =  (lep_pass_pt[0] > 20e3 && lep_pass_pt[1] > 20e3 && lep_pass_pt[2] > 10e3);
+    }
+    return ret;
 }
 #endif

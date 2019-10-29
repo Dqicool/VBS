@@ -14,6 +14,10 @@
 #define Z_MASS 91.1876
 using namespace std;
 
+float getDeltaR(float eta1, float eta2, float phi1, float phi2){
+    return TMath::Sqrt((eta1-eta2)*(eta1-eta2) + (eta1-eta2)*(eta1-eta2));
+}
+
 float getTheta(float particle_eta){
         return (2 * TMath::ATan(TMath::Exp(-particle_eta)));
 }
@@ -208,7 +212,9 @@ float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
 }
 
 vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID, 
-                                                  vector<float> lepton_charge){
+                                                  vector<float> lepton_charge,
+                                                  vector<float> lepton_eta,
+                                                  vector<float> lepton_phi){
     vector<vector<vector<int>>> ret;
     int size = lepton_charge.size();
     for (int i = 0; i < size-1; i++){
@@ -218,10 +224,14 @@ vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID,
                     for (int l = k+1; l<size; l++){
                         if (l != j && k != j){
                             if (lepton_particleID[k] == lepton_particleID[l] && ((lepton_charge[k] - lepton_charge[l])*(lepton_charge[k] - lepton_charge[l]))>2){
-                                vector<int> tmp1{i,j};
-                                vector<int> tmp2{k,l};
-                                vector<vector<int>> tmp{tmp1,tmp2};
-                                ret.push_back(tmp);
+                                auto delR_ij = getDeltaR(lepton_eta[i], lepton_eta[j], lepton_phi[i], lepton_eta[j]);
+                                auto delR_kl = getDeltaR(lepton_eta[k], lepton_eta[l], lepton_phi[k], lepton_eta[l]);
+                                if (delR_ij > 0.1 && delR_kl > 0.1){
+                                    vector<int> tmp1{i,j};
+                                    vector<int> tmp2{k,l};
+                                    vector<vector<int>> tmp{tmp1,tmp2};
+                                    ret.push_back(tmp);
+                                }
                             }
                         }
                     }
@@ -286,6 +296,80 @@ int nJetInBetween(vector<vector<float>> jet_px_py_pz, vector<float> jet_energy, 
         }
     }
     return njb;
+}
+
+std::vector<std::vector<float>> ZPairMSel(vector<vector<float>> lepton_pair_m, float target){
+    vector<vector<float>> ret{};
+    auto siz = lepton_pair_m.size();
+    for (uint i = 0; i < siz; i++){
+        if(lepton_pair_m[i][0] > 10e3 && lepton_pair_m[i][1] > 10e3)
+        {
+            std::vector<float> tmp{1, TMath::Abs(lepton_pair_m[i][0] - target) + TMath::Abs(lepton_pair_m[i][1] - target)};
+            ret.push_back(tmp);
+        }
+        else
+        {
+            vector<float> tmp{-1, 0};
+            ret.push_back(tmp);
+        }
+    }
+    return ret;
+} 
+
+std::vector<std::vector<int>> Z1Z2Ind(std::vector<std::vector<float>> zpair_m_ind, std::vector<std::vector<std::vector<int>>>lepton_pair_ind){
+    auto siz = zpair_m_ind.size();
+    uint min_m_ind = 0;
+    bool flag = 1;
+    std::vector<std::vector<int>> ret{};
+    for(uint i = 0; i < siz; i++){
+        if(zpair_m_ind[i][0] > 0){min_m_ind = i; break;}
+        if(i == siz-1){flag = 0;}
+    }
+    if (flag)
+    {
+        for(uint j = min_m_ind; j < siz; j++)
+        {
+            if(zpair_m_ind[j][0] > 0)
+            {
+                if (zpair_m_ind[j][1] < zpair_m_ind[min_m_ind][1]){
+                    min_m_ind = j;
+                }
+            }
+        }
+        ret = lepton_pair_ind[min_m_ind];
+    }
+    return ret;
+}
+
+
+
+
+
+std::vector<std::vector<int>> getZ1Z2Index(std::vector<int> lepton_particleID, 
+                                std::vector<float> lepton_charge, 
+                                std::vector<float> lepton_eta, 
+                                std::vector<float> lepton_phi,
+                                std::vector<float> lepton_energy,
+                                std::vector<std::vector<float>> lepton_px_py_pz){
+    
+    auto lepton_pair_index =  getLeptonPairInd(lepton_particleID, lepton_charge, lepton_eta, lepton_phi);
+    std::vector<std::vector<int>> ret{};
+    if(lepton_pair_index.size() >= 1)
+    {
+        std::vector<std::vector<float>>  lepton_pair_m;
+        for (uint k = 0; k < lepton_pair_index.size(); k++)
+        {
+            std::vector<float> tmp;
+            tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][0]));
+            tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][1]));
+            lepton_pair_m.push_back(tmp);
+        }
+
+        auto zpair_abs_m_z = ZPairMSel(lepton_pair_m, Z_MASS*1000);
+        
+        ret = Z1Z2Ind(zpair_abs_m_z, lepton_pair_index);
+    }
+    return ret;
 }
 
 #endif

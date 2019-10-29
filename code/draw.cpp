@@ -1,5 +1,5 @@
 //saving histogram as 
-
+#include"histoProp.h"
 //#define debug
 #include <TCanvas.h>
 #include <ROOT/RDataFrame.hxx>
@@ -17,14 +17,14 @@ void draw(const char* in_file, const char* out_histo)
 
     //book histos
         TH1::SetDefaultSumw2();
-        auto h_mjj_sr = f_sr.Histo1D({"h_mjj_sr","",20,2e5,2e6},"jj_m","NormWeight");
-        auto h_mjj_ct_njn = f_ct_njn.Histo1D({"h_mjj_ct_njn","",20,2e5,2e6},"jj_m","NormWeight");
-        auto h_mjj_nct_jn = f_nct_jn.Histo1D({"h_mjj_nct_jn","",20,2e5,2e6},"jj_m","NormWeight");
-        auto h_mjj_nct_njn = f_nct_njn.Histo1D({"h_mjj_nct_njn","",20,2e5,2e6},"jj_m","NormWeight");
-        h_mjj_sr->Scale(1.0 / 3.0);
-        h_mjj_ct_njn->Scale(1.0/3.0);
-        h_mjj_nct_jn->Scale(1.0/3.0);
-        h_mjj_nct_njn->Scale(1.0/3.0);
+        auto h_mjj_sr = f_sr.Histo1D({"h_mjj_sr","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
+        auto h_mjj_ct_njn = f_ct_njn.Histo1D({"h_mjj_ct_njn","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
+        auto h_mjj_nct_jn = f_nct_jn.Histo1D({"h_mjj_nct_jn","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
+        auto h_mjj_nct_njn = f_nct_njn.Histo1D({"h_mjj_nct_njn","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
+        h_mjj_sr->Scale(LUMI / 3.0);
+        h_mjj_ct_njn->Scale(LUMI/3.0);
+        h_mjj_nct_jn->Scale(LUMI/3.0);
+        h_mjj_nct_njn->Scale(LUMI/3.0);
     //save
         TFile* out = TFile::Open(out_histo,"recreate");
         h_mjj_sr->Write();

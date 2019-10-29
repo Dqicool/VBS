@@ -30,6 +30,7 @@ void preAna(const char* infile ,const char* outfile, double lumi)
     auto d1 = d.Define("jet_pass_ind", jetSel, {"jet_pt", "jet_eta"}).
                 Define("lepton_pass_ind", lepSel, {"lepton_pt", "lepton_eta", "lepton_d0sig", "lepton_z0sinTheta", "lepton_particleID", "lepton_isLoose"}).
                 Filter(baseline, {"lepton_pass_ind", "jet_pass_ind"}).
+                Filter(leptonPtSel, {"lepton_pt","lepton_pass_ind"}).
                 Define("NormWeight", proWeight, {"weight"}).
                 Define("jet_pass_pt", fpass_property, {"jet_pass_ind", "jet_pt"}).
                  Define("jet_pass_eta", fpass_property, {"jet_pass_ind", "jet_eta"}).
@@ -51,8 +52,9 @@ void preAna(const char* infile ,const char* outfile, double lumi)
                  Define("lepton_pass_n", passN, {"lepton_pass_ind"});
                  
 
-    
-    d1.Snapshot("SM4L_Nominal", outfile);
+    auto hehe = d1.GetColumnNames();
+    hehe.erase(hehe.begin()+21, hehe.end());
+    d1.Snapshot("SM4L_Nominal", outfile, hehe);
 }
 #ifndef debug
 int main(int argc, char** argv){
@@ -62,8 +64,8 @@ int main(int argc, char** argv){
 }
 #else 
 int main(){
-    const char* infile ="";
-    const char* outfile = "";
+    const char* infile ="/data/999_all/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r9364_p3654.root";
+    const char* outfile = "/output/dbg/bbb.root";
     preAna(infile, outfile, getLumi(infile));
 }
 #endif

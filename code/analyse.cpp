@@ -1,13 +1,17 @@
 //claculation of interesting observables
 
 #include "genAna.h"
+#define MT
 
 //#define debug
-#define MT
+
+#ifdef debug
+#undef MT
+#endif
 void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
 {
     #ifdef MT
-    ROOT::EnableImplicitMT();
+    ROOT::EnableImplicitMT(24);
     #endif
     ROOT::RDataFrame dframe("SM4L_Nominal", {in_file1, in_file2, in_file3});
 
@@ -70,34 +74,22 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                 }
                 return lepton_px_py_pz;
             };
-            auto lepton_pair_index = [](std::vector<int> lepton_particleID, std::vector<float> lepton_charge){
-                return getLeptonPairInd(lepton_particleID, lepton_charge);
+            auto z1_z2_ind = [](std::vector<int> lepton_particleID, 
+                                std::vector<float> lepton_charge, 
+                                std::vector<float> lepton_eta, 
+                                std::vector<float> lepton_phi,
+                                std::vector<float> lepton_energy,
+                                std::vector<std::vector<float>> lepton_px_py_pz)
+            {
+                return getZ1Z2Index(lepton_particleID, lepton_charge, lepton_eta,lepton_phi, lepton_energy, lepton_px_py_pz);
             };
-            auto lepton_pair_m = [](std::vector<std::vector<std::vector<int>>> lepton_pair_index, std::vector<float> lepton_energy, std::vector<std::vector<float>> lepton_px_py_pz){
-                std::vector<std::vector<float>>  lepton_pair_m;
-                for (uint k = 0; k < lepton_pair_index.size(); k++)
-                {
-                    std::vector<float> tmp;
-                    tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][0]));
-                    tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][1]));
-                    lepton_pair_m.push_back(tmp);
-                }
-                return lepton_pair_m;
+
+            auto z1_index = [](std::vector<std::vector<int>> z1_z2_ind){
+                return z1_z2_ind[0];
             };
-            auto m_z1_ind = [](std::vector<std::vector<float>>  lepton_pair_m){
-                return closestMassSelect(lepton_pair_m, Z_MASS*1000);
-            };
-            auto z1_index = [](std::vector<std::vector<std::vector<int>>> lepton_pair_index, std::vector<int> m_z1_ind){
-                std::vector<int> z1_lepton_ind;
-                z1_lepton_ind.push_back(lepton_pair_index[m_z1_ind[0]][m_z1_ind[1]][0]);
-                z1_lepton_ind.push_back(lepton_pair_index[m_z1_ind[0]][m_z1_ind[1]][1]);
-                return z1_lepton_ind;
-            };
-            auto z2_index = [](std::vector<std::vector<std::vector<int>>> lepton_pair_index, std::vector<int> m_z1_ind){
-                std::vector<int> z2_lepton_ind;
-                z2_lepton_ind.push_back(lepton_pair_index[m_z1_ind[0]][!(bool)m_z1_ind[1]][0]);
-                z2_lepton_ind.push_back(lepton_pair_index[m_z1_ind[0]][!(bool)m_z1_ind[1]][1]);
-                return z2_lepton_ind;
+
+            auto z2_index = [](std::vector<std::vector<int>> z1_z2_ind){
+                return z1_z2_ind[1];
             };
             auto z_px_py_pz =[](std::vector<std::vector<float>> lepton_px_py_pz, std::vector<int> z_index){
                 return getCombinedPxPyPzWithInd(lepton_px_py_pz, z_index);
@@ -108,11 +100,8 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
             auto z_pt = [](std::vector<std::vector<float>> lepton_px_py_pz, std::vector<int> z_index){
                 return getTotalPt(lepton_px_py_pz[z_index[0]], lepton_px_py_pz[z_index[1]]);
             };
-            auto z1_m = [](std::vector<std::vector<float>>  lepton_pair_m, std::vector<int> m_z1_ind){
-                return lepton_pair_m[m_z1_ind[0]][m_z1_ind[1]];
-            };
-            auto z2_m = [](std::vector<std::vector<float>>  lepton_pair_m, std::vector<int> m_z1_ind){
-                return lepton_pair_m[m_z1_ind[0]][!(bool)m_z1_ind[1]];
+            auto z_m = [](std::vector<int> z_index, std::vector<std::vector<float>> lepton_px_py_pz, std::vector<float> lepton_energy){
+                return getMassWithInd(lepton_energy, lepton_px_py_pz, z_index);
             };
             auto z_y = [](std::vector<float> z_px_py_pz, float z_energy){
                 return getY(z_px_py_pz,z_energy);
@@ -158,15 +147,15 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
             };
         //working point
             auto pass_cut = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m){
-                auto ret =  j1_pt > 60e3 &&
-                            j2_pt > 40e3 &&
+                auto ret =  j1_pt > 40e3 &&
+                            j2_pt > 30e3 &&
                             llll_m > 150e3 &&
                             jj_m > 200e3 &&
                             jj_product_y < 0 &&
-                            (jj_delta_y > 1.5 || jj_delta_y < -1.5) &&
+                            (jj_delta_y > 2 || jj_delta_y < -2) &&
                             zzjj_rel_pt < 0.2 &&
-                            (z1_m > 72e3 && z1_m < 112e3) &&
-                            (z2_m > 72e3 && z2_m < 112e3);
+                            (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3) &&
+                            (z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3);
                 return ret;
             };
             auto pass_SR= [](bool pass_cut, int njet_inbetween, float centrarity){
@@ -197,20 +186,18 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                         Define("j2_pt", j2_pt, {"jet_pass_pt","j1_j2_index"}).
                         Define("lepton_pass_energy",lepton_energy,{"lepton_pass_m","lepton_pass_eta","lepton_pass_pt"}).
                         Define("lepton_pass_px_py_pz",lepton_px_py_pz, {"lepton_pass_eta","lepton_pass_pt","lepton_pass_phi"}).
-                        Define("lepton_pass_pair_index",lepton_pair_index, {"lepton_pass_particleID","lepton_pass_charge"}).
-                        Filter("lepton_pass_pair_index.size() >= 1").
-                        Define("lepton_pass_pair_m",lepton_pair_m,{"lepton_pass_pair_index", "lepton_pass_energy", "lepton_pass_px_py_pz"}).
-                        Define("m_z1_ind",m_z1_ind, {"lepton_pass_pair_m"}).
-                        Define("z1_index",z1_index, {"lepton_pass_pair_index","m_z1_ind"}).
-                        Define("z2_index",z2_index,  {"lepton_pass_pair_index","m_z1_ind"}).
+                        Define("z1_z2_index",z1_z2_ind, {"lepton_pass_particleID", "lepton_pass_charge", "lepton_pass_eta", "lepton_pass_phi", "lepton_pass_energy", "lepton_pass_px_py_pz"}).
+                        Filter("z1_z2_index.size() >= 1").
+                        Define("z1_index",z1_index, {"z1_z2_index"}).
+                        Define("z2_index",z2_index,  {"z1_z2_index"}).
                         Define("z1_px_py_pz",z_px_py_pz,{"lepton_pass_px_py_pz", "z1_index"}).
                         Define("z2_px_py_pz",z_px_py_pz,{"lepton_pass_px_py_pz", "z2_index"}).
                         Define("z1_energy", z_energy, {"lepton_pass_energy", "z1_index"}).
                         Define("z2_energy", z_energy, {"lepton_pass_energy", "z2_index"}).
                         Define("z1_pt",z_pt,{"lepton_pass_px_py_pz", "z1_index"}).
                         Define("z2_pt",z_pt,{"lepton_pass_px_py_pz", "z2_index"}).
-                        Define("z1_m", z1_m, {"lepton_pass_pair_m", "m_z1_ind"}).
-                        Define("z2_m", z2_m, {"lepton_pass_pair_m", "m_z1_ind"}).
+                        Define("z1_m", z_m, {"z1_index","lepton_pass_px_py_pz", "lepton_pass_energy"}).
+                        Define("z2_m", z_m, {"z2_index","lepton_pass_px_py_pz", "lepton_pass_energy"}).
                         Define("z1_y", z_y, {"z1_px_py_pz", "z1_energy"}).
                         Define("z2_y", z_y, {"z2_px_py_pz", "z2_energy"}).
                         Define("llll_index",llll_index,{"z1_index","z2_index"}).
@@ -220,6 +207,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
                         Define("zzjj_rel_pt",zzjj_rel_pt, {"z1_pt","z2_pt","j1_pt","j2_pt","z1_px_py_pz","z2_px_py_pz","jet_pass_px_py_pz","j1_j2_index"}).
                         Define("centrarity", centrarity, {"jet_pass_px_py_pz", "jet_pass_energy","j1_j2_index", "z1_px_py_pz", "z2_px_py_pz", "z1_energy", "z2_energy", "jj_delta_y"}).
                         Define("pass_cut", pass_cut, {"j1_pt", "j2_pt", "llll_m", "jj_m",  "jj_product_y",  "jj_delta_y",  "zzjj_rel_pt",  "z1_m",  "z2_m"}).
+                        //Filter("pass_cut > 0").
                         Define("pass_SR", pass_SR,{"pass_cut", "njet_inbetween", "centrarity"}).
                         Define("pass_CT_NJN", pass_CT_no_JN,{"pass_cut", "njet_inbetween", "centrarity"}).
                         Define("pass_NCT_JN", pass_no_CT_JN, {"pass_cut", "njet_inbetween", "centrarity"}).
@@ -227,7 +215,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
 
     //save tree
         auto hehe = ana.GetColumnNames();
-        hehe.erase(hehe.begin(),hehe.begin()+39);
+        hehe.erase(hehe.begin(),hehe.begin()+37);
         hehe.push_back("jet_pass_energy");
         hehe.push_back("j1_y");
         hehe.push_back("j2_y");
