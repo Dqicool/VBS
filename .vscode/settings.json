@@ -70,14 +70,12 @@
     "files.exclude": {
         "**/.gitignore": true
     },
-    "workbench.startupEditor": "newUntitledFile",
     "workbench.colorTheme": "Material Theme Palenight High Contrast",
     "window.zoomLevel": 0,
     "editor.cursorStyle": "block",
     "editor.cursorBlinking": "smooth",
     "editor.cursorSmoothCaretAnimation": true,
-    "terminal.integrated.fontFamily": "Iosevka",
-    "editor.fontFamily": "Iosevka, Iosevka, Iosevka, iosevka",
+    "editor.fontFamily": "Iosevka,Iosevka,Iosevka,Iosevka",
     "editor.fontSize": 14,
     "workbench.iconTheme": "material-icon-theme",
     "files.autoSave": "onFocusChange",
@@ -95,5 +93,7 @@
         "--generated-members=numpy.* ,torch.*"
     ],
     "python.linting.pylintEnabled": false,
-    "python.linting.pylamaEnabled": true
+    "python.linting.pylamaEnabled": true,
+    "editor.fontLigatures": true,
+    "terminal.integrated.fontFamily": "Iosevka"
 }

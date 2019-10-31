@@ -4,46 +4,45 @@
 #include <RooUnfoldBayes.h>
 #include <RooUnfoldErrors.h>
 
-void bayesUnfold(const char* in_tree_file, const char* out_histo)
+void bayesUnfold(const char* infile_train, const char* infile_test)
 {   
-    TFile* treeFile = TFile::Open(in_tree_file);
+    TFile* treeFile = TFile::Open(infile_train);
     TTree* tree  = (TTree*)treeFile->Get("SM4L_Nominal");
     //declare histos demands unfold
-    RooUnfoldResponse mjj_resp (10, 0., 2000.0);
-    TH1D* h_mjj = new TH1D("h_mjj","h_mjj",10,0.,2000.);
-    TH1D* h_mjj_true = new TH1D("h_mjj_true","h_mjj",10,0.,2000.);
+    RooUnfoldResponse mjj_resp (20, 200., 3000.0);
+    TH1D* h_mjj = new TH1D("h_mjj","h_mjj",20,200.,3000.);
+    TH1D* h_mjj_true = new TH1D("h_mjj_true","h_mjj",20,200.,3000.);
     //declare variable pointer in tree
     double mjj=0;
     double mjj_true=0;
-    double weights = 0;
-    double fid_weights = 0;
-    bool sr_flag = 0;
-    bool cr_flag = 0;
+    double weight = 0;
+    double weight_true = 0;
+    bool pass_cut = 0;
+
     //set branch
-    tree->SetBranchAddress("SR_flag", &sr_flag);
-    tree->SetBranchAddress("CR_flag", &cr_flag);
+    tree->SetBranchAddress("pass_cut", &pass_cut);
     tree->SetBranchAddress("dijet_mjj",&mjj);
     tree->SetBranchAddress("dijet_mjj_truthBorn",&mjj_true);
-    tree->SetBranchAddress("whights", &weights);
-    tree->SetBranchAddress("fid_weights", &fid_weights);
+    tree->SetBranchAddress("NormWeight", &weight);
+    tree->SetBranchAddress("NormWeight_true", &weight_true);
     //loop over entries
     auto n_entry = tree->GetEntries();
-    for( Long64_t i = 0; i<(int)(0.75*n_entry); i++)
+    for( Long64_t i = 0; i<(int)(n_entry); i++)
     {
         tree->GetEntry(i);
-        //if (sr_flag)
+        if (pass_cut)
         {
             if(mjj>0 && mjj_true>0)
             {
-                mjj_resp.Fill(mjj,mjj_true,weights);
+                mjj_resp.Fill(mjj,mjj_true, weights);
             }
             else if(mjj_true>0 && mjj < 0)
             {
-                mjj_resp.Miss(mjj_true);
+                mjj_resp.Miss(mjj_true, fid_weights);
             }
             else if (mjj_true>0 && mjj<0)
             {
-
+                mjj_resp.Fake(mjj, weights);
             }
         }
     }

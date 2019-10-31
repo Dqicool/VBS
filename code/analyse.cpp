@@ -149,7 +149,7 @@ void analysis(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tre
             auto pass_cut = [](float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m){
                 auto ret =  j1_pt > 40e3 &&
                             j2_pt > 30e3 &&
-                            llll_m > 150e3 &&
+                            //llll_m < 150e3 &&
                             jj_m > 200e3 &&
                             jj_product_y < 0 &&
                             (jj_delta_y > 2 || jj_delta_y < -2) &&

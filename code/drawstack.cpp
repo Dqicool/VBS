@@ -50,7 +50,6 @@ int main()
 
         mjj_sr_stack->Draw("hist,same");
         h_inc_mjj_sr->Draw("E2,same");
-        cout<<h_inc_mjj_sr->Integral()<<endl;
     c1.SaveAs("plots/mjj_sr_stack.png");
 
     TCanvas c2("c2","",1200,800);
@@ -93,4 +92,6 @@ int main()
         h_inc_mjj_nct_njn->Draw("E2,same");
         
     c4.SaveAs("plots/mjj_nct_njn_bkg_stack.png");
+
+    cout<<h_inc_mjj_sr->Integral() + h_inc_mjj_ct_njn->Integral()+ h_inc_mjj_nct_jn->Integral() + h_inc_mjj_nct_njn->Integral()<<endl;
 }

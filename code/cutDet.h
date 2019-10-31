@@ -38,14 +38,42 @@ std::vector<int> jetSel(std::vector<float> jet_pt, std::vector<float> jet_eta)
     std::vector<int> jet_pass_ind;
     auto siz = jet_pt.size();
     for (uint i = 0; i < siz; i++){
-        if (TMath::Abs(jet_eta[i])<2.4 && jet_pt[i] > 30e3){
+        if (TMath::Abs(jet_eta[i]) < 2.4 && jet_pt[i] > 30e3){
             jet_pass_ind.push_back(i);
         }
-        else if(TMath::Abs(jet_eta[i])<4.5 && jet_pt[i] > 40e3){
+        else if(TMath::Abs(jet_eta[i]) < 4.5 && jet_pt[i] > 40e3){
             jet_pass_ind.push_back(i);
         }
     } 
     return jet_pass_ind;
+}
+
+std::vector<int> jetMiss(std::vector<float> jet_pt, std::vector<float> jet_pt_truthBorn)
+{
+    std::vector<int> jet_miss_ind;
+    auto siz = jet_pt.size();
+    for (uint i = 0; i < siz; i++)
+    {
+        if (jet_pt[i] < 0 && jet_pt_truthBorn[i] > 0)
+        {
+            jet_miss_ind.push_back(i);
+        }
+    } 
+    return jet_miss_ind;
+}
+
+std::vector<int> jetFake(std::vector<float> jet_pt, std::vector<float> jet_pt_truthBorn)
+{
+    std::vector<int> jet_fake_ind;
+    auto siz = jet_pt.size();
+    for (uint i = 0; i < siz; i++)
+    {
+        if (jet_pt[i] < 0 && jet_pt_truthBorn[i] > 0)
+        {
+            jet_miss_ind.push_back(i);
+        }
+    } 
+    return jet_miss_ind;
 }
 
 std::vector<float> fpass_property(std::vector<int> index, std::vector<float> fproperty){
