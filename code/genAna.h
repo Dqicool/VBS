@@ -62,26 +62,30 @@ float getMass(vector<float> particle_energy,
 float getMassWithInd(vector<float> particle_energy, 
                     std::vector<std::vector<float>> particle_px_py_pz, 
                     vector<int> ind){
+    float ret = 0;
     float energy = 0;
     float px = 0;
     float py = 0;
     float pz = 0;
-    for (uint i = 0; i<ind.size(); i++){
-        energy += particle_energy[ind[i]];
-        px += particle_px_py_pz[ind[i]][0];
-        py += particle_px_py_pz[ind[i]][1];
-        pz += particle_px_py_pz[ind[i]][2];
+    if (ind.size() > 0){
+        for (uint i = 0; i<ind.size(); i++){
+            energy += particle_energy[ind[i]];
+            px += particle_px_py_pz[ind[i]][0];
+            py += particle_px_py_pz[ind[i]][1];
+            pz += particle_px_py_pz[ind[i]][2];
+        }
+        ret = TMath::Sqrt(TMath::Power(energy,2) - TMath::Power(px,2) - TMath::Power(py,2) - TMath::Power(pz,2));
     }
-    return TMath::Sqrt(TMath::Power(energy,2) - TMath::Power(px,2) - TMath::Power(py,2) - TMath::Power(pz,2));
+    else{
+        ret = -999;
+    }
+    return ret;
 }
 
 vector<int> getMaxSec(vector<float> vec){
     int size = vec.size();
     vector<int> ret;
-    if (size < 2){
-        cout<<"error: size less then 2"<<endl;
-        ret.push_back(-1);
-    }
+    if (size < 2){}
     else if (size == 2){
         ret.push_back(0);
         ret.push_back(1);
@@ -180,15 +184,21 @@ float getTotalPt(vector<float> particle1_px_py_pz,
 }
 
 float getY(vector <float> particle_px_py_pz, float particle_energy){
-    float tmp1 = (particle_energy + particle_px_py_pz[2]);
-    float tmp2 = (particle_energy - particle_px_py_pz[2]);
-    float tmp3 = TMath::Log(tmp1/tmp2);
-    float ret = tmp3 / 2;
+    float ret = 0;
+    if (particle_px_py_pz.size() > 0 && particle_energy > 0){
+        float tmp1 = (particle_energy + particle_px_py_pz[2]);
+        float tmp2 = (particle_energy - particle_px_py_pz[2]);
+        float tmp3 = TMath::Log(tmp1/tmp2);
+        ret = tmp3 / 2;
+    }
+    else{
+        ret = -999;
+    }
     return ret;
 }
 
 vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz, vector<int> ind ){
-    vector <float> ret;
+    vector <float> ret{};
     float px = 0;
     float py = 0;
     float pz = 0;
@@ -205,8 +215,13 @@ vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz,
 
 float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
     float ret = 0;
-    for (uint i = 0; i<ind.size(); i++){
-        ret += energy[ind[i]];
+    if (ind.size() > 0){
+        for (uint i = 0; i<ind.size(); i++){
+            ret += energy[ind[i]];
+        }
+    }
+    else{
+        ret = -999;
     }
     return ret;
 }

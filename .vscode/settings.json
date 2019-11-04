@@ -71,7 +71,7 @@
         "**/.gitignore": true
     },
     "workbench.colorTheme": "Material Theme Palenight High Contrast",
-    "window.zoomLevel": 0,
+    "window.zoomLevel": -1,
     "editor.cursorStyle": "block",
     "editor.cursorBlinking": "smooth",
     "editor.cursorSmoothCaretAnimation": true,

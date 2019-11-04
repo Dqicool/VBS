@@ -19,17 +19,11 @@ void preAna(const char* infile ,const char* outfile, double lumi)
         return weight/lumi;
     };
 
-    auto baseline = [](std::vector<int> lepton_pass_ind, std::vector<int> jet_pass_ind){
 
-        bool ret = lepton_pass_ind.size() >= 4 && jet_pass_ind.size() >= 2;
-        return ret;
-    };
 
     auto d1 = d.Define("jet_pass_ind", jetSel, {"jet_pt", "jet_eta"}).
-                Define("jet_true_pass_ind", jetSel, {"jet_truthBorn_pt", "jet_truthBorn_eta"}).
                 Define("lepton_pass_ind", lepSel, {"lepton_pt", "lepton_eta", "lepton_d0sig", "lepton_z0sinTheta", "lepton_particleID", "lepton_isLoose"}).
-                Filter(baseline, {"lepton_pass_ind", "jet_pass_ind"}).
-                Filter(leptonPtSel, {"lepton_pt","lepton_pass_ind"}).
+                Define("pass_det",baseline, {"lepton_pass_ind", "jet_pass_ind", "lepton_pt"}).
                 Define("NormWeight", proWeight, {"weight"}).
                 Define("jet_pass_pt", fpass_property, {"jet_pass_ind", "jet_pt"}).
                 Define("jet_pass_eta", fpass_property, {"jet_pass_ind", "jet_eta"}).
@@ -50,24 +44,50 @@ void preAna(const char* infile ,const char* outfile, double lumi)
                 Define("lepton_pass_phi", fpass_property, {"lepton_pass_ind", "lepton_phi"}).
                 Define("lepton_pass_n", passN, {"lepton_pass_ind"});
 
-    if(d.HasColumn("fid_weights")){
-        d1 = d1.Define("NormWeight_true", proWeight, {"fid_weights"});
+    if(d.HasColumn("fid_weight")){
+        d1 = d1.Define("NormWeight_true", proWeight, {"fid_weight"}).
+                Define("jet_truthBorn_pass_ind", jetSel, {"jet_truthBorn_pt", "jet_truthBorn_eta"}).
+                Define("lepton_truthBorn_pass_ind", lepTrueSel, {"lepton_truthBorn_pt", "lepton_truthBorn_eta", "lepton_truthBorn_particleID"}).
+                Define("pass_det_truthBorn",baseline, {"lepton_truthBorn_pass_ind", "jet_truthBorn_pass_ind", "lepton_truthBorn_pt"}).
+                Define("jet_truthBorn_pass_pt", fpass_property, {"jet_truthBorn_pass_ind", "jet_truthBorn_pt"}).
+                Define("jet_truthBorn_pass_eta", fpass_property, {"jet_truthBorn_pass_ind", "jet_truthBorn_eta"}).
+                Define("jet_truthBorn_pass_m", fpass_property, {"jet_truthBorn_pass_ind", "jet_truthBorn_m"}).
+                Define("jet_truthBorn_pass_phi", fpass_property, {"jet_truthBorn_pass_ind", "jet_truthBorn_phi"}).
+                Define("jet_truthBorn_pass_n", passN, {"jet_truthBorn_pass_ind"}).
+                Define("lepton_truthBorn_pass_pt", fpass_property, {"lepton_truthBorn_pass_ind", "lepton_truthBorn_pt"}).
+                Define("lepton_truthBorn_pass_eta", fpass_property, {"lepton_truthBorn_pass_ind", "lepton_truthBorn_eta"}).
+                Define("lepton_truthBorn_pass_particleID", ipass_property, {"lepton_truthBorn_pass_ind", "lepton_truthBorn_particleID"}).
+                Define("lepton_truthBorn_pass_charge", fpass_property, {"lepton_truthBorn_pass_ind", "lepton_truthBorn_charge"}).
+                Define("lepton_truthBorn_pass_m", fpass_property, {"lepton_truthBorn_pass_ind", "lepton_truthBorn_m"}).
+                Define("lepton_truthBorn_pass_phi", fpass_property, {"lepton_truthBorn_pass_ind", "lepton_truthBorn_phi"}).
+                Define("lepton_truthBorn_pass_n", passN, {"lepton_truthBorn_pass_ind"});
     }
 
     auto hehe = d1.GetColumnNames();
-    hehe.erase(hehe.begin()+22, hehe.end());
-    hehe.push_back("dijet_mjj");
-    if(d.HasColumn("dijet_mjj_truthBorn")){
-        hehe.push_back("dijet_mjj_truthBorn");
+    if(d.HasColumn("fid_weight")){
+        auto d2 = d1.Filter("pass_det || pass_det_truthBorn");
+        hehe.erase(hehe.begin()+38, hehe.end());
+        d2.Snapshot("SM4L_Nominal", outfile, hehe);
     }
-    d1.Snapshot("SM4L_Nominal", outfile, hehe);
+    else
+    {
+        auto d2 = d1.Filter("pass_det");
+        hehe.erase(hehe.begin()+22, hehe.end());
+        d2.Snapshot("SM4L_Nominal", outfile, hehe);
+    }
+
+
 }
+
+
 #ifndef debug
 int main(int argc, char** argv){
     const char* infile = argv[1];
     const char* outfile = argv[2];
     preAna(infile, outfile, getLumi(infile));
 }
+
+
 #else 
 int main(){
     const char* infile ="/data/999_all/mc16_13TeV.364250.Sherpa_222_NNPDF30NNLO_llll.deriv.DAOD_HIGG2D1.e5894_s3126_r9364_p3654.root";
