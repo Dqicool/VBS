@@ -206,12 +206,12 @@
     bool pass_cut (float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m){
         auto ret =  j1_pt > 40e3 &&
                     j2_pt > 30e3 &&
-                    //llll_m < 150e3 &&
+                    //(llll_m < 150e3 && llll_m > 100e3) &&
                     jj_m > 200e3 &&
                     (jj_product_y < 0 && jj_product_y > -999) &&
                     ((jj_delta_y > 2 || jj_delta_y < -2) && jj_delta_y > -999) &&
                     (zzjj_rel_pt < 0.2 && zzjj_rel_pt >= 0) &&
-                    (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3) &&
+                    (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3);
                     (z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3);
         return ret;
     };

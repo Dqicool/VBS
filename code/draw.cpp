@@ -17,20 +17,78 @@ void draw(const char* in_file, const char* out_histo)
 
     //book histos
         TH1::SetDefaultSumw2();
-        auto h_mjj_sr = f_sr.Histo1D({"h_mjj_sr","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
-        auto h_mjj_ct_njn = f_ct_njn.Histo1D({"h_mjj_ct_njn","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
-        auto h_mjj_nct_jn = f_nct_jn.Histo1D({"h_mjj_nct_jn","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
-        auto h_mjj_nct_njn = f_nct_njn.Histo1D({"h_mjj_nct_njn","",NBIN,XMIN,XMAX},"jj_m","NormWeight");
+        auto h_mjj_sr = f_sr.Histo1D({"h_mjj_sr","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
+        auto h_mjj_ct_njn = f_ct_njn.Histo1D({"h_mjj_ct_njn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
+        auto h_mjj_nct_jn = f_nct_jn.Histo1D({"h_mjj_nct_jn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
+        auto h_mjj_nct_njn = f_nct_njn.Histo1D({"h_mjj_nct_njn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
+
+        auto h_m4l_sr = f_sr.Histo1D({"h_m4l_sr","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+        auto h_m4l_ct_njn = f_ct_njn.Histo1D({"h_m4l_ct_njn","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+        auto h_m4l_nct_jn = f_nct_jn.Histo1D({"h_m4l_nct_jn","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+        auto h_m4l_nct_njn = f_nct_njn.Histo1D({"h_m4l_nct_njn","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+
         h_mjj_sr->Scale(LUMI / 3.0);
         h_mjj_ct_njn->Scale(LUMI/3.0);
         h_mjj_nct_jn->Scale(LUMI/3.0);
         h_mjj_nct_njn->Scale(LUMI/3.0);
+        
+        h_m4l_sr->Scale(LUMI / 3.0);
+        h_m4l_ct_njn->Scale(LUMI/3.0);
+        h_m4l_nct_jn->Scale(LUMI/3.0);
+        h_m4l_nct_njn->Scale(LUMI/3.0);
+
+        
     //save
         TFile* out = TFile::Open(out_histo,"recreate");
+
         h_mjj_sr->Write();
         h_mjj_nct_jn->Write();
         h_mjj_ct_njn->Write();
         h_mjj_nct_njn->Write();
+
+        h_m4l_sr->Write();
+        h_m4l_nct_jn->Write();
+        h_m4l_ct_njn->Write();
+        h_m4l_nct_njn->Write();
+
+        if (df.HasColumn("NormWeight_true")){
+
+            auto f_true_sr = df.Filter("pass_truthBorn_SR == 1");
+            auto f_true_ct_njn = df.Filter("pass_truthBorn_CT_NJN == 1");
+            auto f_true_nct_jn = df.Filter("pass_truthBorn_NCT_JN == 1");
+            auto f_true_nct_njn = df.Filter("pass_truthBorn_NCT_NJN == 1");
+
+            auto h_true_mjj_sr = f_true_sr.Histo1D({"h_true_mjj_sr","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight_true");
+            auto h_true_mjj_ct_njn = f_true_ct_njn.Histo1D({"h_true_mjj_ct_njn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight_true");
+            auto h_true_mjj_nct_jn = f_true_nct_jn.Histo1D({"h_true_mjj_nct_jn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight_true");
+            auto h_true_mjj_nct_njn = f_true_nct_njn.Histo1D({"h_true_mjj_nct_njn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight_true");
+
+            auto h_true_m4l_sr = f_sr.Histo1D({"h_true_m4l_sr","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+            auto h_true_m4l_ct_njn = f_ct_njn.Histo1D({"h_true_m4l_ct_njn","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+            auto h_true_m4l_nct_jn = f_nct_jn.Histo1D({"h_true_m4l_nct_jn","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+            auto h_true_m4l_nct_njn = f_nct_njn.Histo1D({"h_true_m4l_nct_njn","",M4LNBIN,M4LXMIN,M4LXMAX},"llll_m","NormWeight");
+
+            h_true_mjj_sr->Scale(LUMI / 3.0);
+            h_true_mjj_ct_njn->Scale(LUMI/3.0);
+            h_true_mjj_nct_jn->Scale(LUMI/3.0);
+            h_true_mjj_nct_njn->Scale(LUMI/3.0);
+
+            h_true_m4l_sr->Scale(LUMI / 3.0);
+            h_true_m4l_ct_njn->Scale(LUMI/3.0);
+            h_true_m4l_nct_jn->Scale(LUMI/3.0);
+            h_true_m4l_nct_njn->Scale(LUMI/3.0);
+
+            h_true_mjj_sr->Write();
+            h_true_mjj_nct_jn->Write();
+            h_true_mjj_ct_njn->Write();
+            h_true_mjj_nct_njn->Write();
+
+            h_true_m4l_sr->Write();
+            h_true_m4l_nct_jn->Write();
+            h_true_m4l_ct_njn->Write();
+            h_true_m4l_nct_njn->Write();
+        }
+
         out->Close();
 }
 #ifndef debug
