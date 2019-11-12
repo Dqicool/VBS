@@ -3,13 +3,20 @@
 #include <RooUnfoldResponse.h>
 #include <RooUnfoldBayes.h>
 #include <RooUnfoldErrors.h>
+#include <cstdlib>
 
-void mjjUnfold()
+
+
+//#define debug
+
+void distUnfold(char* dist, char* dist_true, int nbins, double xmin, double xmax)
 {   
     //load files in chain
         TH1::SetDefaultSumw2();
+        gStyle->SetPaintTextFormat("1.3f");
         TChain chain("SM4L_Nominal");
         chain.Add("output/analyse_out/999_all/364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.root");
+#ifndef debug
         chain.Add("output/analyse_out/999_all/344235.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_ZZ4lep_notau.root");
         //chain.Add("output/analyse_out/999_all/344295.Sherpa_Zee_4lMassFilter40GeV8GeV.root");
         //chain.Add("output/analyse_out/999_all/344296.Sherpa_Zmumu_4lMassFilter40GeV8GeV.root");
@@ -32,13 +39,12 @@ void mjjUnfold()
         chain.Add("output/analyse_out/999_all/364250.Sherpa_222_NNPDF30NNLO_llll.root");
         chain.Add("output/analyse_out/999_all/410142.Sherpa_NNPDF30NNLO_ttll_mll5.root");
         //chain.Add("output/analyse_out/999_all/410472.PhPy8EG_A14_ttbar_hdamp258p75_dil.root");
+#endif
     //declare histos demands unfold
-        RooUnfoldResponse mjj_resp (MJJNBIN, MJJXMIN, MJJXMAX);
-        TH1D* h_mjj = new TH1D("h_mjj","h_mjj",MJJNBIN,MJJXMIN,MJJXMAX);
-        TH1D* h_mjj_true = new TH1D("h_mjj_true","h_mjj",MJJNBIN,MJJXMIN,MJJXMAX);
+        RooUnfoldResponse resp(nbins, xmin, xmax);
     //declare variable pointer in tree
-        float mjj=0;
-        float mjj_true = 0;
+        float x_measured=0;
+        float x_true = 0;
         double weight = 0;
         double weight_true = 0;
         bool pass_cut = 0;
@@ -47,8 +53,8 @@ void mjjUnfold()
     //set branch
         chain.SetBranchAddress("pass_cut", &pass_cut);
         chain.SetBranchAddress("pass_truthBorn_cut", &pass_true_cut);
-        chain.SetBranchAddress("jj_m",&mjj);
-        chain.SetBranchAddress("jj_truthBorn_m",&mjj_true);
+        chain.SetBranchAddress(dist,&x_measured);
+        chain.SetBranchAddress(dist_true,&x_true);
         chain.SetBranchAddress("NormWeight", &weight);
         chain.SetBranchAddress("NormWeight_true", &weight_true);
     //loop over entries
@@ -61,49 +67,89 @@ void mjjUnfold()
             chain.GetEntry(i);
             
             if(pass_cut && pass_true_cut){
-                mjj_resp.Fill(mjj, mjj_true, weight*LUMI/3.0);
+                resp.Fill(x_measured, x_true, weight*LUMI/3.0);
                 nfill++;
             }
             else if(pass_cut && (pass_true_cut==0)){
-                mjj_resp.Fake(mjj, weight*LUMI/3.0);
+                resp.Fake(x_measured, weight*LUMI/3.0);
                 nfake++;
             }
             else if((pass_cut==0) && pass_true_cut){
-                mjj_resp.Miss(mjj_true, weight_true*LUMI/3.0);
+                resp.Miss(x_true, weight_true*LUMI/3.0);
                 nmiss++;
             }
 
-            if(pass_cut)  {h_mjj->Fill(mjj, weight*LUMI/3.0);}
-            if(pass_true_cut){h_mjj_true->Fill(mjj_true, weight_true*LUMI/3.0);};
-
-            if (i % (Long64_t)(n_entry/100) == 0){
-                cout<<i/(Long64_t)(n_entry/100)<<'%'<<endl;
+            if (i % (Long64_t)(n_entry/10) == 0){
+                cout<<i/(Long64_t)(n_entry/10)<<"0%"<<endl;
                 cout<<"Fill: "<<nfill<<"\t\t"<<"Fake: "<<nfake<<"\t\t"<< "Miss: "<<nmiss<<endl; 
             }
         }
+        TH2D* h_resp = (TH2D*)resp.Hresponse();
+        auto m_resp = resp.Mresponse();
+        auto h_meas = resp.Hmeasured();
+        auto h_true = resp.Htruth();
+        auto h_fake = resp.Hfakes();
+
+
+        cout<<"Purity: \t"<<endl;
+        for(int i=1; i<=nbins; i++){
+            cout<<i<<":\t"<<h_resp->GetBinContent(i,i)<<"\t\t"<<h_resp->Integral(i,i,0,nbins)<<"\t\t"<<
+            h_resp->GetBinContent(i,i)/h_resp->Integral(1, nbins,i,i)<<endl;
+        }
+
     //unfold
-        RooUnfoldBayes mjj_unfold(&mjj_resp, h_mjj, 4);
-        auto cov = mjj_unfold.GetMeasuredCov();
-        TH1D* h_mjj_unfold= (TH1D*) mjj_unfold.Hreco();
-        mjj_unfold.PrintTable (std::cout, h_mjj_true);
+        RooUnfoldBayes unfold(&resp, h_meas, 2);
+        auto cov = unfold.GetMeasuredCov();
+        TH1D* h_unfold= (TH1D*) unfold.Hreco();
+        unfold.PrintTable (std::cout, h_true);
+        
     //save
+        string pic_name = "plots/unfold/" + (string)(const char*)dist;
+        auto unfold_name = pic_name + "_unfold.png";
+        auto resp_name = pic_name + "_resp.png";
+        auto resph_name = pic_name + "_resph.png";
         TCanvas *c1 = new TCanvas("c1","",1200,800);
-            h_mjj_unfold->SetLineColor(kBlue);
-            h_mjj_unfold->GetXaxis()->SetTitle("mjj");
-            h_mjj_unfold->Draw();
-            h_mjj->SetLineColor(kRed);
-            h_mjj->Draw("same");
-            h_mjj_true->SetLineColor(kGreen);
-            h_mjj_true->Draw("same");
-        c1->SaveAs("plots/unfold/test_mjj_unfold.png");
-        TH2D* h_mjj_resp = mjj_resp.HresponseNoOverflow();
-        auto* c2 = new TCanvas("c2","",1200,1200);
-            h_mjj_resp->SetStats(0);
-            h_mjj_resp->Draw("colz");
-            c2->Draw();
-        c2->SaveAs("plots/unfold/test_response.png");
+
+            h_unfold->SetLineColor(kBlue);
+            h_unfold->GetXaxis()->SetTitle(dist);
+            h_unfold->Draw("E");
+            h_meas->SetLineColor(kRed);
+            h_meas->Draw("same HISTO ");
+            h_true->SetLineColor(kGreen);
+            h_true->Draw("same HISTO");
+            h_fake->SetLineColor(kBlack);
+            h_fake->Draw("same HISTO");
+            c1->SaveAs((&unfold_name[0]));
+        
+        auto* c2 = new TCanvas("c2","",2000,2000);
+            auto tmp = new TH2D(m_resp);
+            //tmp->Scale(1+ nmiss/nfill);
+            tmp->SetStats(0);
+            tmp->Draw("COLZ");
+            tmp->Draw("TEXT SAME");
+            c2->SaveAs(&resp_name[0]);
+
+        auto* c3 = new TCanvas("c3","",2000,2000);
+            h_resp->SetStats(0);
+            h_resp->Draw("COLZ");
+            h_resp->Draw("TEXT SAME");
+            c3->SaveAs(&resph_name[0]);
+
 }
 
-int main(){
-    mjjUnfold();
+#ifndef debug
+
+int main(int argc, char** argv){
+    auto dist = argv[1];
+    auto dist_true = argv[2];
+    int nbin = atoi(argv[3]);
+    float xmin = atof(argv[4]);
+    float xmax = atof(argv[5]);
+    distUnfold(dist, dist_true, nbin, xmin, xmax);
 }
+#else
+
+int main(){
+    distUnfold("llll_m", "llll_truthBorn_m", 9, 100000, 1000000);
+}
+#endif

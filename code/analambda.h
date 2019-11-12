@@ -211,8 +211,9 @@
                     (jj_product_y < 0 && jj_product_y > -999) &&
                     ((jj_delta_y > 2 || jj_delta_y < -2) && jj_delta_y > -999) &&
                     (zzjj_rel_pt < 0.2 && zzjj_rel_pt >= 0) &&
-                    (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3);
-                    (z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3);
+                    (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3) &&
+                    //(z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3) &&
+                    (z2_m > 15e3 && z2_m < Z_MASS*1e3+20e3);
         return ret;
     };
     bool pass_SR(bool pass_cut, int njet_inbetween, float centrarity){

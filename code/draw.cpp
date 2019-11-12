@@ -4,6 +4,8 @@
 #include <TCanvas.h>
 #include <ROOT/RDataFrame.hxx>
 
+
+
 void draw(const char* in_file, const char* out_histo)
 {
     ROOT::EnableImplicitMT();
@@ -17,6 +19,7 @@ void draw(const char* in_file, const char* out_histo)
 
     //book histos
         TH1::SetDefaultSumw2();
+
         auto h_mjj_sr = f_sr.Histo1D({"h_mjj_sr","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
         auto h_mjj_ct_njn = f_ct_njn.Histo1D({"h_mjj_ct_njn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
         auto h_mjj_nct_jn = f_nct_jn.Histo1D({"h_mjj_nct_jn","",MJJNBIN,MJJXMIN,MJJXMAX},"jj_m","NormWeight");
@@ -52,7 +55,7 @@ void draw(const char* in_file, const char* out_histo)
         h_m4l_nct_njn->Write();
 
         if (df.HasColumn("NormWeight_true")){
-
+            
             auto f_true_sr = df.Filter("pass_truthBorn_SR == 1");
             auto f_true_ct_njn = df.Filter("pass_truthBorn_CT_NJN == 1");
             auto f_true_nct_jn = df.Filter("pass_truthBorn_NCT_JN == 1");

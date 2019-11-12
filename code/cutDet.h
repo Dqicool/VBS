@@ -7,14 +7,14 @@ std::vector<int> lepSel(std::vector<float> lepton_pt,
                         std::vector<float> lepton_d0sig, 
                         std::vector<float> lepton_z0sinTheta, 
                         std::vector<int> lepton_particleID,
-                        std::vector<char> lepton_isLoose)
+                        std::vector<char> lepton_passesIsolation)
 {
     std::vector<int> letpon_pass_ind;
     auto siz = lepton_pt.size();
 
     for (uint i = 0;i < siz; i++)
     {
-        //if (lepton_isTight[i] == 0)
+        if (lepton_passesIsolation[i] == 1)
         {
             if(lepton_particleID[i] == 11){
                 if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && TMath::Abs(lepton_d0sig[i] < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){

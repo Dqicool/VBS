@@ -11,6 +11,8 @@
 #include <ROOT/RDataFrame.hxx>
 #include <TLorentzVector.h>
 #include <TChain.h>
+#include<TROOT.h>
+#include<TStyle.h>
 #define Z_MASS 91.1876
 using namespace std;
 

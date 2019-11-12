@@ -22,7 +22,7 @@ void preAna(const char* infile ,const char* outfile, double lumi)
 
 
     auto d1 = d.Define("jet_pass_ind", jetSel, {"jet_pt", "jet_eta"}).
-                Define("lepton_pass_ind", lepSel, {"lepton_pt", "lepton_eta", "lepton_d0sig", "lepton_z0sinTheta", "lepton_particleID", "lepton_isLoose"}).
+                Define("lepton_pass_ind", lepSel, {"lepton_pt", "lepton_eta", "lepton_d0sig", "lepton_z0sinTheta", "lepton_particleID", "lepton_passesIsolation"}).
                 Define("pass_det",baseline, {"lepton_pass_ind", "jet_pass_ind", "lepton_pt"}).
                 Define("NormWeight", proWeight, {"weight"}).
                 Define("jet_pass_pt", fpass_property, {"jet_pass_ind", "jet_pt"}).
@@ -67,12 +67,14 @@ void preAna(const char* infile ,const char* outfile, double lumi)
     if(d.HasColumn("fid_weight")){
         auto d2 = d1.Filter("pass_det || pass_det_truthBorn");
         hehe.erase(hehe.begin()+38, hehe.end());
+        hehe.push_back("m4l");
         d2.Snapshot("SM4L_Nominal", outfile, hehe);
     }
     else
     {
         auto d2 = d1.Filter("pass_det");
         hehe.erase(hehe.begin()+22, hehe.end());
+        hehe.push_back("m4l");
         d2.Snapshot("SM4L_Nominal", outfile, hehe);
     }
 
