@@ -142,29 +142,29 @@ void plotProp(const char* outfile, const char* dist, int nbins, double xmin, dou
             h_inc_sr->Add(&(sr_histo[i]));
         }
     //Store
-    TFile * out = TFile::Open(outfile,"recreate");
-    det_stack->Write();
-    nct_stack->Write();
-    njn_stack->Write();
-    nn_stack->Write();
-    sr_stack->Write();
-    cut_stack->Write();
+        TFile * out = TFile::Open(outfile,"recreate");
+        det_stack->Write();
+        nct_stack->Write();
+        njn_stack->Write();
+        nn_stack->Write();
+        sr_stack->Write();
+        cut_stack->Write();
 
-    h_inc_det->Write();
-    h_inc_cut->Write();
-    h_inc_nct->Write();
-    h_inc_njn->Write();
-    h_inc_nn->Write();
-    h_inc_sr->Write();
-    out->Close();
+        h_inc_det->Write();
+        h_inc_cut->Write();
+        h_inc_nct->Write();
+        h_inc_njn->Write();
+        h_inc_nn->Write();
+        h_inc_sr->Write();
+        out->Close();
 
     //print stat
-    cout<<h_inc_det->Integral()<<endl;
-    cout<<h_inc_cut->Integral()<<endl;
-    cout<<h_inc_sr->Integral()<<endl;
-    cout<<h_inc_nct->Integral()<<endl;
-    cout<<h_inc_njn->Integral()<<endl;
-    cout<<h_inc_nn->Integral()<<endl;
+        cout<<h_inc_det->Integral()<<endl;
+        cout<<h_inc_cut->Integral()<<endl;
+        cout<<h_inc_sr->Integral()<<endl;
+        cout<<h_inc_nct->Integral()<<endl;
+        cout<<h_inc_njn->Integral()<<endl;
+        cout<<h_inc_nn->Integral()<<endl;
 
 
     //drawstack
@@ -242,6 +242,8 @@ int main()
     plotProp("output/stack_out/m4l.root", "llll_m", 1000, 0, 1000e3);
     cout<<"mjj:"<<endl;
     plotProp("output/stack_out/mjj.root", "jj_m", 450, 200e3, 2000e3);
+    cout<<"jj_delta_phi"<<endl;
+    plotProp("output/stack_out/jjDelPhi.root", "jj_delta_phi", 200, -2*TMath::Pi(), 2*TMath::Pi());
 }
         
 

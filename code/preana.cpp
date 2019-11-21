@@ -16,7 +16,7 @@ void preAna(const char* infile ,const char* outfile, double lumi)
     ROOT::RDataFrame d("SM4L_Nominal", infile);
 
     auto proWeight = [&](double weight){
-        return weight/lumi;
+        return weight;
     };
 
 
@@ -67,14 +67,16 @@ void preAna(const char* infile ,const char* outfile, double lumi)
     if(d.HasColumn("fid_weight")){
         auto d2 = d1.Filter("pass_det || pass_det_truthBorn");
         hehe.erase(hehe.begin()+38, hehe.end());
-        hehe.push_back("m4l");
+        hehe.push_back("lepton_n");
+        hehe.push_back("jet_n");
         d2.Snapshot("SM4L_Nominal", outfile, hehe);
     }
     else
     {
         auto d2 = d1.Filter("pass_det");
         hehe.erase(hehe.begin()+22, hehe.end());
-        hehe.push_back("m4l");
+        hehe.push_back("lepton_n");
+        hehe.push_back("jet_n");
         d2.Snapshot("SM4L_Nominal", outfile, hehe);
     }
 

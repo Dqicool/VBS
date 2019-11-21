@@ -19,6 +19,17 @@
         }
         return jet_px_py_pz;
     };
+
+    float jj_delta_phi(std::vector<float> jet_phi, std::vector<int> j1_j2_index){
+        float ret = -999;
+        if(jet_phi.size() < 2){}
+        else
+        {
+            ret = jet_phi[j1_j2_index[0]] - jet_phi[j1_j2_index[1]];
+        }
+        return ret;
+    }
+
     std::vector<int> j1_j2_index(std::vector<float> jet_pt){
             return getMaxSec(jet_pt);
     };
@@ -203,17 +214,50 @@
         return ret;
     };
 //working point
+
+    bool cut_jpt(float j1_pt, float j2_pt){
+        return j1_pt > 40e3 && j2_pt > 30e3;
+    }
+
+    bool cut_jjm(float jj_m){
+        return jj_m > 200e3;
+    }
+
+    bool cut_jjyPRODy(float jj_product_y){
+        return jj_product_y < 0 && jj_product_y > -999;
+    }
+
+    bool cut_jjyMINUy(float jj_delta_y){
+        return ((jj_delta_y > 2 || jj_delta_y < -2) && jj_delta_y > -999);
+    }
+
+    bool cut_ptBala(float zzjj_rel_pt){
+        return (zzjj_rel_pt < 0.2 && zzjj_rel_pt >= 0);
+    }
+    bool cut_z1m(float z1_m){
+        return (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3);
+    }
+
+    bool cut_z2m(float z2_m){
+        return (z2_m > 15e3 && z2_m < Z_MASS*1e3+20e3);
+        //return (z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3);
+    }
+
+    bool cut_m4l(float llll_m){
+        //return (llll_m < 150e3 && llll_m > 100e3);
+        return 1;
+    }
+
+
     bool pass_cut (float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m){
-        auto ret =  j1_pt > 40e3 &&
-                    j2_pt > 30e3 &&
+        auto ret =  cut_jpt(j1_pt, j2_pt) &&
                     //(llll_m < 150e3 && llll_m > 100e3) &&
-                    jj_m > 200e3 &&
-                    (jj_product_y < 0 && jj_product_y > -999) &&
-                    ((jj_delta_y > 2 || jj_delta_y < -2) && jj_delta_y > -999) &&
-                    (zzjj_rel_pt < 0.2 && zzjj_rel_pt >= 0) &&
-                    (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3) &&
-                    //(z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3) &&
-                    (z2_m > 15e3 && z2_m < Z_MASS*1e3+20e3);
+                    cut_jjm(jj_m) &&
+                    cut_jjyPRODy(jj_product_y) &&
+                    cut_jjyMINUy(jj_delta_y) &&
+                    cut_ptBala(zzjj_rel_pt) &&
+                    cut_z1m(z1_m) &&
+                    cut_z2m(z2_m);
         return ret;
     };
     bool pass_SR(bool pass_cut, int njet_inbetween, float centrarity){
@@ -228,5 +272,6 @@
     bool pass_no_CT_no_JN (bool pass_cut, int njet_inbetween, float centrarity){
         return pass_cut && (njet_inbetween > 0) && (centrarity >= 0.4);
     };
+
 #endif
 

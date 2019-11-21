@@ -1,0 +1,109 @@
+#include "genAna.h"
+#include "histoProp.h"
+#include <RooUnfoldResponse.h>
+#include <RooUnfoldBayes.h>
+#include <RooUnfoldErrors.h>
+#include <cstdlib>
+
+
+void updateresp(char* dist, char* dist_true, TH1D* templ)
+{   
+    //load files in chain
+        TH1::SetDefaultSumw2();
+        gStyle->SetPaintTextFormat("1.3f");
+        TChain chain("SM4L_Nominal");
+        chain.Add("output/analyse_out/999_all/364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.root");
+        chain.Add("output/analyse_out/999_all/344235.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_ZZ4lep_notau.root");
+        //chain.Add("output/analyse_out/999_all/344295.Sherpa_Zee_4lMassFilter40GeV8GeV.root");
+        //chain.Add("output/analyse_out/999_all/344296.Sherpa_Zmumu_4lMassFilter40GeV8GeV.root");
+        //chain.Add("output/analyse_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
+        //chain.Add("output/analyse_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
+        chain.Add("output/analyse_out/999_all/345038.PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Zincl_MINLO.root");
+        chain.Add("output/analyse_out/999_all/345039.PowhegPythia8EvtGen_NNPDF30_AZNLO_WpH125J_Wincl_MINLO.root");
+        chain.Add("output/analyse_out/999_all/345040.PowhegPythia8EvtGen_NNPDF30_AZNLO_WmH125J_Wincl_MINLO.root");
+        chain.Add("output/analyse_out/999_all/345060.PowhegPythia8EvtGen_NNLOPS_nnlo_30_ggH125_ZZ4l.root");
+        chain.Add("output/analyse_out/999_all/345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.root");
+        chain.Add("output/analyse_out/999_all/345708.Sherpa_222_NNPDF30NNLO_ggllllNoHiggs_0M4l130.root");
+        chain.Add("output/analyse_out/999_all/346340.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_allhad.root");
+        chain.Add("output/analyse_out/999_all/346341.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_semilep.root");
+        chain.Add("output/analyse_out/999_all/346342.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_dilep.root");
+        //chain.Add("output/analyse_out/999_all/361601.PowhegPy8EG_WZlvll_mll4.root");
+        chain.Add("output/analyse_out/999_all/364243.Sherpa_222_NNPDF30NNLO_WWZ_4l2v_EW6.root");
+        chain.Add("output/analyse_out/999_all/364245.Sherpa_222_NNPDF30NNLO_WZZ_5l1v_EW6.root");
+        chain.Add("output/analyse_out/999_all/364247.Sherpa_222_NNPDF30NNLO_ZZZ_6l0v_EW6.root");
+        chain.Add("output/analyse_out/999_all/364248.Sherpa_222_NNPDF30NNLO_ZZZ_4l2v_EW6.root");
+        chain.Add("output/analyse_out/999_all/364250.Sherpa_222_NNPDF30NNLO_llll.root");
+        chain.Add("output/analyse_out/999_all/410142.Sherpa_NNPDF30NNLO_ttll_mll5.root");
+        //chain.Add("output/analyse_out/999_all/410472.PhPy8EG_A14_ttbar_hdamp258p75_dil.root");
+    //declare histos demands unfold
+        RooUnfoldResponse resp(templ, templ);
+        int nbins = templ->GetNbinsX();
+    //declare variable pointer in tree
+        float x_measured=0;
+        float x_true = 0;
+        double weight = 0;
+        double weight_true = 0;
+        bool pass_cut = 0;
+        bool pass_true_cut = 0;
+
+    //set branch
+        chain.SetBranchAddress("pass_cut", &pass_cut);
+        chain.SetBranchAddress("pass_truthBorn_cut", &pass_true_cut);
+        chain.SetBranchAddress(dist,&x_measured);
+        chain.SetBranchAddress(dist_true,&x_true);
+        chain.SetBranchAddress("NormWeight", &weight);
+        chain.SetBranchAddress("NormWeight_true", &weight_true);
+    //loop over entries
+        auto n_entry = chain.GetEntries();
+        long nfill=0;
+        long nfake=0;
+        long nmiss=0;
+        for( Long64_t i = 0; i<(int)(n_entry); i++)
+        {
+            chain.GetEntry(i);
+            
+            if(pass_cut && pass_true_cut){
+                resp.Fill(x_measured, x_true, weight*LUMI/3.0);
+                nfill++;
+            }
+        }
+        auto m_resp = resp.Mresponse();
+        auto h_meas = resp.Hmeasured();
+        auto h_resp = resp.Hresponse();
+
+
+        cout<<"Purity: \t"<<endl;
+        for(int i=1; i<=nbins; i++){
+            cout<<i<<":\t"<<h_resp->GetBinContent(i,i)<<"\t\t"<<h_resp->Integral(i,i,0,nbins)<<"\t\t"<<
+            h_resp->GetBinContent(i,i)/h_resp->Integral(1, nbins,i,i)<<endl;
+        }
+        
+    //save
+        string pic_name = "plots/unfold/" + (string)(const char*)dist;
+        auto resp_name = pic_name + "_resp.png";
+
+        auto* c2 = new TCanvas("c2","",2000,2000);
+            auto tmp = new TH2D(m_resp);
+            //tmp->Scale(1+ nmiss/nfill);
+            tmp->SetStats(0);
+            tmp->Draw("COLZ");
+            tmp->Draw("TEXT SAME");
+            c2->SaveAs(&resp_name[0]);
+
+}
+
+
+int main(){
+
+    TFile* inm4l = TFile::Open("output/histo_out/dem_unfold_m4l.root","read");
+    TFile* inmjj = TFile::Open("output/histo_out/dem_unfold_mjj.root","read");
+    TFile* indelphijj = TFile::Open("output/histo_out/dem_unfold_delphijj.root","read");
+
+    auto Templm4l = (TH1D*)inm4l->Get("h_rebin_m4l_cut");
+    auto Templmjj = (TH1D*)inmjj->Get("h_rebin_mjj_cut");
+    auto Templdelphijj = (TH1D*)indelphijj->Get("h_rebin_delphijj_cut");
+
+    updateresp("llll_m", "llll_truthBorn_m", Templm4l);
+    updateresp("jj_m", "jj_truthBorn_m", Templmjj);
+    updateresp("jj_delta_phi", "jj_truthBorn_delta_phi", Templdelphijj);
+}

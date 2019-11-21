@@ -290,29 +290,44 @@ Color_t str2Color(std::string s){
     return ret;
 }
 
-int nJetInBetween(vector<vector<float>> jet_px_py_pz, vector<float> jet_energy, vector<int> j1_j2_index)
+float dotProd(float theta1, float phi1, float r1, float theta2, float phi2, float r2){
+    auto z1 = TMath::Cos(theta1);
+    auto y1 = TMath::Sin(theta1) * TMath::Sin(phi1);
+    auto x1 = TMath::Sin(theta1) * TMath::Cos(phi1);
+
+    auto z2 = TMath::Cos(theta2);
+    auto y2 = TMath::Sin(theta2) * TMath::Sin(phi2);
+    auto x2 = TMath::Sin(theta2) * TMath::Cos(phi2);
+
+    return x1*x2 + y1*y2 + z1*z2;
+}
+
+int nJetInBetween(vector<float> jet_eta, vector<float> jet_phi, vector<int> j1_j2_index)
 {
-    int njb = 0;
-    if (jet_energy.size() <= 2){}
+    
+    int ret = 0;
+    std::vector<float> jet_theta;
+    if (jet_eta.size()<=2){}
     else
     {
-        
-        auto njet = jet_energy.size();
-        auto j1_y =  getY(jet_px_py_pz[j1_j2_index[0]], jet_energy[j1_j2_index[0]]);
-        auto j2_y =  getY(jet_px_py_pz[j1_j2_index[1]], jet_energy[j1_j2_index[1]]);
-        for(uint i=0;i<njet;i++)
-        {
-            if ((int)i != j1_j2_index[0] && (int)i != j1_j2_index[1])
-            {
-                auto jcandi_y = getY(jet_px_py_pz[i], jet_energy[i]);
-                if ((jcandi_y < j1_y && jcandi_y > j2_y) || (jcandi_y > j1_y && jcandi_y < j2_y))
-                {
-                    njb++;
+        for (uint i = 0; i<jet_eta.size(); i++){
+            jet_theta.push_back(getTheta(jet_eta[i]));
+        }
+        auto cent_theta = (jet_theta[j1_j2_index[0]] + jet_theta[j1_j2_index[1]]) / 2;
+        auto cent_phi   = (jet_phi[j1_j2_index[0]] + jet_phi[j1_j2_index[1]]) / 2;
+        auto lead_jet_dot_cent = dotProd(jet_theta[j1_j2_index[0]], jet_phi[j1_j2_index[0]], 1, cent_theta, cent_phi, 1);
+        //cout<< lead_jet_dot_cent<<endl;
+        for (uint i = 0; i<jet_eta.size(); i++){
+            if(i != (uint)j1_j2_index[0] && i != (uint)j1_j2_index[1]){
+                auto tmp = dotProd(jet_theta[i], jet_phi[i], 1, cent_theta, cent_phi, 1);
+                //cout<<tmp<<endl;
+                if(tmp > lead_jet_dot_cent){
+                    ret++;
                 }
             }
         }
     }
-    return njb;
+    return ret;
 }
 
 std::vector<std::vector<float>> ZPairMSel(vector<vector<float>> lepton_pair_m, float target){

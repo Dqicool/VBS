@@ -8,8 +8,8 @@
 
 
 //#define debug
-
-void distUnfold(char* dist, char* dist_true, int nbins, double xmin, double xmax)
+//#define UPDATERESP
+void distUnfold(char* dist, char* dist_true, TH1D* templ)
 {   
     //load files in chain
         TH1::SetDefaultSumw2();
@@ -41,7 +41,8 @@ void distUnfold(char* dist, char* dist_true, int nbins, double xmin, double xmax
         //chain.Add("output/analyse_out/999_all/410472.PhPy8EG_A14_ttbar_hdamp258p75_dil.root");
 #endif
     //declare histos demands unfold
-        RooUnfoldResponse resp(nbins, xmin, xmax);
+        RooUnfoldResponse resp(templ, templ);
+        int nbins = templ->GetNbinsX();
     //declare variable pointer in tree
         float x_measured=0;
         float x_true = 0;
@@ -85,6 +86,7 @@ void distUnfold(char* dist, char* dist_true, int nbins, double xmin, double xmax
             }
         }
         TH2D* h_resp = (TH2D*)resp.Hresponse();
+
         auto m_resp = resp.Mresponse();
         auto h_meas = resp.Hmeasured();
         auto h_true = resp.Htruth();
@@ -120,7 +122,6 @@ void distUnfold(char* dist, char* dist_true, int nbins, double xmin, double xmax
             h_fake->SetLineColor(kBlack);
             h_fake->Draw("same HISTO");
             c1->SaveAs((&unfold_name[0]));
-        
         auto* c2 = new TCanvas("c2","",2000,2000);
             auto tmp = new TH2D(m_resp);
             //tmp->Scale(1+ nmiss/nfill);
@@ -137,19 +138,19 @@ void distUnfold(char* dist, char* dist_true, int nbins, double xmin, double xmax
 
 }
 
-#ifndef debug
-
-int main(int argc, char** argv){
-    auto dist = argv[1];
-    auto dist_true = argv[2];
-    int nbin = atoi(argv[3]);
-    float xmin = atof(argv[4]);
-    float xmax = atof(argv[5]);
-    distUnfold(dist, dist_true, nbin, xmin, xmax);
-}
-#else
 
 int main(){
-    distUnfold("llll_m", "llll_truthBorn_m", 9, 100000, 1000000);
+
+    TFile* inm4l = TFile::Open("output/histo_out/dem_unfold_m4l.root","read");
+    TFile* inmjj = TFile::Open("output/histo_out/dem_unfold_mjj.root","read");
+    TFile* indelphijj = TFile::Open("output/histo_out/dem_unfold_delphijj.root","read");
+
+    auto Templm4l = (TH1D*)inm4l->Get("h_rebin_m4l_cut");
+    auto Templmjj = (TH1D*)inmjj->Get("h_rebin_mjj_cut");
+    auto Templdelphijj = (TH1D*)indelphijj->Get("h_rebin_delphijj_cut");
+
+    distUnfold("llll_m", "llll_truthBorn_m", Templm4l);
+    distUnfold("jj_m", "jj_truthBorn_m", Templmjj);
+    distUnfold("jj_delta_phi", "jj_truthBorn_delta_phi", Templdelphijj);
 }
-#endif
+

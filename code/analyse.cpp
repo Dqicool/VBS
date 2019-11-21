@@ -22,7 +22,8 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         Define("j1_y", j1_y, {"jet_pass_px_py_pz","jet_pass_energy","j1_j2_index"}).
                         Define("j2_y", j2_y, {"jet_pass_px_py_pz","jet_pass_energy","j1_j2_index"}).
                         Define("jj_m", jj_m, {"jet_pass_energy", "jet_pass_px_py_pz", "j1_j2_index"}).
-                        Define("njet_inbetween",nJetInBetween,{"jet_pass_px_py_pz", "jet_pass_energy", "j1_j2_index"}).
+                        Define("njet_inbetween",nJetInBetween,{"jet_pass_eta", "jet_pass_phi", "j1_j2_index"}).
+                        Define("jj_delta_phi", jj_delta_phi, {"jet_pass_phi","j1_j2_index"}).
                         Define("jj_delta_y",jj_delta_y, {"j1_y","j2_y"}).
                         Define("jj_product_y",jj_product_y,{"j1_y","j2_y"}).
                         Define("j1_pt", j1_pt, {"jet_pass_pt","j1_j2_index"}).
@@ -61,7 +62,8 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         Define("j1_truthBorn_y", j1_y, {"jet_truthBorn_pass_px_py_pz","jet_truthBorn_pass_energy","j1_j2_truthBorn_index"}).
                         Define("j2_truthBorn_y", j2_y, {"jet_truthBorn_pass_px_py_pz","jet_truthBorn_pass_energy","j1_j2_truthBorn_index"}).
                         Define("jj_truthBorn_m", jj_m, {"jet_truthBorn_pass_energy", "jet_truthBorn_pass_px_py_pz", "j1_j2_truthBorn_index"}).
-                        Define("njet_truthBorn_inbetween",nJetInBetween,{"jet_truthBorn_pass_px_py_pz", "jet_truthBorn_pass_energy", "j1_j2_truthBorn_index"}).
+                        Define("njet_truthBorn_inbetween",nJetInBetween,{"jet_truthBorn_pass_eta", "jet_truthBorn_pass_phi", "j1_j2_truthBorn_index"}).
+                        Define("jj_truthBorn_delta_phi", jj_delta_phi, {"jet_truthBorn_pass_phi","j1_j2_truthBorn_index"}).
                         Define("jj_truthBorn_delta_y",jj_delta_y, {"j1_truthBorn_y","j2_truthBorn_y"}).
                         Define("jj_truthBorn_product_y",jj_product_y,{"j1_truthBorn_y","j2_truthBorn_y"}).
                         Define("j1_truthBorn_pt", j1_pt, {"jet_truthBorn_pass_pt","j1_j2_truthBorn_index"}).
@@ -97,13 +99,14 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
     //save tree
         if(dframe.HasColumn("NormWeight_true")){
             auto hehe = ana.GetColumnNames();
-            hehe.erase(hehe.begin(),hehe.begin()+74);
+            hehe.erase(hehe.begin(),hehe.begin()+75);
             hehe.push_back("jet_pass_energy");
             hehe.push_back("j1_y");
             hehe.push_back("j2_y");
             hehe.push_back("jj_m");
             hehe.push_back("njet_inbetween");
             hehe.push_back("jj_delta_y");
+            hehe.push_back("jj_delta_phi");
             hehe.push_back("jj_product_y");
             hehe.push_back("j1_pt");
             hehe.push_back("j2_pt");
@@ -131,6 +134,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
             hehe.push_back("jj_truthBorn_m");
             hehe.push_back("njet_truthBorn_inbetween");
             hehe.push_back("jj_truthBorn_delta_y");
+            hehe.push_back("jj_truthBorn_delta_phi");
             hehe.push_back("jj_truthBorn_product_y");
             hehe.push_back("j1_truthBorn_pt");
             hehe.push_back("j2_truthBorn_pt");
@@ -157,13 +161,14 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
         else{
             auto hehe = ana.GetColumnNames();
 
-            hehe.erase(hehe.begin(),hehe.begin()+37);
+            hehe.erase(hehe.begin(),hehe.begin()+38);
             hehe.push_back("jet_pass_energy");
             hehe.push_back("j1_y");
             hehe.push_back("j2_y");
             hehe.push_back("jj_m");
             hehe.push_back("njet_inbetween");
             hehe.push_back("jj_delta_y");
+            hehe.push_back("jj_delta_phi");
             hehe.push_back("jj_product_y");
             hehe.push_back("j1_pt");
             hehe.push_back("j2_pt");
