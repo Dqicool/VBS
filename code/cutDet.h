@@ -2,6 +2,10 @@
 #define __CUTDET__
 #include"genAna.h"
 
+    auto proWeight = [&](double weight){
+        return weight;///lumi
+    };
+
 std::vector<int> lepSel(std::vector<float> lepton_pt, 
                         std::vector<float> lepton_eta, 
                         std::vector<float> lepton_d0sig, 
@@ -14,7 +18,7 @@ std::vector<int> lepSel(std::vector<float> lepton_pt,
 
     for (uint i = 0;i < siz; i++)
     {
-        if (lepton_passesIsolation[i] == 1)
+        //if (lepton_passesIsolation[i] == 1)
         {
             if(lepton_particleID[i] == 11){
                 if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && TMath::Abs(lepton_d0sig[i] < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
@@ -63,8 +67,8 @@ std::vector<int> lepTrueSel(std::vector<float> lepton_pt,
 
 std::vector<int> jetSel(std::vector<float> jet_pt, std::vector<float> jet_eta)
 {
-    std::vector<int> jet_pass_ind;
-    auto siz = jet_pt.size();
+    std::vector<int> jet_pass_ind;          //the index of passed jets
+    auto siz = jet_pt.size(); 
     for (uint i = 0; i < siz; i++){
         if (TMath::Abs(jet_eta[i]) < 2.4 && jet_pt[i] > 30e3){
             jet_pass_ind.push_back(i);
@@ -110,17 +114,7 @@ int passN(std::vector<int> index){
 
 bool baseline(std::vector<int> lepton_pass_ind, std::vector<int> jet_pass_ind, std::vector<float> lepton_pt)
 {
-    bool ret1 = lepton_pass_ind.size() >= 4 && jet_pass_ind.size() >= 2;
-    bool ret2 = 0;
-    std::vector<float> lep_pass_pt;
-    auto siz = lepton_pass_ind.size();
-    if (siz >= 4){
-        for(uint i = 0; i< siz; i++){
-            lep_pass_pt.push_back(lepton_pt[(lepton_pass_ind[i])]);
-        }
-        sort(lep_pass_pt.begin(), lep_pass_pt.end(), greater<float>());
-        ret2 =  (lep_pass_pt[0] > 20e3 && lep_pass_pt[1] > 20e3 && lep_pass_pt[2] > 10e3);
-    }
-    return ret1 && ret2;
+    bool ret = lepton_pass_ind.size() >= 4 && jet_pass_ind.size() >= 2;
+    return ret;
 }
 #endif

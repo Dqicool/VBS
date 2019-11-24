@@ -1,7 +1,7 @@
 #run
     #VBSHOME='/mnt/MainShare/Projects/Qichen/VBS'
     EXE='/targets/analyse'
-    DATA='/output/preAna_out/999_all/'
+    DATA='/data/999_all/'
     OUT='/output/analyse_out/'
     rm -rf $VBSHOME/$OUT/999_all/*
     mkdir -p $VBSHOME/$OUT/999_all

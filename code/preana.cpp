@@ -15,11 +15,6 @@ void preAna(const char* infile ,const char* outfile, double lumi)
     ROOT::EnableImplicitMT(24);
     ROOT::RDataFrame d("SM4L_Nominal", infile);
 
-    auto proWeight = [&](double weight){
-        return weight;
-    };
-
-
 
     auto d1 = d.Define("jet_pass_ind", jetSel, {"jet_pt", "jet_eta"}).
                 Define("lepton_pass_ind", lepSel, {"lepton_pt", "lepton_eta", "lepton_d0sig", "lepton_z0sinTheta", "lepton_particleID", "lepton_passesIsolation"}).
@@ -65,19 +60,19 @@ void preAna(const char* infile ,const char* outfile, double lumi)
 
     auto hehe = d1.GetColumnNames();
     if(d.HasColumn("fid_weight")){
-        auto d2 = d1.Filter("pass_det || pass_det_truthBorn");
+        //auto d2 = d1.Filter("pass_det || pass_det_truthBorn");
         hehe.erase(hehe.begin()+38, hehe.end());
         hehe.push_back("lepton_n");
         hehe.push_back("jet_n");
-        d2.Snapshot("SM4L_Nominal", outfile, hehe);
+        d1.Snapshot("SM4L_Nominal", outfile, hehe);
     }
     else
     {
-        auto d2 = d1.Filter("pass_det");
+        //auto d2 = d1.Filter("pass_det");
         hehe.erase(hehe.begin()+22, hehe.end());
         hehe.push_back("lepton_n");
         hehe.push_back("jet_n");
-        d2.Snapshot("SM4L_Nominal", outfile, hehe);
+        d1.Snapshot("SM4L_Nominal", outfile, hehe);
     }
 
 

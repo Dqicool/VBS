@@ -3,8 +3,10 @@
 #include<THStack.h>
 #include <iterator>
 #include <TLegend.h>
+#include<fstream>
+#include<cstdio>
 
-//#define debug
+#define debug
 
 void cutflowstack(const char* outfile){
     //loading data from files
@@ -59,10 +61,10 @@ void cutflowstack(const char* outfile){
             rests.push_back("output/cutflow_out/999_all/410142.Sherpa_NNPDF30NNLO_ttll_mll5.root");
             rests.push_back("output/cutflow_out/999_all/410472.PhPy8EG_A14_ttbar_hdamp258p75_dil.root");
 
-            //rests.push_back("output/cutflow_out/999_all/344295.Sherpa_Zee_4lMassFilter40GeV8GeV.root");
-            //rests.push_back("output/cutflow_out/999_all/344296.Sherpa_Zmumu_4lMassFilter40GeV8GeV.root");
-            //rests.push_back("output/cutflow_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
-            //rests.push_back("output/cutflow_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
+            rests.push_back("output/cutflow_out/999_all/344295.Sherpa_Zee_4lMassFilter40GeV8GeV.root");
+            rests.push_back("output/cutflow_out/999_all/344296.Sherpa_Zmumu_4lMassFilter40GeV8GeV.root");
+            rests.push_back("output/cutflow_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
+            rests.push_back("output/cutflow_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
             #endif
         files =     {signals, higgses, gg4ls, tribosons, qq4ls, WZs, rests};
         cata = {"signals", "higgses", "gg4ls", "tribosons", "qq4ls", "WZs", "rests"};
@@ -74,6 +76,9 @@ void cutflowstack(const char* outfile){
         THStack* stack = new THStack("s_cutflow_n", "");
 
         std::vector<TH1D> histo; 
+        std::remove("plots/cutflow/cutflow_text.csv");
+        std::ofstream outcsv("plots/cutflow/cutflow_text.csv");
+
 
         for(uint i = 0; i < files.size(); i++){
             cout<<"\n"<<cata[i] + " is in color " + color_name[i]<<endl;
@@ -83,11 +88,12 @@ void cutflowstack(const char* outfile){
                 auto tmp = (TH1D*)f->Get("cutflow");
 
                 auto lst = tmp->GetArray();
-                cout<<"\n"<<cata[i] + ": "<<files[i][j]<<endl;
-                for(uint j=1;j<sizeof(lst);j++)
+                outcsv<<"\n"<<cata[i] + ": "<<files[i][j]<<", ";
+                for(uint j=1;j<=sizeof(lst);j++)
                 {
-                    cout<<lst[j] << "("<< lst[j]/lst[1] <<")"<<"\t";
+                    outcsv<<lst[j] << "("<< lst[j]/lst[1] <<")"<<", ";
                 }
+                outcsv<<endl;
                 tmp->SetFillColor(color_vec[i]);
                 tmp->SetLineColor(color_vec[i]);
                 tmp->SetMarkerColor(color_vec[i]);
@@ -96,12 +102,12 @@ void cutflowstack(const char* outfile){
 
         }
         auto h_inc = (TH1D* )(histo[0]).Clone("hehe");
-        h_inc->Clear();
+        //h_inc->Clear();
 
         for(uint i=0; i<histo.size(); i++)
         {
             stack->Add(&(histo[i]));
-            h_inc->Add(&(histo[i]));
+            if(i>0) h_inc->Add(&(histo[i]));
         }
     //Store
         TFile * out = TFile::Open(outfile,"recreate");
@@ -112,16 +118,16 @@ void cutflowstack(const char* outfile){
     //drawstack
         //sr plot
             TCanvas c1("c1","",1200,800);
-            h_inc->Draw("same TEXT");
+            h_inc->Draw("TEXT");
             stack->Draw("hist same");
-
+#ifndef debug
             TLegend *legend = new TLegend(0.55,0.65,0.76,0.82);
             legend->AddEntry(&histo[0],"Signal","f");
             legend->AddEntry(&histo[5],"gg4l","f");
             legend->AddEntry(&histo[13],"qq4l","f");
             legend->AddEntry(&histo[18],"other","f");
             legend->Draw();
-            
+#endif
             stack->GetYaxis()->SetTitle("Events");
             //stack->GetXaxis()->SetTitle("Cut applied");
 

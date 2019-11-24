@@ -243,7 +243,7 @@ vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID,
                             if (lepton_particleID[k] == lepton_particleID[l] && ((lepton_charge[k] - lepton_charge[l])*(lepton_charge[k] - lepton_charge[l]))>2){
                                 auto delR_ij = getDeltaR(lepton_eta[i], lepton_eta[j], lepton_phi[i], lepton_eta[j]);
                                 auto delR_kl = getDeltaR(lepton_eta[k], lepton_eta[l], lepton_phi[k], lepton_eta[l]);
-                                if (delR_ij > 0.1 && delR_kl > 0.1){
+                                if (delR_ij > 0.2 && delR_kl > 0.2){
                                     vector<int> tmp1{i,j};
                                     vector<int> tmp2{k,l};
                                     vector<vector<int>> tmp{tmp1,tmp2};
