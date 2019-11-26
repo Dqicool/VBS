@@ -228,10 +228,13 @@ float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
     return ret;
 }
 
-vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID, 
-                                                  vector<float> lepton_charge,
-                                                  vector<float> lepton_eta,
-                                                  vector<float> lepton_phi){
+vector<vector<vector<int>>> getLeptonPairInd(   vector<int> lepton_particleID, 
+                                                vector<float> lepton_charge,
+                                                vector<float> lepton_eta,
+                                                vector<float> lepton_phi,
+                                                vector<vector<float>> lepton_px_py_pz,
+                                                vector<float> lepton_energy)
+{
     vector<vector<vector<int>>> ret;
     int size = lepton_charge.size();
     for (int i = 0; i < size-1; i++){
@@ -244,10 +247,21 @@ vector<vector<vector<int>>> getLeptonPairInd(vector<int> lepton_particleID,
                                 auto delR_ij = getDeltaR(lepton_eta[i], lepton_eta[j], lepton_phi[i], lepton_eta[j]);
                                 auto delR_kl = getDeltaR(lepton_eta[k], lepton_eta[l], lepton_phi[k], lepton_eta[l]);
                                 if (delR_ij > 0.2 && delR_kl > 0.2){
-                                    vector<int> tmp1{i,j};
-                                    vector<int> tmp2{k,l};
-                                    vector<vector<int>> tmp{tmp1,tmp2};
-                                    ret.push_back(tmp);
+                                    if( lepton_particleID[i] == lepton_particleID[k] 
+                                        && getMassWithInd(lepton_energy, lepton_px_py_pz, {i,j}) > 10e3 
+                                        && getMassWithInd(lepton_energy, lepton_px_py_pz, {k,l}) > 10e3)
+                                    {
+                                        vector<int> tmp1{i,j};
+                                        vector<int> tmp2{k,l};
+                                        vector<vector<int>> tmp{tmp1,tmp2};
+                                        ret.push_back(tmp);
+                                    }
+                                    else{
+                                        vector<int> tmp1{i,j};
+                                        vector<int> tmp2{k,l};
+                                        vector<vector<int>> tmp{tmp1,tmp2};
+                                        ret.push_back(tmp);
+                                    }
                                 }
                             }
                         }
@@ -307,7 +321,7 @@ int nJetInBetween(vector<float> jet_eta, vector<float> jet_phi, vector<int> j1_j
     
     int ret = 0;
     std::vector<float> jet_theta;
-    if (jet_eta.size()<=2){}
+    if (j1_j2_index.size()<=2){}
     else
     {
         for (uint i = 0; i<jet_eta.size(); i++){
@@ -384,7 +398,7 @@ std::vector<std::vector<int>> getZ1Z2Index(std::vector<int> lepton_particleID,
                                 std::vector<float> lepton_energy,
                                 std::vector<std::vector<float>> lepton_px_py_pz){
     
-    auto lepton_pair_index =  getLeptonPairInd(lepton_particleID, lepton_charge, lepton_eta, lepton_phi);
+    auto lepton_pair_index =  getLeptonPairInd(lepton_particleID, lepton_charge, lepton_eta, lepton_phi, lepton_px_py_pz, lepton_energy);
     std::vector<std::vector<int>> ret{};
     if(lepton_pair_index.size() >= 1)
     {

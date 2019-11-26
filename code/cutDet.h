@@ -21,13 +21,13 @@ std::vector<int> lepSel(std::vector<float> lepton_pt,
         //if (lepton_passesIsolation[i] == 1)
         {
             if(lepton_particleID[i] == 11){
-                if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && TMath::Abs(lepton_d0sig[i] < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
+                if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && (TMath::Abs(lepton_d0sig[i]) < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
                     letpon_pass_ind.push_back(i);
                 }
             }
             else if(lepton_particleID[i] == 13)
             {
-                if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.7 && TMath::Abs(lepton_d0sig[i] < 3) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
+                if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.7 && (TMath::Abs(lepton_d0sig[i]) < 3) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
                     letpon_pass_ind.push_back(i);
                 }
             }

@@ -20,18 +20,56 @@
         return jet_px_py_pz;
     };
 
-    float jj_delta_phi(std::vector<float> jet_phi, std::vector<int> j1_j2_index){
+    float jj_delta_phi(std::vector<float> jet_phi, std::vector<int> j1_j2_index, float j1_y, float j2_y){
         float ret = -999;
-        if(jet_phi.size() < 2){}
+        if(j1_j2_index.size() < 1){}
         else
         {
-            ret = jet_phi[j1_j2_index[0]] - jet_phi[j1_j2_index[1]];
+            if (j1_y > j2_y)    ret = jet_phi[j1_j2_index[0]] - jet_phi[j1_j2_index[1]];
+            else                ret = jet_phi[j1_j2_index[1]] - jet_phi[j1_j2_index[0]];
         }
         return ret;
     }
 
-    std::vector<int> j1_j2_index(std::vector<float> jet_pt){
-            return getMaxSec(jet_pt);
+    std::vector<int> j1_j2_index(std::vector<float> jet_pt, std::vector<std::vector<float>> jet_px_py_pz, std::vector<float> jet_energy){
+        std::vector<int> ret{};
+        uint size = jet_pt.size();
+        if (size < 2) {}
+        else{
+            std::vector<std::vector<int>> jets_pairs_ind{};
+            std::vector<float> jets_pair_energy{};
+            for (uint i=0; i < size; i++)
+            {
+                for (uint j=i+1;j<size;j++)
+                {
+                    if(getY(jet_px_py_pz[i], jet_energy[i]) * getY(jet_px_py_pz[j], jet_energy[j]) < 0)
+                    {
+                        std::vector<int> tmp_pairs_ind{(int)i,(int)j};
+                        jets_pairs_ind.push_back(tmp_pairs_ind);
+                        jets_pair_energy.push_back(jet_energy[i] + jet_energy[j]);
+                    }
+                }
+            }
+            if(jets_pair_energy.size() > 0)
+            {
+                uint maxind = 0;
+                for (uint k=1; k<jets_pair_energy.size(); k++)
+                {
+                    if(jets_pair_energy[k] > jets_pair_energy[maxind])
+                    {
+                        maxind = k;
+                    }
+                }
+                if(jet_pt[jets_pairs_ind[maxind][1]] > jet_pt[jets_pairs_ind[maxind][0]])
+                {
+                    auto tmp = jets_pairs_ind[maxind][0];
+                    jets_pairs_ind[maxind][0] = jets_pairs_ind[maxind][1];
+                    jets_pairs_ind[maxind][1] = tmp;
+                }
+                ret = jets_pairs_ind[maxind];
+            }
+        }
+        return ret;
     };
     float j1_y(std::vector<std::vector<float>> jet_px_py_pz,std::vector<float> jet_energy, std::vector<int> j1_j2_index){
         float ret = -999;
@@ -223,16 +261,12 @@
         return jj_m > 200e3;
     }
 
-    bool cut_jjyPRODy(float jj_product_y){
-        return jj_product_y < 0 && jj_product_y > -999;
-    }
-
     bool cut_jjyMINUy(float jj_delta_y){
         return ((jj_delta_y > 2 || jj_delta_y < -2) && jj_delta_y > -999);
     }
 
     bool cut_ptBala(float zzjj_rel_pt){
-        return (zzjj_rel_pt < 0.2 && zzjj_rel_pt >= 0);
+        return (zzjj_rel_pt < 0.4 && zzjj_rel_pt >= 0);
     }
     bool cut_z1m(float z1_m){
         return (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3);
@@ -240,20 +274,12 @@
 
     bool cut_z2m(float z2_m){
         return (z2_m > 15e3 && z2_m < Z_MASS*1e3+20e3);
-        //return (z2_m > Z_MASS*1e3-20e3 && z2_m < Z_MASS*1e3+20e3);
-    }
-
-    bool cut_m4l(float llll_m){
-        //return (llll_m < 150e3 && llll_m > 100e3);
-        return 1;
     }
 
 
     bool pass_cut (float j1_pt, float j2_pt, float llll_m, float jj_m, float jj_product_y, float jj_delta_y, float zzjj_rel_pt, float z1_m, float z2_m){
         auto ret =  cut_jpt(j1_pt, j2_pt) &&
-                    //(llll_m < 150e3 && llll_m > 100e3) &&
                     cut_jjm(jj_m) &&
-                    cut_jjyPRODy(jj_product_y) &&
                     cut_jjyMINUy(jj_delta_y) &&
                     cut_ptBala(zzjj_rel_pt) &&
                     cut_z1m(z1_m) &&

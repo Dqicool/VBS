@@ -2,13 +2,14 @@
 
 #include "analambda.h"
 #include "cutDet.h"
-#define MT
 
+#define MT
 //#define debug
 
 #ifdef debug
 #undef MT
 #endif
+
 void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
 {
     #ifdef MT
@@ -66,7 +67,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //23
                         Define("jet_pass_px_py_pz",jet_px_py_pz, {"jet_pass_eta","jet_pass_pt","jet_pass_phi"}).
                         //24
-                        Define("j1_j2_index", j1_j2_index, {"jet_pass_pt"}).
+                        Define("j1_j2_index", j1_j2_index, {"jet_pass_pt", "jet_pass_px_py_pz", "jet_pass_energy"}).
                         //25
                         Define("j1_y", j1_y, {"jet_pass_px_py_pz","jet_pass_energy","j1_j2_index"}).
                         //26
@@ -76,7 +77,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //28
                         Define("njet_inbetween",nJetInBetween,{"jet_pass_eta", "jet_pass_phi", "j1_j2_index"}).
                         //29
-                        Define("jj_delta_phi", jj_delta_phi, {"jet_pass_phi","j1_j2_index"}).
+                        Define("jj_delta_phi", jj_delta_phi, {"jet_pass_phi","j1_j2_index", "j1_y", "j2_y"}).
                         //30
                         Define("jj_delta_y",jj_delta_y, {"j1_y","j2_y"}).
                         //31
@@ -176,7 +177,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //77
                         Define("jet_truthBorn_pass_px_py_pz",jet_px_py_pz, {"jet_truthBorn_pass_eta","jet_truthBorn_pass_pt","jet_truthBorn_pass_phi"}).
                         //78
-                        Define("j1_j2_truthBorn_index", j1_j2_index, {"jet_truthBorn_pass_pt"}).
+                        Define("j1_j2_truthBorn_index", j1_j2_index, {"jet_truthBorn_pass_pt", "jet_truthBorn_pass_px_py_pz", "jet_truthBorn_pass_energy"}).
                         //79
                         Define("j1_truthBorn_y", j1_y, {"jet_truthBorn_pass_px_py_pz","jet_truthBorn_pass_energy","j1_j2_truthBorn_index"}).
                         //80
@@ -186,7 +187,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //82
                         Define("njet_truthBorn_inbetween",nJetInBetween,{"jet_truthBorn_pass_eta", "jet_truthBorn_pass_phi", "j1_j2_truthBorn_index"}).
                         //83
-                        Define("jj_truthBorn_delta_phi", jj_delta_phi, {"jet_truthBorn_pass_phi","j1_j2_truthBorn_index"}).
+                        Define("jj_truthBorn_delta_phi", jj_delta_phi, {"jet_truthBorn_pass_phi","j1_j2_truthBorn_index", "j1_truthBorn_y", "j2_truthBorn_y"}).
                         //84
                         Define("jj_truthBorn_delta_y",jj_delta_y, {"j1_truthBorn_y","j2_truthBorn_y"}).
                         //85
@@ -288,6 +289,14 @@ int main(int argc, char** argv)
     char* in_file3 = argv[3];
     char* out_tree = argv[4];
 
+    analyse(in_file1, in_file2, in_file3, out_tree);
+}
+#else
+int main(){
+    char* in_file1 = "data/200_vbsf/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10201_r10210_p3654.root";
+    char* in_file2 = "data/200_vbsf/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10724_r10726_p3654.root";
+    char* in_file3 = "data/200_vbsf/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r9364_r9315_p3654.root";
+    char* out_tree = "debug.root";
     analyse(in_file1, in_file2, in_file3, out_tree);
 }
 #endif

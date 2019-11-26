@@ -9,7 +9,6 @@ TH1D getHisto(ROOT::RDataFrame df, const char* filterr, const char* dist, int nb
     auto histoname = "h_" + (string)dist + "_" + (string)filterr;
     auto filteddf = df.Filter(filterr); 
     auto h = filteddf.Histo1D({&histoname[0],"",nbins,xmin,xmax},dist,"NormWeight");
-    h->Scale(LUMI/3.0);
     h->SetFillColor(col);
     h->SetLineColor(col);
     h->SetMarkerColor(col);
