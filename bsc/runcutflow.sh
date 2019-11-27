@@ -1,4 +1,4 @@
-#run
+#!/bin/bash
     EXE='/targets/cutflow'
     DATA='/output/analyse_out/999_all/'
     OUT='/output/cutflow_out/999_all/'

@@ -114,9 +114,10 @@ void delphijjBinSizeEva(){
     auto nbin = h_jj_delta_phi_cut->GetNbinsX();
     auto wbin = h_jj_delta_phi_cut->GetBinWidth(1);
     auto xmin = h_jj_delta_phi_cut->GetBinLowEdge(1);
-    std::vector<double> sepaR{100};
+
+    std::vector<double> sepaR{(double)nbin/2};
     std::vector<double> sepaL{};
-    for(int i=101; i<nbin; ){
+    for(int i=nbin/2 +1; i<nbin; ){
         double store = 0;
         while (store < 10 && i < nbin){
             store += h_jj_delta_phi_cut->GetBinContent(i);
@@ -126,7 +127,7 @@ void delphijjBinSizeEva(){
     }
     sepaL = sepaR;
     std::reverse(sepaL.begin(), sepaL.end());
-    sepaL = pluScalar(mulScalar(sepaL, -1), 200);
+    sepaL = pluScalar(mulScalar(sepaL, -1), nbin);
 
     std::vector<double> sepa{};
     sepa.insert(sepa.end(), sepaL.begin(), sepaL.end()-1);
@@ -153,4 +154,5 @@ void delphijjBinSizeEva(){
 int main(){
     m4lBinSizeEva();
     mjjBinSizeEva();
-    delphijjBinSizeEva();}
+    delphijjBinSizeEva();
+}

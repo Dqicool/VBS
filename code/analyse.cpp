@@ -139,7 +139,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //59
                         Define("pass_NCT_NJN", pass_no_CT_no_JN, {"pass_cut", "njet_inbetween", "centrarity"});
 
-        if(dframe.HasColumn("NormWeight_true")){
+        if(dframe.HasColumn("fid_weight")){
             ana =   ana.//60
                         Define("NormWeight_true", proWeight, {"fid_weight"}).
                         //61
@@ -251,7 +251,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
         }
 
     //save tree
-        if(dframe.HasColumn("NormWeight_true")){
+        if(dframe.HasColumn("fid_weight")){
             auto hehe = ana.GetColumnNames();
             hehe.erase(hehe.begin()+115,hehe.end());
             hehe.erase(hehe.begin()+90, hehe.begin()+91);

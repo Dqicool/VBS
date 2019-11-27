@@ -1,4 +1,10 @@
 #include "analambda.h"
+
+bool lptsel(std::vector<int> z1_index, std::vector<int> z2_index, std::vector<float> lepton_pt){
+    std::vector<float> l1l2l3l4_pt{lepton_pt[z1_index[0]], lepton_pt[z1_index[1]], lepton_pt[z2_index[0]], lepton_pt[z2_index[1]]};
+    std::sort(l1l2l3l4_pt.begin(), l1l2l3l4_pt.end());
+    return l1l2l3l4_pt[3] > 20e3 && l1l2l3l4_pt[2] > 20e3 && l1l2l3l4_pt[1] > 10e3;
+}
 void cutflow(const char* infile, const char* outfile)
 {
     ROOT::EnableImplicitMT(24);
@@ -12,7 +18,7 @@ void cutflow(const char* infile, const char* outfile)
     auto df4 = df3.Filter("lepton_pass_n >= 4");
     auto df5 = df4.Filter("z1_energy > 0 && z2_energy > 0");
     auto df6 = df5.Filter("z1_m > 66e3 && z1_m < 116e3 && z2_m > 66e3 && z2_m < 116e3");
-    auto df7 = df6.Filter("(lepton_pass_pt[z1_index[0]] > 20e3 && lepton_pass_pt[z1_index[1]] > 20e3) && (lepton_pass_pt[z2_index[0]] > 10e3 || lepton_pass_pt[z2_index[1]] > 10e3)");
+    auto df7 = df6.Filter(lptsel, {"z1_index", "z2_index", "lepton_pass_pt"});
 
     n_evt_survive.push_back(df0.Sum("NormWeight").GetValue());
     n_evt_survive.push_back(df1.Sum("NormWeight").GetValue());

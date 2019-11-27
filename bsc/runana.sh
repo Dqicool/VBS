@@ -1,4 +1,5 @@
-#run
+#!/bin/bash
+SECONDS=0
     #VBSHOME='/mnt/MainShare/Projects/Qichen/VBS'
     EXE='/targets/analyse'
     DATA='/data/999_all/'
@@ -53,4 +54,5 @@
         let ii+=1
     done
     wait
-    echo "alldone"
+ELAPSED="Elapsed: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
+echo $ELAPSED

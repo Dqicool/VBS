@@ -266,7 +266,7 @@
     }
 
     bool cut_ptBala(float zzjj_rel_pt){
-        return (zzjj_rel_pt < 0.4 && zzjj_rel_pt >= 0);
+        return (zzjj_rel_pt < 0.5 && zzjj_rel_pt >= 0);
     }
     bool cut_z1m(float z1_m){
         return (z1_m > Z_MASS*1e3-20e3 && z1_m < Z_MASS*1e3+20e3);

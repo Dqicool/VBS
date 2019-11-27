@@ -316,28 +316,32 @@ float dotProd(float theta1, float phi1, float r1, float theta2, float phi2, floa
     return x1*x2 + y1*y2 + z1*z2;
 }
 
-int nJetInBetween(vector<float> jet_eta, vector<float> jet_phi, vector<int> j1_j2_index)
+int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector<int> j1_j2_index)
 {
     
     int ret = 0;
-    std::vector<float> jet_theta;
-    if (j1_j2_index.size()<=2){}
+    std::vector<float> jet_pass_theta;
+    if (j1_j2_index.size()<2){}
     else
     {
-        for (uint i = 0; i<jet_eta.size(); i++){
-            jet_theta.push_back(getTheta(jet_eta[i]));
+        auto j1_theta = getTheta(jet_pass_eta[j1_j2_index[0]]);
+        auto j1_phi = jet_pass_phi[j1_j2_index[0]];
+
+        auto j2_theta = getTheta(jet_pass_eta[j1_j2_index[1]]);
+        auto j2_phi = jet_pass_phi[j1_j2_index[1]];
+
+        for (uint i = 0; i<jet_pass_eta.size(); i++){
+            jet_pass_theta.push_back(getTheta(jet_pass_eta[i]));
         }
-        auto cent_theta = (jet_theta[j1_j2_index[0]] + jet_theta[j1_j2_index[1]]) / 2;
-        auto cent_phi   = (jet_phi[j1_j2_index[0]] + jet_phi[j1_j2_index[1]]) / 2;
-        auto lead_jet_dot_cent = dotProd(jet_theta[j1_j2_index[0]], jet_phi[j1_j2_index[0]], 1, cent_theta, cent_phi, 1);
+        auto cent_theta = (j1_theta + j2_theta) / 2;
+        auto cent_phi   = (j1_phi + j2_phi) / 2;
+        auto lead_jet_dot_cent = dotProd(j1_theta, j1_phi, 1, cent_theta, cent_phi, 1);
         //cout<< lead_jet_dot_cent<<endl;
-        for (uint i = 0; i<jet_eta.size(); i++){
-            if(i != (uint)j1_j2_index[0] && i != (uint)j1_j2_index[1]){
-                auto tmp = dotProd(jet_theta[i], jet_phi[i], 1, cent_theta, cent_phi, 1);
-                //cout<<tmp<<endl;
-                if(tmp > lead_jet_dot_cent){
-                    ret++;
-                }
+        for (uint i = 0; i<jet_pass_eta.size(); i++){
+            auto tmp = dotProd(jet_pass_theta[i], jet_pass_phi[i], 1, cent_theta, cent_phi, 1);
+            //cout<<tmp<<endl;
+            if(tmp > lead_jet_dot_cent){
+                ret++;
             }
         }
     }
