@@ -10,9 +10,9 @@
 #define M4L_X_MAX 1000e3
 #define M4L_N_BIN 1000
 
-#define PHI_X_MIN -2*TMath::Pi()
-#define PHI_X_MAX  2*TMath::Pi()
-#define PHI_N_BIN   1000
+#define PHI_X_MIN -TMath::Pi()
+#define PHI_X_MAX  TMath::Pi()
+#define PHI_N_BIN  1000
 
 TH1D getHisto(ROOT::RDataFrame df, const char* filterr, const char* dist, const char* weight, int nbins, double xmin, double xmax)
 {

@@ -13,6 +13,7 @@
 #include <TChain.h>
 #include<TROOT.h>
 #include<TStyle.h>
+#include<TLatex.h>
 #define Z_MASS 91.1876
 using namespace std;
 

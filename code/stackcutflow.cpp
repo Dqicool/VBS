@@ -118,7 +118,7 @@ void cutflowstack(const char* outfile){
     //drawstack
         //sr plot
             TCanvas c1("c1","",1200,800);
-            h_inc->SetAxisRange(0,1500,"Y");
+            h_inc->SetAxisRange(0,100,"Y");
             h_inc->Draw("TEXT");
             stack->Draw("hist same");
 #ifndef debug

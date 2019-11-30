@@ -47,10 +47,10 @@ void plotProp(const char* outfile, const char* dist){
         //TRIBOSON
             std::vector<std::string> tribosons;
             #ifndef debug
-            tribosons.push_back("output/draw_out/999_all/364243.Sherpa_222_NNPDF30NNLO_WWZ_4l2v_EW6.root");
-            tribosons.push_back("output/draw_out/999_all/364245.Sherpa_222_NNPDF30NNLO_WZZ_5l1v_EW6.root");
-            tribosons.push_back("output/draw_out/999_all/364247.Sherpa_222_NNPDF30NNLO_ZZZ_6l0v_EW6.root");
-            tribosons.push_back("output/draw_out/999_all/364248.Sherpa_222_NNPDF30NNLO_ZZZ_4l2v_EW6.root");
+            //tribosons.push_back("output/draw_out/999_all/364243.Sherpa_222_NNPDF30NNLO_WWZ_4l2v_EW6.root");
+            //tribosons.push_back("output/draw_out/999_all/364245.Sherpa_222_NNPDF30NNLO_WZZ_5l1v_EW6.root");
+            //tribosons.push_back("output/draw_out/999_all/364247.Sherpa_222_NNPDF30NNLO_ZZZ_6l0v_EW6.root");
+            //tribosons.push_back("output/draw_out/999_all/364248.Sherpa_222_NNPDF30NNLO_ZZZ_4l2v_EW6.root");
             #endif
         //qq4l
             std::vector<std::string> qq4ls;
@@ -63,7 +63,7 @@ void plotProp(const char* outfile, const char* dist){
         //WZllvl
             std::vector<std::string> WZs;
             #ifndef debug
-            WZs.push_back("output/draw_out/999_all/361601.PowhegPy8EG_WZlvll_mll4.root");
+            //WZs.push_back("output/draw_out/999_all/361601.PowhegPy8EG_WZlvll_mll4.root");
             #endif
         //rest
             std::vector<std::string> rests;

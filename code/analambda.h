@@ -28,6 +28,12 @@
             if (j1_y > j2_y)    ret = jet_phi[j1_j2_index[0]] - jet_phi[j1_j2_index[1]];
             else                ret = jet_phi[j1_j2_index[1]] - jet_phi[j1_j2_index[0]];
         }
+        if(ret > TMath::Pi()){
+            ret -= 2*TMath::Pi();
+        }
+        else if(ret < -TMath::Pi()){
+            ret += 2*TMath::Pi();
+        }
         return ret;
     }
 

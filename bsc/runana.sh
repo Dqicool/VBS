@@ -1,4 +1,5 @@
 #!/bin/bash
+make ana
 SECONDS=0
     #VBSHOME='/mnt/MainShare/Projects/Qichen/VBS'
     EXE='/targets/analyse'

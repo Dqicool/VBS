@@ -1,6 +1,8 @@
 #include "genAna.h"
 #include <THStack.h>
 
+#define NEVTSPERBIN 15
+
 std::vector<double> mulScalar(std::vector<double> mat, double x){
     std::vector<double> ret{};
     for(int i = 0; i < mat.size(); i++){
@@ -33,7 +35,7 @@ void m4lBinSizeEva()
     std::vector<double> sepa{0, 115, 135};
     for(int i=135; i<nbin; ){
         double store = 0;
-        while (store < 10 && i < nbin){
+        while (store < NEVTSPERBIN && i < nbin){
             store += h_llll_m_cut->GetBinContent(i);
             i++;
         }
@@ -42,6 +44,7 @@ void m4lBinSizeEva()
     sepa = mulScalar(sepa, wbin);
     auto h_rebin_m4l_cut = h_llll_m_cut->Rebin(sepa.size()-1, "h_rebin_m4l_cut",&sepa[0]);
     //cout<<h_rebin_m4l_cut->Integral()<<endl;
+    h_rebin_m4l_cut->SetAxisRange(0,20,"Y");
     h_rebin_m4l_cut->SetStats(0);
     h_rebin_m4l_cut->Draw("");
     h_llll_m_cut->Scale(10.0);
@@ -76,7 +79,7 @@ void mjjBinSizeEva()
     std::vector<double> sepa{0};
     for(int i=0; i<nbin; ){
         double store = 0;
-        while (store < 10 && i < nbin){
+        while (store < NEVTSPERBIN && i < nbin){
             store += h_jj_m_cut->GetBinContent(i);
             i++;
         }
@@ -87,6 +90,7 @@ void mjjBinSizeEva()
     auto h_rebin_mjj_cut = h_jj_m_cut->Rebin(sepa.size()-1, "h_rebin_mjj_cut",&sepa[0]);
     //cout<<h_rebin_mjj_cut->Integral()<<endl;
     h_rebin_mjj_cut->SetStats(0);
+    h_rebin_mjj_cut->SetAxisRange(0,20,"Y");
     h_rebin_mjj_cut->Draw("");
     h_jj_m_cut->Scale(10.0);
     h_jj_m_cut->SetFillColor(kRed);
@@ -119,7 +123,7 @@ void delphijjBinSizeEva(){
     std::vector<double> sepaL{};
     for(int i=nbin/2 +1; i<nbin; ){
         double store = 0;
-        while (store < 10 && i < nbin){
+        while (store < NEVTSPERBIN && i < nbin){
             store += h_jj_delta_phi_cut->GetBinContent(i);
             i++;
         }
@@ -136,6 +140,7 @@ void delphijjBinSizeEva(){
     sepa = pluScalar(sepa,xmin);
     auto h_rebin_delphijj_cut = h_jj_delta_phi_cut->Rebin(sepa.size()-1, "h_rebin_delphijj_cut",&sepa[0]);
     //cout<<h_rebin_delphijj_cut->Integral()<<endl;
+    h_rebin_delphijj_cut->SetAxisRange(0,20,"Y");
     h_rebin_delphijj_cut->SetStats(0);
     h_rebin_delphijj_cut->Draw("");
     h_jj_delta_phi_cut->Scale(5.0);

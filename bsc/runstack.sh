@@ -1,4 +1,6 @@
 #!/bin/bash
+make draw
+make stack
 SECONDS=0
     EXE='/targets/draw'
     DATA='/output/analyse_out/999_all/'

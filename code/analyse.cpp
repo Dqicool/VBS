@@ -5,6 +5,7 @@
 
 #define MT
 //#define debug
+//#define PRESERVEALL
 
 #ifdef debug
 #undef MT
@@ -263,8 +264,11 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
 
             hehe.push_back("lepton_n");
             hehe.push_back("jet_n");
-
+            #ifndef PRESERVEALL
+            ana.Filter("pass_cut || pass_truthBorn_cut").Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
+            #else
             ana.Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
+            #endif
         }
         else{
             auto hehe = ana.GetColumnNames();
@@ -275,9 +279,11 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
 
             hehe.push_back("lepton_n");
             hehe.push_back("jet_n");
-
+            #ifndef PRESERVEALL
+            ana.Filter("pass_cut").Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
+            #else
             ana.Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
-            
+            #endif  
         }
 }
 
