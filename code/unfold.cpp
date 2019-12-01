@@ -4,7 +4,7 @@
 #include <RooUnfoldErrors.h>
 #include <cstdlib>
 #include <TLegend.h>
-
+#include<THashList.h>
 
 //#define debug
 void distUnfold(const char* dist, const char* labeltex)
@@ -103,12 +103,14 @@ void distUnfold(const char* dist, const char* labeltex)
             auto tmp = new TH2D(m_resp);
             for(int i=0; i < h_meas->GetNbinsX(); i++){
                 std::stringstream buffer;
-                buffer <<std::setprecision(3)<< h_meas->GetBinLowEdge(i+1)<<" < "<<labeltex<<" < " << (h_meas->GetBinLowEdge(i+1) + h_meas->GetBinWidth(i+1));
-                tmp->GetXaxis()->SetBinLabel(i+1, &(buffer.str())[0]);
-                tmp->GetYaxis()->SetBinLabel(i+1, &(buffer.str())[0]);
-                tmp->GetXaxis()->SetLabelSize(0.03);
-                tmp->GetYaxis()->SetLabelSize(0.03);
+                buffer <<std::setprecision(3)<< h_meas->GetBinLowEdge(i+1);
+                cout<<buffer.str()<<endl;
+                tmp->GetXaxis()->ChangeLabel(i+1,-1,-1,-1,-1,-1, &(buffer.str())[0]);
+                tmp->GetYaxis()->ChangeLabel(i+1,-1,-1,-1,-1,-1, &(buffer.str())[0]);
             }
+            tmp->SetTitle("Colums sum to unity, indecates how truth smeared");
+            tmp->GetXaxis()->SetTitle("True");
+            tmp->GetYaxis()->SetTitle("Meas");
             tmp->SetStats(0);
             tmp->SetMaximum(1);
             tmp->SetMinimum(0);
@@ -118,8 +120,12 @@ void distUnfold(const char* dist, const char* labeltex)
 
         auto* c3 = new TCanvas("c3","",2000,2000);
             auto h_resp = resp_disp.Hresponse();
+            h_resp->SetTitle("Colums sum to unity, indecates how measurments distributed in truth");
+            h_resp->GetXaxis()->SetTitle("Meas");
+            h_resp->GetYaxis()->SetTitle("True");
             h_resp->SetStats(0);
-
+            h_resp->Draw("COLZ");
+            h_resp->Draw("TEXT SAME");
             auto nx = h_resp->GetNbinsX();
             auto ny = h_resp->GetNbinsY();
             for(int i = 1; i <= nx; i++){
@@ -130,15 +136,14 @@ void distUnfold(const char* dist, const char* labeltex)
             }
             h_resp->SetMaximum(1);
             h_resp->SetMinimum(0);
-            h_resp->Draw("COLZ");
-            h_resp->Draw("TEXT SAME");
+            //h_resp->Draw("COLZ");
+            //h_resp->Draw("TEXT SAME");
             c3->SaveAs(&resph_name[0]);
 }
 
 
 int main(){
-    //distUnfold("llll_m", "llll_truthBorn_m", Templm4l);
-    //distUnfold("jj_m", "jj_truthBorn_m", Templmjj);
+
     distUnfold("jj_delta_phi", "#Delta#phi_{jj}");
     distUnfold("jj_m", "m_{jj}");
     distUnfold("llll_m", "m_{4l}");

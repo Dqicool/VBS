@@ -76,7 +76,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //27
                         Define("jj_m", jj_m, {"jet_pass_energy", "jet_pass_px_py_pz", "j1_j2_index"}).
                         //28
-                        Define("njet_inbetween",nJetInBetween,{"jet_pass_eta", "jet_pass_phi", "j1_j2_index"}).
+                        Define("njet_inbetween",nJetInBetween,{"jet_pass_eta", "jet_pass_phi", "j1_j2_index", "jet_pass_px_py_pz", "jet_pass_energy"}).
                         //29
                         Define("jj_delta_phi", jj_delta_phi, {"jet_pass_phi","j1_j2_index", "j1_y", "j2_y"}).
                         //30
@@ -186,7 +186,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //81
                         Define("jj_truthBorn_m", jj_m, {"jet_truthBorn_pass_energy", "jet_truthBorn_pass_px_py_pz", "j1_j2_truthBorn_index"}).
                         //82
-                        Define("njet_truthBorn_inbetween",nJetInBetween,{"jet_truthBorn_pass_eta", "jet_truthBorn_pass_phi", "j1_j2_truthBorn_index"}).
+                        Define("njet_truthBorn_inbetween",nJetInBetween,{"jet_truthBorn_pass_eta", "jet_truthBorn_pass_phi", "j1_j2_truthBorn_index", "jet_truthBorn_pass_px_py_pz", "jet_truthBorn_pass_energy"}).
                         //83
                         Define("jj_truthBorn_delta_phi", jj_delta_phi, {"jet_truthBorn_pass_phi","j1_j2_truthBorn_index", "j1_truthBorn_y", "j2_truthBorn_y"}).
                         //84

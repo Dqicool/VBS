@@ -5,22 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "bashdb",
-            "request": "launch",
-            "name": "Bash-Debug current file",
-            "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/code/${fileBasenameNoExtension}.sh",
-            "args": []
-        },
-        
-        
-
-
-        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/../targets/${fileBasenameNoExtension}",
+            "additionalSOLibSearchPath":"/opt/root/lib;/opt/root/RooUnfold/",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -34,34 +23,6 @@
                     "ignoreFailures": true
                 }
             ]
-        },
-        {
-            "name": "c++ build and debug active file",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${fileDirname}/../targets/${fileBasenameNoExtension}",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "preLaunchTask": "c++ build active file",
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "Compile dummy",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/targets/clear",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "preLaunchTask": "c++ build active file",
-            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }

@@ -17,6 +17,10 @@
 #define Z_MASS 91.1876
 using namespace std;
 
+//#define JET_BETWEEN_GEO
+//#define JET_BETWEEN_PSUDO
+#define JET_BETWEEN_RAPI
+
 float getDeltaR(float eta1, float eta2, float phi1, float phi2){
     return TMath::Sqrt((eta1-eta2)*(eta1-eta2) + (eta1-eta2)*(eta1-eta2));
 }
@@ -317,9 +321,9 @@ float dotProd(float theta1, float phi1, float r1, float theta2, float phi2, floa
     return x1*x2 + y1*y2 + z1*z2;
 }
 
-int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector<int> j1_j2_index)
+int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector<int> j1_j2_index, std::vector<std::vector<float>> jet_pass_px_py_pz, std::vector<float> jet_pass_energy)
 {
-    
+#ifdef JET_BETWEEN_GEO
     int ret = 0;
     std::vector<float> jet_pass_theta;
     if (j1_j2_index.size()<2){}
@@ -339,14 +343,50 @@ int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector
         auto lead_jet_dot_cent = dotProd(j1_theta, j1_phi, 1, cent_theta, cent_phi, 1);
         //cout<< lead_jet_dot_cent<<endl;
         for (uint i = 0; i<jet_pass_eta.size(); i++){
-            auto tmp = dotProd(jet_pass_theta[i], jet_pass_phi[i], 1, cent_theta, cent_phi, 1);
-            //cout<<tmp<<endl;
-            if(tmp > lead_jet_dot_cent){
-                ret++;
+            if(i != j1_j2_index[0] && i != j1_j2_index[1]){
+                auto tmp = dotProd(jet_pass_theta[i], jet_pass_phi[i], 1, cent_theta, cent_phi, 1);
+                //cout<<tmp<<endl;
+                if(tmp > lead_jet_dot_cent){
+                    ret++;
+                }
             }
         }
     }
     return ret;
+#endif
+#ifdef JET_BETWEEN_PSUDO
+    int ret = 0;
+    if (j1_j2_index.size()<2){}
+    else{
+        for (uint i = 0; i<jet_pass_eta.size(); i++){
+            if(i != j1_j2_index[0] && i != j1_j2_index[1]){
+                if (jet_pass_eta[j1_j2_index[0]] < jet_pass_eta[i] && jet_pass_eta[j1_j2_index[1]] > jet_pass_eta[i])
+                    ret++;
+                else if(jet_pass_eta[j1_j2_index[0]] > jet_pass_eta[i] && jet_pass_eta[j1_j2_index[1]] < jet_pass_eta[i])
+                    ret++;
+            }
+        }
+    }
+    return ret;
+#endif
+#ifdef JET_BETWEEN_RAPI
+    int ret = 0;
+    if (j1_j2_index.size()<2){}
+    else{
+        std::vector<float> jet_pass_y{};
+        for (uint i = 0; i<jet_pass_eta.size(); i++)
+            jet_pass_y.push_back(getY(jet_pass_px_py_pz[i], jet_pass_energy[i]));
+        for (uint i = 0; i<jet_pass_eta.size(); i++){
+            if(i != j1_j2_index[0] && i != j1_j2_index[1]){
+                if (jet_pass_y[j1_j2_index[0]] < jet_pass_y[i] && jet_pass_y[j1_j2_index[1]] > jet_pass_y[i])
+                    ret++;
+                else if(jet_pass_y[j1_j2_index[0]] > jet_pass_y[i] && jet_pass_y[j1_j2_index[1]] < jet_pass_y[i])
+                    ret++;
+            }
+        }
+    }
+    return ret;
+#endif
 }
 
 std::vector<std::vector<float>> ZPairMSel(vector<vector<float>> lepton_pair_m, float target){
@@ -391,10 +431,6 @@ std::vector<std::vector<int>> Z1Z2Ind(std::vector<std::vector<float>> zpair_m_in
     }
     return ret;
 }
-
-
-
-
 
 std::vector<std::vector<int>> getZ1Z2Index(std::vector<int> lepton_particleID, 
                                 std::vector<float> lepton_charge, 
