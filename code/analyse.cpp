@@ -5,7 +5,7 @@
 
 #define MT
 //#define debug
-//#define PRESERVEALL
+#define PRESERVEALL
 
 #ifdef debug
 #undef MT
@@ -14,7 +14,7 @@
 void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)
 {
     #ifdef MT
-    ROOT::EnableImplicitMT(24);
+    ROOT::EnableImplicitMT();
     #endif
     ROOT::RDataFrame dframe("SM4L_Nominal", {in_file1, in_file2, in_file3});
 

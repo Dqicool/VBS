@@ -48,6 +48,7 @@ void draw(const char* in_file, const char* out_histo)
         TH1D h_phi_njn = getHisto(df, "pass_CT_NJN",    "jj_delta_phi", "NormWeight", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
         TH1D h_phi_nct = getHisto(df, "pass_NCT_JN",    "jj_delta_phi", "NormWeight", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
         TH1D h_phi_nn  = getHisto(df, "pass_NCT_NJN",   "jj_delta_phi", "NormWeight", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
+        
 
         
     //save
@@ -73,23 +74,23 @@ void draw(const char* in_file, const char* out_histo)
 
         if (df.HasColumn("NormWeight_true")){
             
-            TH1D h_true_mjj_cut = getHisto(df, "pass_cut",       "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
-            TH1D h_true_mjj_sr  = getHisto(df, "pass_SR",        "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
-            TH1D h_true_mjj_njn = getHisto(df, "pass_CT_NJN",    "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
-            TH1D h_true_mjj_nct = getHisto(df, "pass_NCT_JN",    "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
-            TH1D h_true_mjj_nn  = getHisto(df, "pass_NCT_NJN",   "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
+            TH1D h_true_mjj_cut = getHisto(df, "pass_truthBorn_cut",       "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
+            TH1D h_true_mjj_sr  = getHisto(df, "pass_truthBorn_SR",        "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
+            TH1D h_true_mjj_njn = getHisto(df, "pass_truthBorn_CT_NJN",    "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
+            TH1D h_true_mjj_nct = getHisto(df, "pass_truthBorn_NCT_JN",    "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
+            TH1D h_true_mjj_nn  = getHisto(df, "pass_truthBorn_NCT_NJN",   "jj_truthBorn_m", "NormWeight_true", MJJ_N_BIN, MJJ_X_MIN, MJJ_X_MAX);
 
-            TH1D h_true_m4l_cut = getHisto(df, "pass_cut",       "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
-            TH1D h_true_m4l_sr  = getHisto(df, "pass_SR",        "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
-            TH1D h_true_m4l_njn = getHisto(df, "pass_CT_NJN",    "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
-            TH1D h_true_m4l_nct = getHisto(df, "pass_NCT_JN",    "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
-            TH1D h_true_m4l_nn  = getHisto(df, "pass_NCT_NJN",   "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
+            TH1D h_true_m4l_cut = getHisto(df, "pass_truthBorn_cut",       "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
+            TH1D h_true_m4l_sr  = getHisto(df, "pass_truthBorn_SR",        "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
+            TH1D h_true_m4l_njn = getHisto(df, "pass_truthBorn_CT_NJN",    "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
+            TH1D h_true_m4l_nct = getHisto(df, "pass_truthBorn_NCT_JN",    "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
+            TH1D h_true_m4l_nn  = getHisto(df, "pass_truthBorn_NCT_NJN",   "llll_truthBorn_m", "NormWeight_true", M4L_N_BIN, M4L_X_MIN, M4L_X_MAX);
 
-            TH1D h_true_phi_cut = getHisto(df, "pass_cut",       "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
-            TH1D h_true_phi_sr  = getHisto(df, "pass_SR",        "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
-            TH1D h_true_phi_njn = getHisto(df, "pass_CT_NJN",    "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
-            TH1D h_true_phi_nct = getHisto(df, "pass_NCT_JN",    "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
-            TH1D h_true_phi_nn  = getHisto(df, "pass_NCT_NJN",   "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
+            TH1D h_true_phi_cut = getHisto(df, "pass_truthBorn_cut",       "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
+            TH1D h_true_phi_sr  = getHisto(df, "pass_truthBorn_SR",        "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
+            TH1D h_true_phi_njn = getHisto(df, "pass_truthBorn_CT_NJN",    "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
+            TH1D h_true_phi_nct = getHisto(df, "pass_truthBorn_NCT_JN",    "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
+            TH1D h_true_phi_nn  = getHisto(df, "pass_truthBorn_NCT_NJN",   "jj_truthBorn_delta_phi", "NormWeight_true", PHI_N_BIN, PHI_X_MIN, PHI_X_MAX);
 
             h_true_mjj_cut.Write();
             h_true_mjj_sr.Write();

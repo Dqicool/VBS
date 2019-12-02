@@ -30,7 +30,7 @@ void cutflow(const char* infile, const char* outfile)
     n_evt_survive.push_back(df7.Sum("NormWeight").GetValue());
 
     auto h_cutflow = new TH1D("cutflow", "", n_evt_survive.size(), 0, n_evt_survive.size());
-    std::vector<const char*> binlabels{"origin", "2_jets_pass_det", "jj_m > 300", "|jj_delta_y| > 2", "4_leps_pass_det", "2_lpair_(del_R_ll > 0.2)", "z1_z2_m_around_Z", "lep_pt>20,20,10"};
+    std::vector<const char*> binlabels{"origin", "2_jets_pass_det", "jj_m > 300", "|jj_delta_y| > 2", "4_leps_pass_det", "2_lpairs", "z1_z2_m_around_Z", "lep_pt>20,20,10"};
 
     for(uint i=0; i < n_evt_survive.size(); i++){
         h_cutflow->SetBinContent(i+1, n_evt_survive[i]);

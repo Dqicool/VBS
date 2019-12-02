@@ -16,7 +16,7 @@ TH1D getDraw(const char* file, const char* filterr, const char* dist,  Color_t c
 }
 
 
-void plotProp(const char* outfile, const char* dist){
+void plotProp(const char* outfile, const char* dist, bool truth){
     ROOT::EnableImplicitMT(24);
     TH1::SetDefaultSumw2();
     //loading data from files
@@ -105,11 +105,20 @@ void plotProp(const char* outfile, const char* dist){
 
         for(uint i = 0; i < files.size(); i++){
             for (uint j = 0; j < (files[i]).size(); j++){
-                cut_histo.push_back(getDraw(&(files[i][j])[0], "pass_cut", dist, color_vec[i]));
-                nct_histo.push_back(getDraw(&(files[i][j])[0], "pass_NCT_JN", dist, color_vec[i]));
-                njn_histo.push_back(getDraw(&(files[i][j])[0], "pass_CT_NJN", dist, color_vec[i]));
-                nn_histo.push_back(getDraw(&(files[i][j])[0], "pass_NCT_NJN", dist, color_vec[i]));
-                sr_histo.push_back(getDraw(&(files[i][j])[0], "pass_SR", dist, color_vec[i]));
+                if(truth){
+                    cut_histo.push_back(getDraw(&(files[i][j])[0], "pass_truthBorn_cut", dist, color_vec[i]));
+                    nct_histo.push_back(getDraw(&(files[i][j])[0], "pass_truthBorn_NCT_JN", dist, color_vec[i]));
+                    njn_histo.push_back(getDraw(&(files[i][j])[0], "pass_truthBorn_CT_NJN", dist, color_vec[i]));
+                    nn_histo.push_back(getDraw(&(files[i][j])[0], "pass_truthBorn_NCT_NJN", dist, color_vec[i]));
+                    sr_histo.push_back(getDraw(&(files[i][j])[0], "pass_truthBorn_SR", dist, color_vec[i]));
+                }
+                else{
+                    cut_histo.push_back(getDraw(&(files[i][j])[0], "pass_cut", dist, color_vec[i]));
+                    nct_histo.push_back(getDraw(&(files[i][j])[0], "pass_NCT_JN", dist, color_vec[i]));
+                    njn_histo.push_back(getDraw(&(files[i][j])[0], "pass_CT_NJN", dist, color_vec[i]));
+                    nn_histo.push_back(getDraw(&(files[i][j])[0], "pass_NCT_NJN", dist, color_vec[i]));
+                    sr_histo.push_back(getDraw(&(files[i][j])[0], "pass_SR", dist, color_vec[i]));
+                }
             }
             cout<<cata[i] + " is in color " + color_name[i]<<endl;
         }
@@ -222,11 +231,17 @@ void plotProp(const char* outfile, const char* dist){
 int main()
 {
     cout<<"m4l:"<<endl;
-    plotProp("output/stack_out/m4l.root", "llll_m");
+    plotProp("output/stack_out/m4l.root", "llll_m", 0);
     cout<<"mjj:"<<endl;
-    plotProp("output/stack_out/mjj.root", "jj_m");
+    plotProp("output/stack_out/mjj.root", "jj_m", 0);
     cout<<"jj_delta_phi"<<endl;
-    plotProp("output/stack_out/jjDelPhi.root", "jj_delta_phi");
+    plotProp("output/stack_out/jjDelPhi.root", "jj_delta_phi", 0);
+    cout<<"llll_truthBorn_m"<<endl;
+    plotProp("output/stack_out/llll_true_m.root", "llll_truthBorn_m", 1);
+        cout<<"jj_truthBorn_m"<<endl;
+    plotProp("output/stack_out/jj_true_m.root", "jj_truthBorn_m" , 1);
+        cout<<"llll_truthBorn_m"<<endl;
+    plotProp("output/stack_out/jj_true_delphi.root", "jj_truthBorn_delta_phi" ,1);
 }
         
 

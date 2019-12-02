@@ -19,9 +19,9 @@ void getGraph(){
     c1.SaveAs("mjj1.png");
 
     TCanvas c2("c2","",1200,800);
-    auto h1 = df1.Histo1D({"mjj", "", 400, 0, 2000e3}, "jj_m", "NormWeight");
-    c2.SetLeftMargin(0.5);
-    c2.SetBottomMargin(0.5);
+    auto h1 = df.Histo1D({"mjj", "", 400, 0, 2000e3}, "jj_m", "NormWeight");
+    c2.SetLeftMargin(0.2);
+    c2.SetBottomMargin(0.2);
     h1->Draw();
     c2.SaveAs("mjj2.png");
 }
@@ -48,7 +48,7 @@ void testunfold(){
     std::vector<double> m{1,2,3,4,5,6,7,8,9,1};
     std::vector<double> t{1,2,3,4,5,6,7,8,9,9};
     RooUnfoldResponse resp(10,0,10);
-    for( int i = 0;i<m.size();i++){
+    for( uint i = 0;i<m.size();i++){
         resp.Fill(m[i],t[i]);
     }
     TH2D* h_m = new TH2D(resp.Mresponse());
@@ -91,5 +91,6 @@ int main(){
     integraldelphijj("jj_delta_phi_njn_h");
     integraldelphijj("jj_delta_phi_nct_h");
     integraldelphijj("jj_delta_phi_nn_h");
+    getGraph();
 
 }

@@ -377,7 +377,7 @@ int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector
         for (uint i = 0; i<jet_pass_eta.size(); i++)
             jet_pass_y.push_back(getY(jet_pass_px_py_pz[i], jet_pass_energy[i]));
         for (uint i = 0; i<jet_pass_eta.size(); i++){
-            if(i != j1_j2_index[0] && i != j1_j2_index[1]){
+            if((int)i != j1_j2_index[0] && (int)i != j1_j2_index[1]){
                 if (jet_pass_y[j1_j2_index[0]] < jet_pass_y[i] && jet_pass_y[j1_j2_index[1]] > jet_pass_y[i])
                     ret++;
                 else if(jet_pass_y[j1_j2_index[0]] > jet_pass_y[i] && jet_pass_y[j1_j2_index[1]] < jet_pass_y[i])
