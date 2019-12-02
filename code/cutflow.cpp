@@ -1,7 +1,7 @@
 #include "analambda.h"
 
-bool lptsel(std::vector<int> z1_index, std::vector<int> z2_index, std::vector<float> lepton_pt){
-    std::vector<float> l1l2l3l4_pt{lepton_pt[z1_index[0]], lepton_pt[z1_index[1]], lepton_pt[z2_index[0]], lepton_pt[z2_index[1]]};
+bool lptsel(std::vector<int> z1_index, std::vector<int> z2_index, std::vector<double> lepton_pt){
+    std::vector<double> l1l2l3l4_pt{lepton_pt[z1_index[0]], lepton_pt[z1_index[1]], lepton_pt[z2_index[0]], lepton_pt[z2_index[1]]};
     std::sort(l1l2l3l4_pt.begin(), l1l2l3l4_pt.end());
     return l1l2l3l4_pt[3] > 20e3 && l1l2l3l4_pt[2] > 20e3 && l1l2l3l4_pt[1] > 10e3;
 }

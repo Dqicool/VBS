@@ -15,8 +15,8 @@ void calResp(const char* infile, const char* out_resp,  const char* dist, const 
 
     
     //declare variable pointer in tree
-        float x_measured=0;
-        float x_true = 0;
+        double x_measured=0;
+        double x_true = 0;
         double weight = 0;
         double weight_true = 0;
         bool pass_cut = 0;

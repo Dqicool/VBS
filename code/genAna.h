@@ -21,42 +21,42 @@ using namespace std;
 //#define JET_BETWEEN_PSUDO
 #define JET_BETWEEN_RAPI
 
-float getDeltaR(float eta1, float eta2, float phi1, float phi2){
+double getDeltaR(double eta1, double eta2, double phi1, double phi2){
     return TMath::Sqrt((eta1-eta2)*(eta1-eta2) + (eta1-eta2)*(eta1-eta2));
 }
 
-float getTheta(float particle_eta){
+double getTheta(double particle_eta){
         return (2 * TMath::ATan(TMath::Exp(-particle_eta)));
 }
 
-float getTotalP(float particle_pt,
-                 float particle_eta){
+double getTotalP(double particle_pt,
+                 double particle_eta){
     return (particle_pt)*TMath::CosH(particle_eta);
 }
 
-vector<float> getPxPyPz(float particle_pt,
-                             float particle_eta,
-                             float particle_phi){
-    std::vector<float> particle_px_py_pz;
-    //float particle_total_p = getTotalP(particle_pt,particle_eta);
+vector<double> getPxPyPz(double particle_pt,
+                             double particle_eta,
+                             double particle_phi){
+    std::vector<double> particle_px_py_pz;
+    //double particle_total_p = getTotalP(particle_pt,particle_eta);
     particle_px_py_pz.push_back(particle_pt * TMath::Sin(particle_phi));
     particle_px_py_pz.push_back(particle_pt * TMath::Cos(particle_phi));
     particle_px_py_pz.push_back(particle_pt * TMath::SinH(particle_eta));
     return particle_px_py_pz;
 }
 
-float getEnergy(float particle_m,  
-                float particle_eta, 
-                float particle_pt){
+double getEnergy(double particle_m,  
+                double particle_eta, 
+                double particle_pt){
     return TMath::Sqrt(TMath::Power(particle_m, 2) + TMath::Power(getTotalP(particle_pt, particle_eta), 2));
 }
 
-float getMass(vector<float> particle_energy, 
-                std::vector<std::vector<float>> particle_px_py_pz){
-    float energy = 0;
-    float px = 0;
-    float py = 0;
-    float pz = 0;
+double getMass(vector<double> particle_energy, 
+                std::vector<std::vector<double>> particle_px_py_pz){
+    double energy = 0;
+    double px = 0;
+    double py = 0;
+    double pz = 0;
     for (uint i = 0; i<particle_energy.size(); i++){
         energy += particle_energy[i];
         px += particle_px_py_pz[i][0];
@@ -66,14 +66,14 @@ float getMass(vector<float> particle_energy,
     return TMath::Sqrt(TMath::Power(energy,2) - TMath::Power(px,2) - TMath::Power(py,2) - TMath::Power(pz,2));
 }
 
-float getMassWithInd(vector<float> particle_energy, 
-                    std::vector<std::vector<float>> particle_px_py_pz, 
+double getMassWithInd(vector<double> particle_energy, 
+                    std::vector<std::vector<double>> particle_px_py_pz, 
                     vector<int> ind){
-    float ret = 0;
-    float energy = 0;
-    float px = 0;
-    float py = 0;
-    float pz = 0;
+    double ret = 0;
+    double energy = 0;
+    double px = 0;
+    double py = 0;
+    double pz = 0;
     if (ind.size() > 0){
         for (uint i = 0; i<ind.size(); i++){
             energy += particle_energy[ind[i]];
@@ -89,7 +89,7 @@ float getMassWithInd(vector<float> particle_energy,
     return ret;
 }
 
-vector<int> getMaxSec(vector<float> vec){
+vector<int> getMaxSec(vector<double> vec){
     int size = vec.size();
     vector<int> ret;
     if (size < 2){}
@@ -98,8 +98,8 @@ vector<int> getMaxSec(vector<float> vec){
         ret.push_back(1);
     }
     else{
-        float maxind = 0;
-        float secind = 1;
+        double maxind = 0;
+        double secind = 1;
         if (vec[maxind] < vec[secind]){
             maxind = 1;
             secind = 0;
@@ -123,7 +123,7 @@ vector<int> getMaxSec(vector<float> vec){
     return ret;
 }
 
-int findLowestNum(vector<float> vec){
+int findLowestNum(vector<double> vec){
     int size = vec.size();
     int ret = 0;
     for (int i = 1; i<size; i++){
@@ -159,7 +159,7 @@ vector<int> getLeptonPeerInd(vector<int> lepton_particleID,
     return ret;
 }
 
-vector<int> closestMassSelect(vector<vector<float>> particle_mass, float target_mass){
+vector<int> closestMassSelect(vector<vector<double>> particle_mass, double target_mass){
     int minind1 = 0;
     int minind2 = 0;
     for (uint i = 0; i < particle_mass.size(); i++){
@@ -184,18 +184,18 @@ vector<int> closestMassSelect(vector<vector<float>> particle_mass, float target_
     return minind;
 }
 
-float getTotalPt(vector<float> particle1_px_py_pz, 
-                 vector<float> particle2_px_py_pz){
+double getTotalPt(vector<double> particle1_px_py_pz, 
+                 vector<double> particle2_px_py_pz){
     return TMath::Sqrt(TMath::Power((particle1_px_py_pz[0]+particle2_px_py_pz[0]),2) +
                 TMath::Power((particle1_px_py_pz[1]+particle2_px_py_pz[1]),2));
 }
 
-float getY(vector <float> particle_px_py_pz, float particle_energy){
-    float ret = 0;
+double getY(vector <double> particle_px_py_pz, double particle_energy){
+    double ret = 0;
     if (particle_px_py_pz.size() > 0 && particle_energy > 0){
-        float tmp1 = (particle_energy + particle_px_py_pz[2]);
-        float tmp2 = (particle_energy - particle_px_py_pz[2]);
-        float tmp3 = TMath::Log(tmp1/tmp2);
+        double tmp1 = (particle_energy + particle_px_py_pz[2]);
+        double tmp2 = (particle_energy - particle_px_py_pz[2]);
+        double tmp3 = TMath::Log(tmp1/tmp2);
         ret = tmp3 / 2;
     }
     else{
@@ -204,11 +204,11 @@ float getY(vector <float> particle_px_py_pz, float particle_energy){
     return ret;
 }
 
-vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz, vector<int> ind ){
-    vector <float> ret{};
-    float px = 0;
-    float py = 0;
-    float pz = 0;
+vector<double> getCombinedPxPyPzWithInd(std::vector<std::vector<double>> px_py_pz, vector<int> ind ){
+    vector <double> ret{};
+    double px = 0;
+    double py = 0;
+    double pz = 0;
     for (uint i = 0; i<ind.size(); i++){
         px += px_py_pz[ind[i]][0];
         py += px_py_pz[ind[i]][1];
@@ -220,8 +220,8 @@ vector<float> getCombinedPxPyPzWithInd(std::vector<std::vector<float>> px_py_pz,
     return ret;
 }
 
-float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
-    float ret = 0;
+double getCombinedEnergyWithInd(vector<double> energy, vector<int> ind ){
+    double ret = 0;
     if (ind.size() > 0){
         for (uint i = 0; i<ind.size(); i++){
             ret += energy[ind[i]];
@@ -234,11 +234,11 @@ float getCombinedEnergyWithInd(vector<float> energy, vector<int> ind ){
 }
 
 vector<vector<vector<int>>> getLeptonPairInd(   vector<int> lepton_particleID, 
-                                                vector<float> lepton_charge,
-                                                vector<float> lepton_eta,
-                                                vector<float> lepton_phi,
-                                                vector<vector<float>> lepton_px_py_pz,
-                                                vector<float> lepton_energy)
+                                                vector<double> lepton_charge,
+                                                vector<double> lepton_eta,
+                                                vector<double> lepton_phi,
+                                                vector<vector<double>> lepton_px_py_pz,
+                                                vector<double> lepton_energy)
 {
     vector<vector<vector<int>>> ret;
     int size = lepton_charge.size();
@@ -309,7 +309,7 @@ Color_t str2Color(std::string s){
     return ret;
 }
 
-float dotProd(float theta1, float phi1, float r1, float theta2, float phi2, float r2){
+double dotProd(double theta1, double phi1, double r1, double theta2, double phi2, double r2){
     auto z1 = TMath::Cos(theta1);
     auto y1 = TMath::Sin(theta1) * TMath::Sin(phi1);
     auto x1 = TMath::Sin(theta1) * TMath::Cos(phi1);
@@ -321,11 +321,11 @@ float dotProd(float theta1, float phi1, float r1, float theta2, float phi2, floa
     return x1*x2 + y1*y2 + z1*z2;
 }
 
-int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector<int> j1_j2_index, std::vector<std::vector<float>> jet_pass_px_py_pz, std::vector<float> jet_pass_energy)
+int nJetInBetween(vector<double> jet_pass_eta, vector<double> jet_pass_phi, vector<int> j1_j2_index, std::vector<std::vector<double>> jet_pass_px_py_pz, std::vector<double> jet_pass_energy)
 {
 #ifdef JET_BETWEEN_GEO
     int ret = 0;
-    std::vector<float> jet_pass_theta;
+    std::vector<double> jet_pass_theta;
     if (j1_j2_index.size()<2){}
     else
     {
@@ -373,7 +373,7 @@ int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector
     int ret = 0;
     if (j1_j2_index.size()<2){}
     else{
-        std::vector<float> jet_pass_y{};
+        std::vector<double> jet_pass_y{};
         for (uint i = 0; i<jet_pass_eta.size(); i++)
             jet_pass_y.push_back(getY(jet_pass_px_py_pz[i], jet_pass_energy[i]));
         for (uint i = 0; i<jet_pass_eta.size(); i++){
@@ -389,25 +389,25 @@ int nJetInBetween(vector<float> jet_pass_eta, vector<float> jet_pass_phi, vector
 #endif
 }
 
-std::vector<std::vector<float>> ZPairMSel(vector<vector<float>> lepton_pair_m, float target){
-    vector<vector<float>> ret{};
+std::vector<std::vector<double>> ZPairMSel(vector<vector<double>> lepton_pair_m, double target){
+    vector<vector<double>> ret{};
     auto siz = lepton_pair_m.size();
     for (uint i = 0; i < siz; i++){
         if(lepton_pair_m[i][0] > 10e3 && lepton_pair_m[i][1] > 10e3)
         {
-            std::vector<float> tmp{1, TMath::Abs(lepton_pair_m[i][0] - target) + TMath::Abs(lepton_pair_m[i][1] - target)};
+            std::vector<double> tmp{1, TMath::Abs(lepton_pair_m[i][0] - target) + TMath::Abs(lepton_pair_m[i][1] - target)};
             ret.push_back(tmp);
         }
         else
         {
-            vector<float> tmp{-1, 0};
+            vector<double> tmp{-1, 0};
             ret.push_back(tmp);
         }
     }
     return ret;
 } 
 
-std::vector<std::vector<int>> Z1Z2Ind(std::vector<std::vector<float>> zpair_m_ind, std::vector<std::vector<std::vector<int>>>lepton_pair_ind){
+std::vector<std::vector<int>> Z1Z2Ind(std::vector<std::vector<double>> zpair_m_ind, std::vector<std::vector<std::vector<int>>>lepton_pair_ind){
     auto siz = zpair_m_ind.size();
     uint min_m_ind = 0;
     bool flag = 1;
@@ -433,20 +433,20 @@ std::vector<std::vector<int>> Z1Z2Ind(std::vector<std::vector<float>> zpair_m_in
 }
 
 std::vector<std::vector<int>> getZ1Z2Index(std::vector<int> lepton_particleID, 
-                                std::vector<float> lepton_charge, 
-                                std::vector<float> lepton_eta, 
-                                std::vector<float> lepton_phi,
-                                std::vector<float> lepton_energy,
-                                std::vector<std::vector<float>> lepton_px_py_pz){
+                                std::vector<double> lepton_charge, 
+                                std::vector<double> lepton_eta, 
+                                std::vector<double> lepton_phi,
+                                std::vector<double> lepton_energy,
+                                std::vector<std::vector<double>> lepton_px_py_pz){
     
     auto lepton_pair_index =  getLeptonPairInd(lepton_particleID, lepton_charge, lepton_eta, lepton_phi, lepton_px_py_pz, lepton_energy);
     std::vector<std::vector<int>> ret{};
     if(lepton_pair_index.size() >= 1)
     {
-        std::vector<std::vector<float>>  lepton_pair_m;
+        std::vector<std::vector<double>>  lepton_pair_m;
         for (uint k = 0; k < lepton_pair_index.size(); k++)
         {
-            std::vector<float> tmp;
+            std::vector<double> tmp;
             tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][0]));
             tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][1]));
             lepton_pair_m.push_back(tmp);
