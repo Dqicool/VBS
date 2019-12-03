@@ -1,111 +1,13 @@
-#include "genAna.h"
 #include "analambda.h"
 #include "cutDet.h"
 
-#include <RooUnfoldResponse.h>
-#include <RooUnfoldBayes.h>
-#include <RooUnfoldErrors.h>
-#include <cstdlib>
-#include <TLegend.h>
-#include<THashList.h>
-
-void getGraph(){
-    std::vector<std::string> signals{};
-    signals.push_back("output/analyse_out/999_all/364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.root");
-    signals.push_back("output/analyse_out/999_all/344235.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_ZZ4lep_notau.root");
-    ROOT::RDataFrame df("SM4L_Nominal", {signals[0], signals[1]});
-    auto df0 = df.Filter("jet_n>=2 && lepton_n >= 4");
-    auto df1 = df0.Filter("jet_pass_n >= 2");
-    auto df2 = df1.Filter("jj_m > 300e3");
-
-    TCanvas c1("c1","",1200,800);
-    auto h = df2.Histo1D({"mjj", "", 400, 0, 2000e3}, "jj_m", "NormWeight");
-    h->Draw();
-    c1.SaveAs("mjj1.png");
-
-    TCanvas c2("c2","",1200,800);
-    auto h1 = df.Histo1D({"mjj", "", 400, 0, 2000e3}, "jj_m", "NormWeight");
-    c2.SetLeftMargin(0.2);
-    c2.SetBottomMargin(0.2);
-    h1->Draw();
-    c2.SaveAs("mjj2.png");
-}
-
-void testlatex(){
-    TFile* indelphijj = TFile::Open("output/histo_out/dem_unfold_delphijj.root","read");
-    auto Templdelphijj = (TH1D*)indelphijj->Get("h_rebin_delphijj_cut");
-    
-    for(int i=0; i < Templdelphijj->GetNbinsX(); i++){
-        std::stringstream buffer;
-        buffer <<std::setprecision(3)<< Templdelphijj->GetBinLowEdge(i+1)/TMath::Pi() <<"#pi<"<<"#Delta#phi_{jj}"<<"<" << (Templdelphijj->GetBinLowEdge(i+1) + Templdelphijj->GetBinWidth(i+1))/TMath::Pi()<<"#pi";
-        cout<<buffer.str()<<endl;
-        Templdelphijj->GetXaxis()->SetBinLabel(i+1, &(buffer.str())[0]);
-        //Templdelphijj->GetYaxis()->SetBinLabel(i+1, &(buffer.str())[0]);
-    }
-    std::stringstream buffer;
-    buffer<<"-0.5#pi<#Delta#phi_{jj}<0.5#pi";
-    Templdelphijj->GetXaxis()->SetBinLabel(1,&(buffer.str())[0]);
-    TCanvas c1("c1","",2000,2000);
-        Templdelphijj->Draw();
-}
-
-void testunfold(){
-    std::vector<double> m{1,2,3,4,5,6,7,8,9,1};
-    std::vector<double> t{1,2,3,4,5,6,7,8,9,9};
-    RooUnfoldResponse resp(10,0,10);
-    for( uint i = 0;i<m.size();i++){
-        resp.Fill(m[i],t[i]);
-    }
-    TH2D* h_m = new TH2D(resp.Mresponse());
-    auto h = resp.Hresponse();
-    auto* c1 = new TCanvas("c1","",2000,2000);
-    h->SetStats(0);
-    auto nx = h->GetNbinsX();
-    auto ny = h->GetNbinsY();
-    for(int i = 1; i <= nx; i++){
-        auto linetotal = h->Integral(i, i, 1, ny);
-        for(int j = 1; j <= ny; j++){
-            h->SetBinContent(i,j, h->GetBinContent(i,j)/linetotal);
-        }
-    }
-
-    h->Draw("COLZ");
-    h->Draw("TEXT SAME");
-    auto* c3 = new TCanvas("c3","",2000,2000);
-    h_m->Draw("COLZ");
-    h_m->Draw("TEXT SAME");
-    c1->SaveAs("hh.png");
-    c3->SaveAs("hm.png");
-}
-
-void integraldelphijj(const char* dist){
-    TFile* f= TFile::Open("output/stack_out/jjDelPhi.root", "read");
-    TH1D* h = (TH1D*) f->Get(dist);
-    double errplus, errminus, errall;
-    auto plus = h->IntegralAndError(501,1000, errplus,"");
-    auto minus = h->IntegralAndError(1,500, errminus,"");
-    auto all = h->IntegralAndError(1,1000, errall,"");
-    auto A = (plus - minus) / all;
-    auto errUp = TMath::Sqrt(errplus*errplus + errminus*errminus);
-    auto errA = TMath::Sqrt((errUp * errUp / (plus-minus) / (plus-minus)  + errall * errall / all*all)* A * A);
-    cout<<dist<<"\tA = " <<A<<" +- "<<errA<<"\tsignificance: "<< A/errA <<endl;
-}
-
-void columntype(){
-
-    ROOT::RDataFrame dframe("SM4L_Nominal", "data/999_all/mc16_13TeV.344235.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_ZZ4lep_notau.deriv.DAOD_HIGG2D1.e5500_s3126_r9364_p3654.root");
-    auto col_name = dframe.GetColumnNames();
-    for(uint i=0; col_name.size();i++){
-        cout<<col_name[i]<<":\t" <<dframe.GetColumnType(col_name[i])<<endl;
-    }
-}
 
 void comPareevents(){
     //chain signals 
     ROOT::RDataFrame df("SM4L_Nominal", 
-    {"data/999_all/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r9364_r9315_p3654.root",
-     "data/999_all/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10201_r10210_p3654.root",
-    "data/999_all/mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10724_r10726_p3654.root"});
+    {"mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r9364_r9315_p3654.root",
+     "mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10201_r10210_p3654.root",
+    "mc16_13TeV.364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.deriv.DAOD_HIGG2D1.e6611_e5984_a875_r10724_r10726_p3654.root"});
 
     //analysis
     auto ana=df.//0
@@ -239,23 +141,57 @@ void comPareevents(){
             .Define("cut_z_m" ,[](double z1_m, double z2_m){return z1_m > 66e3 && z1_m < 116e3 && z2_m > 66e3 && z2_m < 116e3;},{"z1_m","z2_m"});
 
     //save files
+    auto col_name = cut.GetDefinedColumnNames();
     auto col_name = cut.GetColumnNames();
-            col_name.erase(col_name.begin()+67,col_name.end());
-
+            col_name.erase(col_name.begin()+66,col_name.end());
             col_name.erase(col_name.begin()+36, col_name.begin()+37);
             col_name.erase(col_name.begin()+35, col_name.begin()+36);
             col_name.erase(col_name.begin()+23, col_name.begin()+24);
+            
             cut.Snapshot("SM4L_Nominal", "output.root", col_name);
-
 }
-int main(){
-    // integraldelphijj("jj_delta_phi_cut_h");
-    // integraldelphijj("jj_delta_phi_sr_h");
-    // integraldelphijj("jj_delta_phi_njn_h");
-    // integraldelphijj("jj_delta_phi_nct_h");
-    // integraldelphijj("jj_delta_phi_nn_h");
-    // getGraph();
-    //columntype();
-    comPareevents();
+
+#define BEN
+//#define HAR
+#define DON
+
+void compares(){
+    bool Dcut[7], Hcut[7], Bcut[7];
+#ifdef HAR
+    auto Hf = TFile::Open("output_H.root","read");
+    TTree* Ht = (TTree*)Hf->Get("SM4L_Nominal");
+    auto n_h = Ht->GetEntries();
+#endif
+#ifdef BEN
+    auto Bf = TFile::Open("output_B.root", "read");
+    TTree* Bt = (TTree*)Bf->Get("SM4L_Nominal");
+    auto n_b = Bt->GetEntries();
+    Bt->SetBranchAddress("cut1", &Dcut[0]);
+    Bt->SetBranchAddress("cut2", &Dcut[1]);
+    Bt->SetBranchAddress("cut3",&Dcut[2]);
+    Bt->SetBranchAddress("cut4",&Dcut[3]);
+    Bt->SetBranchAddress("cut5", &Dcut[4]);
+    Bt->SetBranchAddress("cut6", &Dcut[5]);
+    Bt->SetBranchAddress("cut_z_m", &Dcut[6]);
+#endif
+#ifdef DON
+    auto Df = TFile::Open("output_D.root","read");
+    TTree* Dt = (TTree*)Df->Get("SM4L_Nominal");
+    auto n_d = Dt->GetEntries();
+    Dt->SetBranchAddress("cut_base", &Dcut[0]);
+    Dt->SetBranchAddress("pass_truthBorn_cut", &Dcut[1]);
+    Dt->SetBranchAddress("cut_mjj",&Dcut[2]);
+    Dt->SetBranchAddress("cut_jjdely",&Dcut[3]);
+    Dt->SetBranchAddress("cut_lep_det", &Dcut[4]);
+    Dt->SetBranchAddress("cut_lep_2_pairs", &Dcut[5]);
+    Dt->SetBranchAddress("cut_z_m", &Dcut[6]);
+#endif
+
+
+
+
+    //setting pointers
+
+
 
 }

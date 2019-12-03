@@ -24,7 +24,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //1
                         Define("lepton_pass_ind", lepSel, {"lepton_pt", "lepton_eta", "lepton_d0sig", "lepton_z0sinTheta", "lepton_particleID", "lepton_passesIsolation"}).
                         //2
-                        Define("pass_det",baseline, {"lepton_pass_ind", "jet_pass_ind", "lepton_pt"}).
+                        Define("pass_det",baseline, {"lepton_pass_ind", "jet_pass_ind"}).
                         //3
                         Define("NormWeight", proWeight, {"weight"}).
                         //4
@@ -148,7 +148,7 @@ void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree
                         //62
                         Define("lepton_truthBorn_pass_ind", lepTrueSel, {"lepton_truthBorn_pt", "lepton_truthBorn_eta", "lepton_truthBorn_particleID"}).
                         //63
-                        Define("pass_det_truthBorn",baseline, {"lepton_truthBorn_pass_ind", "jet_truthBorn_pass_ind", "lepton_truthBorn_pt"}).
+                        Define("pass_det_truthBorn",baseline, {"lepton_truthBorn_pass_ind", "jet_truthBorn_pass_ind"}).
                         //64
                         Define("jet_truthBorn_pass_pt", fpass_property, {"jet_truthBorn_pass_ind", "jet_truthBorn_pt"}).
                         //65

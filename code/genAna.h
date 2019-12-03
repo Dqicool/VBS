@@ -22,7 +22,7 @@ using namespace std;
 #define JET_BETWEEN_RAPI
 
 double getDeltaR(double eta1, double eta2, double phi1, double phi2){
-    return TMath::Sqrt((eta1-eta2)*(eta1-eta2) + (eta1-eta2)*(eta1-eta2));
+    return TMath::Sqrt((eta1-eta2)*(eta1-eta2) + (phi1-phi2)*(phi1-phi2));
 }
 
 double getTheta(double particle_eta){

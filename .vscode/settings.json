@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.cu": "cpp",
         "analysis_basic.C": "cpp",
         "vector": "cpp",
         "analysis_medium.C": "cpp",
@@ -65,7 +66,9 @@
         "bitset": "cpp",
         "*.icc": "cpp",
         "random": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "execution_policy": "cpp",
+        "forward_list": "cpp"
     },
     "files.exclude": {
         "**/.gitignore": true
