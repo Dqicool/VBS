@@ -14,6 +14,8 @@ SECONDS=0
         ($VBSHOME$EXE $VBSHOME$DATA$entry $VBSHOME$OUT$entry) &
         let i+=1
     done
+    echo "[$i] data1516"
+    ($VBSHOME$EXE $VBSHOME/output/analyse_out/Data1516.root $VBSHOME/output/draw_out/Data1516.root) &
     wait
 
     $VBSHOME/targets/stack

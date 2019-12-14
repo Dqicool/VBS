@@ -1,3 +1,4 @@
+
 #ifndef __GEN_ANA__
 #define __GEN_ANA__
 #include <TH1.h>
@@ -9,236 +10,126 @@
 #include <iostream>
 #include <string.h>
 #include <ROOT/RDataFrame.hxx>
-#include <TLorentzVector.h>
+#include <Math/GenVector/LorentzVector.h>
+#include <Math/GenVector/PtEtaPhiM4D.h>
+#include <Math/GenVector/PtEtaPhiM4Dfwd.h>
+#include <Math/Vector4Dfwd.h>
 #include <TChain.h>
 #include<TROOT.h>
 #include<TStyle.h>
 #include<TLatex.h>
-#define Z_MASS 91.1876
+#define Z_MASS 91.1876e3
 using namespace std;
+using namespace ROOT::Math;
 
-//#define JET_BETWEEN_GEO
-//#define JET_BETWEEN_PSUDO
-#define JET_BETWEEN_RAPI
+
+vector<PtEtaPhiMVector> getLorentz(vector<double> pt, vector<double> eta, vector<double> phi, vector<double> m){
+    std::vector<PtEtaPhiMVector> ret{};
+    for(uint i = 0; i < pt.size(); i++){
+        PtEtaPhiMVector tmpv(pt[i], eta[i], phi[i], m[i]);
+        ret.push_back(tmpv);
+    } 
+    return ret;
+}
 
 double getDeltaR(double eta1, double eta2, double phi1, double phi2){
     return TMath::Sqrt((eta1-eta2)*(eta1-eta2) + (phi1-phi2)*(phi1-phi2));
 }
 
-double getTheta(double particle_eta){
-        return (2 * TMath::ATan(TMath::Exp(-particle_eta)));
-}
-
-double getTotalP(double particle_pt,
-                 double particle_eta){
-    return (particle_pt)*TMath::CosH(particle_eta);
-}
-
-vector<double> getPxPyPz(double particle_pt,
-                             double particle_eta,
-                             double particle_phi){
-    std::vector<double> particle_px_py_pz;
-    //double particle_total_p = getTotalP(particle_pt,particle_eta);
-    particle_px_py_pz.push_back(particle_pt * TMath::Sin(particle_phi));
-    particle_px_py_pz.push_back(particle_pt * TMath::Cos(particle_phi));
-    particle_px_py_pz.push_back(particle_pt * TMath::SinH(particle_eta));
-    return particle_px_py_pz;
-}
-
-double getEnergy(double particle_m,  
-                double particle_eta, 
-                double particle_pt){
-    return TMath::Sqrt(TMath::Power(particle_m, 2) + TMath::Power(getTotalP(particle_pt, particle_eta), 2));
-}
-
-double getMass(vector<double> particle_energy, 
-                std::vector<std::vector<double>> particle_px_py_pz){
-    double energy = 0;
-    double px = 0;
-    double py = 0;
-    double pz = 0;
-    for (uint i = 0; i<particle_energy.size(); i++){
-        energy += particle_energy[i];
-        px += particle_px_py_pz[i][0];
-        py += particle_px_py_pz[i][1];
-        pz += particle_px_py_pz[i][2];
-    }
-    return TMath::Sqrt(TMath::Power(energy,2) - TMath::Power(px,2) - TMath::Power(py,2) - TMath::Power(pz,2));
-}
-
-double getMassWithInd(vector<double> particle_energy, 
-                    std::vector<std::vector<double>> particle_px_py_pz, 
-                    vector<int> ind){
-    double ret = 0;
-    double energy = 0;
-    double px = 0;
-    double py = 0;
-    double pz = 0;
-    if (ind.size() > 0){
-        for (uint i = 0; i<ind.size(); i++){
-            energy += particle_energy[ind[i]];
-            px += particle_px_py_pz[ind[i]][0];
-            py += particle_px_py_pz[ind[i]][1];
-            pz += particle_px_py_pz[ind[i]][2];
-        }
-        ret = TMath::Sqrt(TMath::Power(energy,2) - TMath::Power(px,2) - TMath::Power(py,2) - TMath::Power(pz,2));
-    }
+std::vector<int> getJ1J2Ind(std::vector<PtEtaPhiMVector> jet_lorentz){
+    std::vector<int> ret{};
+    uint size = jet_lorentz.size();
+    if (size < 2) {}
     else{
-        ret = -999;
-    }
-    return ret;
-}
-
-vector<int> getMaxSec(vector<double> vec){
-    int size = vec.size();
-    vector<int> ret;
-    if (size < 2){}
-    else if (size == 2){
-        ret.push_back(0);
-        ret.push_back(1);
-    }
-    else{
-        double maxind = 0;
-        double secind = 1;
-        if (vec[maxind] < vec[secind]){
-            maxind = 1;
-            secind = 0;
-        }
-        for (int i=2;i<size;i++){
-            
-            if (vec[i]>vec[maxind]){
-                secind = maxind;
-                maxind = i;
-            }
-            else if (vec[i]>vec[secind]){
-                secind =i;
-            }
-            else{
-                continue;
-            }
-        }
-        ret.push_back(maxind);
-        ret.push_back(secind);
-    }
-    return ret;
-}
-
-int findLowestNum(vector<double> vec){
-    int size = vec.size();
-    int ret = 0;
-    for (int i = 1; i<size; i++){
-        if (vec[ret] > vec[i]) ret = i;
-    }
-    return ret;
-}
-
-vector<int> getLeptonPeerInd(vector<int> lepton_particleID, 
-                             vector<int> lepton_charge){
-    vector<int> ret;
-    for (uint i = 0; i<lepton_charge.size(); i++ )
-    {
-        for (uint j = i+1; j<lepton_charge.size(); j++)
+        std::vector<std::vector<int>> jets_pairs_ind{};
+        std::vector<double> jets_pair_energy{};
+        for (uint i=0; i < size; i++)
         {
-            if(lepton_particleID[i] == lepton_particleID[j] && lepton_charge[i] != lepton_charge[j])
+            for (uint j=i+1;j<size;j++)
             {
+                if(jet_lorentz[i].Rapidity() * jet_lorentz[j].Rapidity() < 0)
                 {
-                    ret.push_back(i);
-                    ret.push_back(j);
+                    std::vector<int> tmp_pairs_ind{(int)i,(int)j};
+                    jets_pairs_ind.push_back(tmp_pairs_ind);
+                    jets_pair_energy.push_back((jet_lorentz[i] + jet_lorentz[j]).Pt());
                 }
             }
         }
-    }
-    if (ret.size()>4)
-    {
-        int arr1 = ret[6]; int arr2 = ret[7];
-        int arr[] = {arr1, arr2};
-        ret.insert(ret.begin(),arr, arr+2);
-
-        ret.erase(ret.end() - 2, ret.end());
-    }
-    return ret;
-}
-
-vector<int> closestMassSelect(vector<vector<double>> particle_mass, double target_mass){
-    int minind1 = 0;
-    int minind2 = 0;
-    for (uint i = 0; i < particle_mass.size(); i++){
-        for (int j = 0; j < 2; j++){
-            auto m11 = TMath::Power(particle_mass[minind1][minind2]-target_mass, 2);
-            auto m21 = TMath::Power(particle_mass[i][j]-target_mass, 2);
-            if (m11 > m21){
-                minind1 = i;
-                minind2 = j;
-            }
-            else if (m11 == m21 && (int)i != minind1){
-                auto m12 = TMath::Power(particle_mass[minind1][!(bool)minind2]-target_mass, 2);
-                auto m22 = TMath::Power(particle_mass[i][!(bool)j]-target_mass, 2);
-                if (m12 > m22){
-                    minind1 = i;
-                    minind2 = j;
+        if(jets_pair_energy.size() > 0)
+        {
+            uint maxind = 0;
+            for (uint k=1; k<jets_pair_energy.size(); k++)
+            {
+                if(jets_pair_energy[k] > jets_pair_energy[maxind])
+                {
+                    maxind = k;
                 }
             }
+            if(jet_lorentz[jets_pairs_ind[maxind][1]].E() > jet_lorentz[jets_pairs_ind[maxind][0]].Pt())
+            {
+                auto tmp = jets_pairs_ind[maxind][0];
+                jets_pairs_ind[maxind][0] = jets_pairs_ind[maxind][1];
+                jets_pairs_ind[maxind][1] = tmp;
+            }
+            ret = jets_pairs_ind[maxind];
+
+            if(jet_lorentz[jets_pairs_ind[maxind][0]].Pt() < 40e3 || jet_lorentz[jets_pairs_ind[maxind][1]].Pt() < 30e3)
+                ret = {};
         }
     }
-    vector<int> minind{minind1,minind2};
-    return minind;
+    return ret;
+};
+
+double getMjj(std::vector<PtEtaPhiMVector> jet_lorentz, std::vector<int> j1_j2_ind)
+{
+    double ret = -999;
+    if (j1_j2_ind.size() >= 2) ret = (jet_lorentz[j1_j2_ind[0]] + jet_lorentz[j1_j2_ind[1]]).M();
+    return ret;
 }
 
-double getTotalPt(vector<double> particle1_px_py_pz, 
-                 vector<double> particle2_px_py_pz){
-    return TMath::Sqrt(TMath::Power((particle1_px_py_pz[0]+particle2_px_py_pz[0]),2) +
-                TMath::Power((particle1_px_py_pz[1]+particle2_px_py_pz[1]),2));
-}
-
-double getY(vector <double> particle_px_py_pz, double particle_energy){
-    double ret = 0;
-    if (particle_px_py_pz.size() > 0 && particle_energy > 0){
-        double tmp1 = (particle_energy + particle_px_py_pz[2]);
-        double tmp2 = (particle_energy - particle_px_py_pz[2]);
-        double tmp3 = TMath::Log(tmp1/tmp2);
-        ret = tmp3 / 2;
-    }
-    else{
-        ret = -999;
+int GetNJBetween(std::vector<PtEtaPhiMVector> jet_lorentz, std::vector<int> j1_j2_ind)
+{
+    int ret = 0;
+    if (j1_j2_ind.size() >= 2){
+        for (uint i = 0; i<jet_lorentz.size(); i++){
+            if((int)i != j1_j2_ind[0] && (int)i != j1_j2_ind[1]){
+                if ((jet_lorentz[j1_j2_ind[0]].Rapidity() < jet_lorentz[i].Rapidity()) && (jet_lorentz[j1_j2_ind[1]].Rapidity() > jet_lorentz[i].Rapidity())) {ret++;}
+                else if((jet_lorentz[j1_j2_ind[0]].Rapidity() > jet_lorentz[i].Rapidity()) && (jet_lorentz[j1_j2_ind[1]].Rapidity() < jet_lorentz[i].Rapidity())) {ret++;};
+            }
+        }
     }
     return ret;
 }
 
-vector<double> getCombinedPxPyPzWithInd(std::vector<std::vector<double>> px_py_pz, vector<int> ind ){
-    vector <double> ret{};
-    double px = 0;
-    double py = 0;
-    double pz = 0;
-    for (uint i = 0; i<ind.size(); i++){
-        px += px_py_pz[ind[i]][0];
-        py += px_py_pz[ind[i]][1];
-        pz += px_py_pz[ind[i]][2];
+double getJJDelPhi(std::vector<PtEtaPhiMVector> jet_lorentz, std::vector<int> j1_j2_ind){
+    double ret = -999;
+    if(j1_j2_ind.size() >= 2){
+        if (jet_lorentz[j1_j2_ind[0]].Rapidity() > jet_lorentz[j1_j2_ind[1]].Rapidity())    
+            ret = jet_lorentz[j1_j2_ind[0]].Phi() - jet_lorentz[j1_j2_ind[1]].Phi();
+        else                
+            ret = jet_lorentz[j1_j2_ind[1]].Phi() - jet_lorentz[j1_j2_ind[0]].Phi();
+        
+        if(ret > TMath::Pi()){
+            ret -= 2*TMath::Pi();
+        }
+        else if(ret < -TMath::Pi()){
+            ret += 2*TMath::Pi();
+        }
     }
-    ret.push_back(px);
-    ret.push_back(py);
-    ret.push_back(pz);
     return ret;
 }
 
-double getCombinedEnergyWithInd(vector<double> energy, vector<int> ind ){
-    double ret = 0;
-    if (ind.size() > 0){
-        for (uint i = 0; i<ind.size(); i++){
-            ret += energy[ind[i]];
-        }
-    }
-    else{
-        ret = -999;
+double getJJDelY(std::vector<PtEtaPhiMVector> jet_lorentz, std::vector<int> j1_j2_ind){
+    double ret = -999;
+    if(j1_j2_ind.size() >= 2){
+        ret =  jet_lorentz[j1_j2_ind[0]].Rapidity() -  jet_lorentz[j1_j2_ind[1]].Rapidity();
     }
     return ret;
 }
 
 vector<vector<vector<int>>> getLeptonPairInd(   vector<int> lepton_particleID, 
                                                 vector<double> lepton_charge,
-                                                vector<double> lepton_eta,
-                                                vector<double> lepton_phi,
-                                                vector<vector<double>> lepton_px_py_pz,
-                                                vector<double> lepton_energy)
+                                                std::vector<PtEtaPhiMVector> lepton_lorentz)
 {
     vector<vector<vector<int>>> ret;
     int size = lepton_charge.size();
@@ -249,19 +140,19 @@ vector<vector<vector<int>>> getLeptonPairInd(   vector<int> lepton_particleID,
                     for (int l = k+1; l<size; l++){
                         if (l != j && k != j){
                             if (lepton_particleID[k] == lepton_particleID[l] && ((lepton_charge[k] - lepton_charge[l])*(lepton_charge[k] - lepton_charge[l]))>2){
-                                auto delR_ij = getDeltaR(lepton_eta[i], lepton_eta[j], lepton_phi[i], lepton_eta[j]);
-                                auto delR_kl = getDeltaR(lepton_eta[k], lepton_eta[l], lepton_phi[k], lepton_eta[l]);
+                                auto delR_ij = getDeltaR(lepton_lorentz[i].Eta(), lepton_lorentz[j].Eta(), lepton_lorentz[i].Phi(), lepton_lorentz[j].Phi());
+                                auto delR_kl = getDeltaR(lepton_lorentz[k].Eta(), lepton_lorentz[l].Eta(), lepton_lorentz[k].Phi(), lepton_lorentz[l].Phi());
                                 if (delR_ij > 0.2 && delR_kl > 0.2){
                                     if( lepton_particleID[i] == lepton_particleID[k] 
-                                        && getMassWithInd(lepton_energy, lepton_px_py_pz, {i,j}) > 10e3 
-                                        && getMassWithInd(lepton_energy, lepton_px_py_pz, {k,l}) > 10e3)
+                                        && (lepton_lorentz[i] + lepton_lorentz[j]).M() > 10e3 
+                                        && (lepton_lorentz[i] + lepton_lorentz[j]).M() > 10e3)
                                     {
                                         vector<int> tmp1{i,j};
                                         vector<int> tmp2{k,l};
                                         vector<vector<int>> tmp{tmp1,tmp2};
                                         ret.push_back(tmp);
                                     }
-                                    else{
+                                    else if(lepton_particleID[i] != lepton_particleID[k]){
                                         vector<int> tmp1{i,j};
                                         vector<int> tmp2{k,l};
                                         vector<vector<int>> tmp{tmp1,tmp2};
@@ -279,167 +170,12 @@ vector<vector<vector<int>>> getLeptonPairInd(   vector<int> lepton_particleID,
     return ret;
 }
 
-char * intToChar(int a){
-        char ret1 = (char)(a/10 + 48);
-        char ret2 = (char)((a - 10*(a/10)) +48);
-        char tmp1[2] = {ret1,'\0'};
-        char tmp2[2] = {ret2,'\0'};
-        char* ret = strcat(tmp1, tmp2); 
-        return ret;
-}
-
-Color_t str2Color(std::string s){
-    Color_t ret=0;
-    if (s == "kWhite") {ret=kWhite;}
-    else if (s == "kBlack") {ret=kBlack;}
-    else if (s == "kGray") {ret=kGray;}
-    else if (s == "kRed") {ret=kRed;}
-    else if (s == "kGreen") {ret=kGreen;}
-    else if (s == "kBlue") {ret=kBlue;}
-    else if (s == "kYellow") {ret=kYellow;}
-    else if (s == "kMagenta") {ret=kMagenta;}
-    else if (s == "kCyan") {ret=kCyan;}
-    else if (s == "kOrange") {ret=kOrange;}
-    else if (s == "kSpring") {ret=kSpring;}
-    else if (s == "kTeal") {ret=kTeal;}
-    else if (s == "kAzure") {ret=kAzure;}
-    else if (s == "kViolet") {ret=kViolet;}
-    else if (s == "kPink") {ret=kPink;}
-    else {return -1;}
-    return ret;
-}
-
-double dotProd(double theta1, double phi1, double r1, double theta2, double phi2, double r2){
-    auto z1 = TMath::Cos(theta1);
-    auto y1 = TMath::Sin(theta1) * TMath::Sin(phi1);
-    auto x1 = TMath::Sin(theta1) * TMath::Cos(phi1);
-
-    auto z2 = TMath::Cos(theta2);
-    auto y2 = TMath::Sin(theta2) * TMath::Sin(phi2);
-    auto x2 = TMath::Sin(theta2) * TMath::Cos(phi2);
-
-    return x1*x2 + y1*y2 + z1*z2;
-}
-
-int nJetInBetween(vector<double> jet_pass_eta, vector<double> jet_pass_phi, vector<int> j1_j2_index, std::vector<std::vector<double>> jet_pass_px_py_pz, std::vector<double> jet_pass_energy)
-{
-#ifdef JET_BETWEEN_GEO
-    int ret = 0;
-    std::vector<double> jet_pass_theta;
-    if (j1_j2_index.size()<2){}
-    else
-    {
-        auto j1_theta = getTheta(jet_pass_eta[j1_j2_index[0]]);
-        auto j1_phi = jet_pass_phi[j1_j2_index[0]];
-
-        auto j2_theta = getTheta(jet_pass_eta[j1_j2_index[1]]);
-        auto j2_phi = jet_pass_phi[j1_j2_index[1]];
-
-        for (uint i = 0; i<jet_pass_eta.size(); i++){
-            jet_pass_theta.push_back(getTheta(jet_pass_eta[i]));
-        }
-        auto cent_theta = (j1_theta + j2_theta) / 2;
-        auto cent_phi   = (j1_phi + j2_phi) / 2;
-        auto lead_jet_dot_cent = dotProd(j1_theta, j1_phi, 1, cent_theta, cent_phi, 1);
-        //cout<< lead_jet_dot_cent<<endl;
-        for (uint i = 0; i<jet_pass_eta.size(); i++){
-            if(i != j1_j2_index[0] && i != j1_j2_index[1]){
-                auto tmp = dotProd(jet_pass_theta[i], jet_pass_phi[i], 1, cent_theta, cent_phi, 1);
-                //cout<<tmp<<endl;
-                if(tmp > lead_jet_dot_cent){
-                    ret++;
-                }
-            }
-        }
-    }
-    return ret;
-#endif
-#ifdef JET_BETWEEN_PSUDO
-    int ret = 0;
-    if (j1_j2_index.size()<2){}
-    else{
-        for (uint i = 0; i<jet_pass_eta.size(); i++){
-            if(i != j1_j2_index[0] && i != j1_j2_index[1]){
-                if (jet_pass_eta[j1_j2_index[0]] < jet_pass_eta[i] && jet_pass_eta[j1_j2_index[1]] > jet_pass_eta[i])
-                    ret++;
-                else if(jet_pass_eta[j1_j2_index[0]] > jet_pass_eta[i] && jet_pass_eta[j1_j2_index[1]] < jet_pass_eta[i])
-                    ret++;
-            }
-        }
-    }
-    return ret;
-#endif
-#ifdef JET_BETWEEN_RAPI
-    int ret = 0;
-    if (j1_j2_index.size()<2){}
-    else{
-        std::vector<double> jet_pass_y{};
-        for (uint i = 0; i<jet_pass_eta.size(); i++)
-            jet_pass_y.push_back(getY(jet_pass_px_py_pz[i], jet_pass_energy[i]));
-        for (uint i = 0; i<jet_pass_eta.size(); i++){
-            if((int)i != j1_j2_index[0] && (int)i != j1_j2_index[1]){
-                if (jet_pass_y[j1_j2_index[0]] < jet_pass_y[i] && jet_pass_y[j1_j2_index[1]] > jet_pass_y[i])
-                    ret++;
-                else if(jet_pass_y[j1_j2_index[0]] > jet_pass_y[i] && jet_pass_y[j1_j2_index[1]] < jet_pass_y[i])
-                    ret++;
-            }
-        }
-    }
-    return ret;
-#endif
-}
-
-std::vector<std::vector<double>> ZPairMSel(vector<vector<double>> lepton_pair_m, double target){
-    vector<vector<double>> ret{};
-    auto siz = lepton_pair_m.size();
-    for (uint i = 0; i < siz; i++){
-        if(lepton_pair_m[i][0] > 10e3 && lepton_pair_m[i][1] > 10e3)
-        {
-            std::vector<double> tmp{1, TMath::Abs(lepton_pair_m[i][0] - target) + TMath::Abs(lepton_pair_m[i][1] - target)};
-            ret.push_back(tmp);
-        }
-        else
-        {
-            vector<double> tmp{-1, 0};
-            ret.push_back(tmp);
-        }
-    }
-    return ret;
-} 
-
-std::vector<std::vector<int>> Z1Z2Ind(std::vector<std::vector<double>> zpair_m_ind, std::vector<std::vector<std::vector<int>>>lepton_pair_ind){
-    auto siz = zpair_m_ind.size();
-    uint min_m_ind = 0;
-    bool flag = 1;
-    std::vector<std::vector<int>> ret{};
-    for(uint i = 0; i < siz; i++){
-        if(zpair_m_ind[i][0] > 0){min_m_ind = i; break;}
-        if(i == siz-1){flag = 0;}
-    }
-    if (flag)
-    {
-        for(uint j = min_m_ind; j < siz; j++)
-        {
-            if(zpair_m_ind[j][0] > 0)
-            {
-                if (zpair_m_ind[j][1] < zpair_m_ind[min_m_ind][1]){
-                    min_m_ind = j;
-                }
-            }
-        }
-        ret = lepton_pair_ind[min_m_ind];
-    }
-    return ret;
-}
 
 std::vector<std::vector<int>> getZ1Z2Index(std::vector<int> lepton_particleID, 
                                 std::vector<double> lepton_charge, 
-                                std::vector<double> lepton_eta, 
-                                std::vector<double> lepton_phi,
-                                std::vector<double> lepton_energy,
-                                std::vector<std::vector<double>> lepton_px_py_pz){
+                                std::vector<PtEtaPhiMVector> lepton_lorentz){
     
-    auto lepton_pair_index =  getLeptonPairInd(lepton_particleID, lepton_charge, lepton_eta, lepton_phi, lepton_px_py_pz, lepton_energy);
+    auto lepton_pair_index =  getLeptonPairInd(lepton_particleID, lepton_charge, lepton_lorentz);
     std::vector<std::vector<int>> ret{};
     if(lepton_pair_index.size() >= 1)
     {
@@ -447,16 +183,120 @@ std::vector<std::vector<int>> getZ1Z2Index(std::vector<int> lepton_particleID,
         for (uint k = 0; k < lepton_pair_index.size(); k++)
         {
             std::vector<double> tmp;
-            tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][0]));
-            tmp.push_back(getMassWithInd(lepton_energy, lepton_px_py_pz, lepton_pair_index[k][1]));
+            tmp.push_back((lepton_lorentz[lepton_pair_index[k][0][0]] + lepton_lorentz[lepton_pair_index[k][0][1]]).M());
+            tmp.push_back((lepton_lorentz[lepton_pair_index[k][1][0]] + lepton_lorentz[lepton_pair_index[k][1][1]]).M());
             lepton_pair_m.push_back(tmp);
         }
 
-        auto zpair_abs_m_z = ZPairMSel(lepton_pair_m, Z_MASS*1000);
-        
-        ret = Z1Z2Ind(zpair_abs_m_z, lepton_pair_index);
+        vector<double> mass_diff{};
+        for (uint i = 0; i < lepton_pair_m.size(); i++){
+            auto tmp = TMath::Abs(lepton_pair_m[i][0] - Z_MASS) + TMath::Abs(lepton_pair_m[i][1] - Z_MASS);
+            mass_diff.push_back(tmp);
+        }
+
+        int min_ind = 0;
+        for (uint i = 1; i < mass_diff.size(); i++){
+            if (mass_diff[min_ind] > mass_diff[i]) min_ind = (int)i;
+        }
+        if(TMath::Abs(lepton_pair_m[min_ind][1] - Z_MASS) < TMath::Abs(lepton_pair_m[min_ind][0] - Z_MASS)){
+            auto tmp = lepton_pair_index[min_ind][1];
+            lepton_pair_index[min_ind][1] = lepton_pair_index[min_ind][0];
+            lepton_pair_index[min_ind][0] = tmp;
+        }
+        ret = lepton_pair_index[min_ind];
     }
     return ret;
 }
 
+std::vector<int> getZ1Ind(std::vector<PtEtaPhiMVector> lepton_lorentz, std::vector<std::vector<int>> z1_z2_ind){
+    std::vector<int> ret{};
+    if(z1_z2_ind.size() >=2)
+        ret = z1_z2_ind[0];
+    return ret;
+}
+
+std::vector<int> getZ2Ind(std::vector<PtEtaPhiMVector> lepton_lorentz, std::vector<std::vector<int>> z1_z2_ind){
+    std::vector<int> ret{};
+    if(z1_z2_ind.size() >=2)
+        ret = z1_z2_ind[1];
+    return ret;
+}
+
+double getPtBala (std::vector<PtEtaPhiMVector> jet_lorentz, std::vector<int> j1_j2_ind, std::vector<PtEtaPhiMVector> lepton_lorentz, vector<std::vector<int>> z1_z2_ind){
+    double ret = -999;
+    if(j1_j2_ind.size() >= 2 && z1_z2_ind.size() >= 2){
+        auto z1_lorentz = lepton_lorentz[z1_z2_ind[0][0]] + lepton_lorentz[z1_z2_ind[0][1]];
+        auto z2_lorentz = lepton_lorentz[z1_z2_ind[1][0]] + lepton_lorentz[z1_z2_ind[1][1]];
+        auto j1_lorentz = jet_lorentz[j1_j2_ind[0]];
+        auto j2_lorentz = jet_lorentz[j1_j2_ind[1]];
+        auto tot_lorentz = z1_lorentz + z2_lorentz +j1_lorentz + j2_lorentz;
+
+        double zzjj_scaler_sum_pt =z1_lorentz.Pt()  + z2_lorentz.Pt() + j1_lorentz.Pt() + j2_lorentz.Pt();
+        double zzjj_sys_pt = tot_lorentz.Pt();
+        ret = zzjj_sys_pt / zzjj_scaler_sum_pt;
+    }
+    return ret;
+}
+
+double getCentra (std::vector<PtEtaPhiMVector> jet_lorentz, std::vector<int> j1_j2_ind, std::vector<PtEtaPhiMVector> lepton_lorentz, vector<std::vector<int>> z1_z2_ind){
+        double ret = -999;
+        if(j1_j2_ind.size()>=2 && z1_z2_ind.size() >= 2){
+            auto z1_lorentz = lepton_lorentz[z1_z2_ind[0][0]] + lepton_lorentz[z1_z2_ind[0][1]];
+            auto z2_lorentz = lepton_lorentz[z1_z2_ind[1][0]] + lepton_lorentz[z1_z2_ind[1][1]];
+            auto j1_lorentz = jet_lorentz[j1_j2_ind[0]];
+            auto j2_lorentz = jet_lorentz[j1_j2_ind[1]];
+
+            ret =  TMath::Abs(((j1_lorentz + j2_lorentz).Rapidity() - (z1_lorentz + z2_lorentz).Rapidity()) / (j1_lorentz.Rapidity() - j2_lorentz.Rapidity()));
+        }
+        return ret;
+}
+
+double getM4l(std::vector<PtEtaPhiMVector> lepton_lorentz, std::vector<std::vector<int>> z1_z2_ind){
+    double ret = -999;
+    if(z1_z2_ind.size() >= 2){
+            auto zz_lorentz = lepton_lorentz[z1_z2_ind[0][0]] + lepton_lorentz[z1_z2_ind[0][1]] + lepton_lorentz[z1_z2_ind[1][0]] + lepton_lorentz[z1_z2_ind[1][1]];
+            ret = zz_lorentz.M();
+    }
+    return ret;
+}
+
+double getZ1M(std::vector<PtEtaPhiMVector> lepton_lorentz, std::vector<std::vector<int>> z1_z2_ind){
+    double ret = -999;
+    if(z1_z2_ind.size()>=2){
+        auto z1_lorentz = lepton_lorentz[z1_z2_ind[0][0]] + lepton_lorentz[z1_z2_ind[0][1]];
+        ret =  (z1_lorentz.M());
+    }
+    return ret;
+}
+
+double getZ2M(std::vector<PtEtaPhiMVector> lepton_lorentz, std::vector<std::vector<int>> z1_z2_ind){
+    double ret = -999;
+    if(z1_z2_ind.size()>=2){
+        auto z2_lorentz = lepton_lorentz[z1_z2_ind[1][0]] + lepton_lorentz[z1_z2_ind[1][1]];
+        ret =  (z2_lorentz.M());
+    }
+    return ret;
+}
+
+bool pass_cut (double jj_m, double jj_delta_y, double pt_bala, double z1_m, double z2_m, double llll_m){
+    auto ret =  jj_m > 200e3 &&
+                ((jj_delta_y > 2 || jj_delta_y < -2) && jj_delta_y > -999)  &&
+                (TMath::Abs(pt_bala < 0.5)) &&
+                (z1_m > 70e3 && z1_m < 110e3) &&
+                z2_m > 21.1876e3 && z2_m < 110e3 &&
+                llll_m > 0;
+    return ret;
+};
+bool pass_SR(bool pass_cut, int njet_inbetween, double centrarity){
+    return pass_cut && (njet_inbetween == 0) && (centrarity<0.4);
+};
+bool pass_CT_no_JN (bool pass_cut, int njet_inbetween, double centrarity){
+    return pass_cut && (njet_inbetween > 0) && (centrarity<0.4);
+};
+bool pass_no_CT_JN (bool pass_cut, int njet_inbetween, double centrarity){
+    return pass_cut && (njet_inbetween == 0) && (centrarity >= 0.4);
+};
+bool pass_no_CT_no_JN (bool pass_cut, int njet_inbetween, double centrarity){
+    return pass_cut && (njet_inbetween > 0) && (centrarity >= 0.4);
+};
 #endif

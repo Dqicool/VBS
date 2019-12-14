@@ -2,77 +2,15 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "c++ build active file",
-            "command": "/usr/bin/c++",
+            "label": "make build active file",
+            "command": "make",
             "args": [
-                "-O2",
-                "-Wall",
-                 "-fPIC", 
-                "-pthread",
-                "-std=c++11",
-                "-m64",
-                "-I/opt/root/include",
-                "-I/opt/root/RooUnfold/src/",
-                "-I/opt/root/RooUnfold",
-                "-DHAVE_TSVDUNFOLD=1",
-                "-DMAKEBUILD",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/../targets/${fileBasenameNoExtension}",
-                "-L/opt/root/RooUnfold/",
-                "-lRooUnfold_static",
-                "-L/opt/root/lib",
-                "-lCore",
-                "-lImt",
-                "-lRIO",
-                "-lNet",
-                "-lHist",
-                "-lGraf",
-                "-lGraf3d",
-                "-lGpad",
-                "-lROOTVecOps",
-                "-lTree",
-                "-lTreePlayer",
-                "-lRint",
-                "-lPostscript",
-                "-lMatrix",
-                "-lPhysics",
-                "-lMathCore",
-                "-lThread",
-                "-lMultiProc",
-                "-lROOTDataFrame",
-                "-pthread",
-                "-lm",
-                "-ldl",
-                "-rdynamic",
-                "-lUnfold",
-                "-lRooFit",
-                "-lRooFitCore",
-                "-lThread",
-                "-lMinuit",
-                "-lFoam",
-                "-lMathMore",
-                "-lHtml" 
+                "${fileBasenameNoExtension}"
             ],
             "options": {
                 "cwd": "/usr/bin"
             },
             "problemMatcher": []
-        },
-        {
-            "type": "shell",
-            "label": "g++-7 build active file",
-            "command": "/usr/bin/g++-7",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
-            ],
-            "options": {
-                "cwd": "/usr/bin"
-            }
         }
     ],
     "version": "2.0.0"

@@ -15,6 +15,8 @@ make stackcutflow
         let i+=1
     done
     wait
+    
+    targets/stackcutflow
 
 
 

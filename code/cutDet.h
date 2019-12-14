@@ -18,7 +18,7 @@ std::vector<int> lepSel(std::vector<float> lepton_pt,
 
     for (uint i = 0;i < siz; i++)
     {
-        //if (lepton_passesIsolation[i] == 1)
+        if (lepton_passesIsolation[i])
         {
             if(lepton_particleID[i] == 11){
                 if(lepton_pt[i] > 7e3 && TMath::Abs(lepton_eta[i]) < 2.47 && (TMath::Abs(lepton_d0sig[i]) < 5) && TMath::Abs(lepton_z0sinTheta[i]) < 0.5){
@@ -65,7 +65,22 @@ std::vector<int> lepTrueSel(std::vector<float> lepton_pt,
     return letpon_pass_ind;
 }
 
-std::vector<int> jetSel(std::vector<float> jet_pt, std::vector<float> jet_eta)
+std::vector<int> jetSel(std::vector<float> jet_pt, std::vector<float> jet_eta, vector<float> jet_Jvt)
+{
+    std::vector<int> jet_pass_ind;          //the index of passed jets
+    auto siz = jet_pt.size(); 
+    for (uint i = 0; i < siz; i++){
+        if (TMath::Abs(jet_eta[i]) < 2.4 && jet_pt[i] > 30e3 && jet_Jvt[i] > 0.6){
+            jet_pass_ind.push_back(i);
+        }
+        else if(TMath::Abs(jet_eta[i]) < 4.5 && jet_pt[i] > 40e3){
+            jet_pass_ind.push_back(i);
+        }
+    } 
+    return jet_pass_ind;
+}
+
+std::vector<int> jetTrueSel(std::vector<float> jet_pt, std::vector<float> jet_eta)
 {
     std::vector<int> jet_pass_ind;          //the index of passed jets
     auto siz = jet_pt.size(); 
