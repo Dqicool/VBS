@@ -4,7 +4,7 @@
 
 #define MT
 //#define debug
-//#define PRESERVEALL
+#define PRESERVEALL
 
 
 void analyse(char* in_file1,char* in_file2, char* in_file3, char* out_anaed_tree)

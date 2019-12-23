@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: essey.aux
+The style file: plain.bst
+Database file #1: bibli.bib.bib
+Warning--to sort, need author or key in ATLAS-CONF-2019-033
+Warning--empty author in ATLAS-CONF-2019-033
+Warning--empty journal in 1405.0301
+Warning--empty journal in 0811.4622
+Warning--empty journal in 0911.5299
+Warning--empty journal in 1007.3893
+Warning--empty journal in 1410.3012
+You've used 11 entries,
+            2118 wiz_defined-function locations,
+            568 strings with 8691 characters,
+and the built_in function-call counts, 8574 in all, are:
+= -- 655
+> -- 1008
+< -- 1
++ -- 408
+- -- 392
+* -- 929
+:= -- 1595
+add.period$ -- 33
+call.type$ -- 11
+change.case$ -- 229
+chr.to.int$ -- 0
+cite$ -- 18
+duplicate$ -- 113
+empty$ -- 246
+format.name$ -- 392
+if$ -- 1506
+int.to.chr$ -- 0
+int.to.str$ -- 11
+missing$ -- 10
+newline$ -- 58
+num.names$ -- 20
+pop$ -- 227
+preamble$ -- 1
+purify$ -- 218
+quote$ -- 0
+skip$ -- 76
+stack$ -- 0
+substring$ -- 206
+swap$ -- 6
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 44
+warning$ -- 7
+while$ -- 26
+width$ -- 13
+write$ -- 114
+(There were 7 warnings)

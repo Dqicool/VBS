@@ -1,6 +1,8 @@
 #include "genAna.h"
 #define LUMI 139e3
 #include<THStack.h>
+#define IMAGEX 3000
+#define IMAGEY 2000
 
 //#define debug
 
@@ -63,7 +65,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
         //WZllvl
             std::vector<std::string> WZs;
             #ifndef debug
-            // WZs.push_back("output/draw_out/999_all/361601.PowhegPy8EG_WZlvll_mll4.root");
+            WZs.push_back("output/draw_out/999_all/361601.PowhegPy8EG_WZlvll_mll4.root");
             #endif
         //rest
             std::vector<std::string> rests;
@@ -76,10 +78,10 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             // // rests.push_back("output/draw_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
             // rests.push_back("output/draw_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
             #endif
-        files =     {signals, higgses, gg4ls, tribosons, qq4ls, WZs, rests};
-        cata = {"signals", "higgses", "gg4ls", "tribosons", "qq4ls", "WZs", "rests"};
-        color_vec = {kRed, kGreen, kBlue, kYellow, kMagenta,kCyan,kOrange,kSpring,kTeal,kAzure,kViolet,kPink};
-        color_name = {"kRed", "kGreen", "kBlue", "kYellow", "kMagenta","kCyan","kOrange","kSpring","kTeal", "kAzure","kViolet","kPink"};
+        files =         {WZs,       rests,      higgses,    tribosons,      signals,   gg4ls,       qq4ls};
+        cata =          {"WZs",     "rests",    "higgses",  "tribosons",    "signals", "gg4ls",     "qq4ls"};
+        color_vec =     {kOrange,   kOrange,    kOrange,    kOrange,        kRed,       kBlue,   kMagenta};
+        color_name =    {"kOrange", "kOrange",  "kOrange",  "kOrange",      "kRed",     "kMagenta", "kBlue"};
         
     //stack
         string cut_st_n = (string)dist + "_cut_stack";
@@ -183,7 +185,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
 
     //drawstack
         //sr plot
-            TCanvas c1("c1","",1200,800);
+            TCanvas c1("c1","",IMAGEX,IMAGEY);
             h_inc_sr->SetMarkerColor(kBlack);
             h_inc_sr->SetLineColor(kBlack);
             h_inc_sr->SetFillColor(kBlack);
@@ -194,7 +196,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             auto sr_save_name = "plots/stack/sr_" + (string)dist + "_stack.png";
             c1.SaveAs(&sr_save_name[0]);
         //nn plot
-            TCanvas c2("c2","",1200,800);
+            TCanvas c2("c2","",IMAGEX,IMAGEY);
             h_inc_nn->SetMarkerColor(kBlack);
             h_inc_nn->SetLineColor(kBlack);
             h_inc_nn->SetFillColor(kBlack);
@@ -205,7 +207,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             auto nn_save_name = "plots/stack/nn_" + (string)dist + "_stack.png";
             c2.SaveAs(&nn_save_name[0]);
         //nct plot
-            TCanvas c3("c3","",1200,800);
+            TCanvas c3("c3","",IMAGEX,IMAGEY);
             h_inc_nct->SetMarkerColor(kBlack);
             h_inc_nct->SetLineColor(kBlack);
             h_inc_nct->SetFillColor(kBlack);
@@ -216,7 +218,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             auto nct_save_name = "plots/stack/nct_" + (string)dist + "_stack.png";
             c3.SaveAs(&nct_save_name[0]);
         //njn plot
-            TCanvas c4("c4","",1200,800);
+            TCanvas c4("c4","",IMAGEX,IMAGEY);
             h_inc_njn->SetMarkerColor(kBlack);
             h_inc_njn->SetLineColor(kBlack);
             h_inc_njn->SetFillColor(kBlack);
@@ -227,7 +229,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             auto njn_save_name = "plots/stack/njn_" + (string)dist + "_stack.png";
             c4.SaveAs(&njn_save_name[0]);
         //cut plot
-            TCanvas c5("c5","",1200,800);
+            TCanvas c5("c5","",IMAGEX,IMAGEY);
             h_inc_cut->SetMarkerColor(kBlack);
             h_inc_cut->SetLineColor(kBlack);
             h_inc_cut->SetFillColor(kBlack);
@@ -238,7 +240,7 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             auto cut_save_name = "plots/stack/cut_" + (string)dist + "_stack.png";
             c5.SaveAs(&cut_save_name[0]);
         //det plot
-            TCanvas c6("c6","",1200,800);
+            TCanvas c6("c6","",IMAGEX,IMAGEY);
             h_inc_det->SetMarkerColor(kBlack);
             h_inc_det->SetLineColor(kBlack);
             h_inc_det->SetFillColor(kBlack);

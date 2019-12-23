@@ -6,7 +6,7 @@
 #include<fstream>
 #include<cstdio>
 
-//#define debug
+#define debug
 
 void cutflowstack(const char* outfile){
     //loading data from files
@@ -20,12 +20,12 @@ void cutflowstack(const char* outfile){
             signals.push_back("output/cutflow_out/999_all/364364.Sherpa_222_NNPDF30NNLO_lllljj_EW6_noHiggs.root");
             signals.push_back("output/cutflow_out/999_all/344235.PowhegPy8EG_NNPDF30_AZNLOCTEQ6L1_VBFH125_ZZ4lep_notau.root");
 
-        //Higgs
-            std::vector<std::string> higgses;
+            std::vector<std::string> qq4ls;
             #ifndef debug
-            higgses.push_back("output/cutflow_out/999_all/345038.PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Zincl_MINLO.root");
-            higgses.push_back("output/cutflow_out/999_all/345039.PowhegPythia8EvtGen_NNPDF30_AZNLO_WpH125J_Wincl_MINLO.root");
-            higgses.push_back("output/cutflow_out/999_all/345040.PowhegPythia8EvtGen_NNPDF30_AZNLO_WmH125J_Wincl_MINLO.root");
+            qq4ls.push_back("output/cutflow_out/999_all/364250.Sherpa_222_NNPDF30NNLO_llll.root");
+            qq4ls.push_back("output/cutflow_out/999_all/346340.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_allhad.root");
+            qq4ls.push_back("output/cutflow_out/999_all/346341.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_semilep.root");
+            qq4ls.push_back("output/cutflow_out/999_all/346342.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_dilep.root");
             #endif
         //gg4l
             std::vector<std::string> gg4ls;
@@ -34,6 +34,15 @@ void cutflowstack(const char* outfile){
             gg4ls.push_back("output/cutflow_out/999_all/345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.root");
             gg4ls.push_back("output/cutflow_out/999_all/345708.Sherpa_222_NNPDF30NNLO_ggllllNoHiggs_0M4l130.root");
             #endif
+        
+        //Higgs
+            std::vector<std::string> higgses;
+            #ifndef debug
+            higgses.push_back("output/cutflow_out/999_all/345038.PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Zincl_MINLO.root");
+            higgses.push_back("output/cutflow_out/999_all/345039.PowhegPythia8EvtGen_NNPDF30_AZNLO_WpH125J_Wincl_MINLO.root");
+            higgses.push_back("output/cutflow_out/999_all/345040.PowhegPythia8EvtGen_NNPDF30_AZNLO_WmH125J_Wincl_MINLO.root");
+            #endif
+
         //TRIBOSON
             std::vector<std::string> tribosons;
             #ifndef debug
@@ -42,14 +51,7 @@ void cutflowstack(const char* outfile){
             tribosons.push_back("output/cutflow_out/999_all/364247.Sherpa_222_NNPDF30NNLO_ZZZ_6l0v_EW6.root");
             tribosons.push_back("output/cutflow_out/999_all/364248.Sherpa_222_NNPDF30NNLO_ZZZ_4l2v_EW6.root");
             #endif
-        //qq4l
-            std::vector<std::string> qq4ls;
-            #ifndef debug
-            qq4ls.push_back("output/cutflow_out/999_all/364250.Sherpa_222_NNPDF30NNLO_llll.root");
-            qq4ls.push_back("output/cutflow_out/999_all/346340.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_allhad.root");
-            qq4ls.push_back("output/cutflow_out/999_all/346341.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_semilep.root");
-            qq4ls.push_back("output/cutflow_out/999_all/346342.PowhegPy8EG_A14NNPDF23_NNPDF30ME_ttH125_ZZ4l_dilep.root");
-            #endif
+            
         //WZllvl
             std::vector<std::string> WZs;
             #ifndef debug
@@ -66,8 +68,8 @@ void cutflowstack(const char* outfile){
             // rests.push_back("output/cutflow_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
             // rests.push_back("output/cutflow_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
             #endif
-        files =     {signals, higgses, gg4ls, tribosons, qq4ls, WZs, rests};
-        cata = {"signals", "higgses", "gg4ls", "tribosons", "qq4ls", "WZs", "rests"};
+        files =     {tribosons, higgses, WZs, rests, signals, qq4ls, gg4ls};
+        cata = {"tribosons", "higgses", "WZs", "rests", "signals", "qq4ls", "gg4ls"};
         color_vec = {kRed, kGreen, kBlue, kYellow, kMagenta,kCyan,kOrange,kSpring,kTeal,kAzure,kViolet,kPink};
         color_name = {"kRed", "kGreen", "kBlue", "kYellow", "kMagenta","kCyan","kOrange","kSpring","kTeal", "kAzure","kViolet","kPink"};
         
@@ -117,10 +119,17 @@ void cutflowstack(const char* outfile){
 
     //drawstack
         //sr plot
-            TCanvas c1("c1","",1200,800);
-            h_inc->SetAxisRange(0,300,"Y");
+            TCanvas c1("c1","",2000,2000);
+            h_inc->SetStats(0);
+            h_inc->SetFillColor(kRed);
+            h_inc->SetLineColor(kBlack);
+            h_inc->SetMarkerColor(kBlack);
+            h_inc->SetAxisRange(0,100,"Y");
+            h_inc->GetYaxis()->SetTitle("Predicted events");
+            h_inc->GetXaxis()->SetTitle("Selections");
             h_inc->Draw("TEXT");
-            stack->Draw("hist same");
+            h_inc->Draw("HIST SAME");
+            //stack->Draw("hist same");
 #ifndef debug
             TLegend *legend = new TLegend(0.55,0.65,0.76,0.82);
             legend->AddEntry(&histo[0],"Signal","f");
@@ -129,8 +138,9 @@ void cutflowstack(const char* outfile){
             //legend->AddEntry(&histo[18],"other","f");
             legend->Draw();
 #endif
-            stack->GetYaxis()->SetTitle("Events");
-            //stack->GetXaxis()->SetTitle("Cut applied");
+            
+
+
 
             string sr_save_name = (string)"plots/cutflow/cutflow" + (string)"_stack.png";
             c1.SaveAs(&sr_save_name[0]);
