@@ -5,6 +5,7 @@ SECONDS=0
     EXE='/targets/draw'
     DATA='/output/analyse_out/999_all/'
     OUT='/output/draw_out/999_all/'
+    VBSHOME='/mnt/SSD/VBS/'
 
     rm -rf $OUT/*
     mkdir -p $VBSHOME$OUT

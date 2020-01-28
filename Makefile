@@ -1,13 +1,14 @@
 
 ROOTFLAGS = $(shell root-config --cflags)
 ROOTLIBS  = $(shell root-config --libs)
+ROOUNFDIR = /mnt/SSD/VBS/RooUnfold
 
-UNFOLD_COMP_FLAG = -O2 -Wall -fPIC -pthread -std=c++11 -m64 -I/opt/root/include -DHAVE_TSVDUNFOLD=1 -DMAKEBUILD 
-UNFOLD_COMP_LIBS = -L/opt/root/RooUnfold/ -lRooUnfold_static  -L/opt/root/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
-UNFOLD_COMP_AFTF = -I/opt/root/RooUnfold/src/ -I/opt/root/RooUnfold
+UNFOLD_COMP_FLAG = -Wall -fPIC -pthread -std=c++17 -m64 -I/usr/include -DHAVE_TSVDUNFOLD=1 -DMAKEBUILD 
+UNFOLD_COMP_LIBS = -L$(ROOUNFDIR)/ -lRooUnfold_static  -L/usr/lib/root -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
+UNFOLD_COMP_AFTF = -I$(ROOUNFDIR)/src/ -I$(ROOUNFDIR)
 
-UNFOLD_LINK_LAGS = -O2 -m64
-UNFOLD_LINK_LIBS = -L/opt/root/RooUnfold/ -lRooUnfold_static  -L/opt/root/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
+UNFOLD_LINK_LAGS =  -m64
+UNFOLD_LINK_LIBS = -L$(ROOUNFDIR)/ -lRooUnfold_static  -L/usr/lib/root -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
 
 test: code/test.cpp
 	$(CXX) $(UNFOLD_COMP_FLAG) -g -c code/test.cpp -o targets/test.o $(UNFOLD_COMP_LIBS) $(UNFOLD_COMP_AFTF)
@@ -50,5 +51,6 @@ a: code/genAna.h code/analambda.h
 	$(CXX) $(ROOTFLAGS) -g -c code/genAna.h -o code/genAna.o $(ROOTLIBS)
 	ar cq my.a code/genAna.o code/analambda.o
 
-cevt: code/cevt.cpp
-	$(CXX) $(ROOTFLAGS) -g  code/cevt.cpp  -o targets/cevt $(ROOTLIBS)
+getevtn: code/getEventNum.cpp
+	$(CXX) $(ROOTFLAGS) -g  code/getEventNum.cpp  -o targets/getEventNum $(ROOTLIBS)
+

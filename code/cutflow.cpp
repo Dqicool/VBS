@@ -19,6 +19,7 @@ void cutflowref(const char* infile, const char* outfile)
     auto df5 = df4.Filter("z1_m > 0 && z2_m > 0");
     auto df6 = df5.Filter("z1_m > 66e3 && z1_m < 116e3 && z2_m > 66e3 && z2_m < 116e3");
 
+    n_evt_survive.push_back(df.Sum("NormWeight").GetValue());
     n_evt_survive.push_back(df0.Sum("NormWeight").GetValue());
     n_evt_survive.push_back(df1.Sum("NormWeight").GetValue());
     n_evt_survive.push_back(df2.Sum("NormWeight").GetValue());
@@ -28,7 +29,7 @@ void cutflowref(const char* infile, const char* outfile)
     n_evt_survive.push_back(df6.Sum("NormWeight").GetValue());
 
     auto h_cutflow = new TH1D("cutflow", "", n_evt_survive.size(), 0, n_evt_survive.size());
-    std::vector<const char*> binlabels{"total", "minimum 2 jets", "m_{jj} > 300", "|y_{j1}-y_{j2}| > 2", "minimum 4 leptons", "2 OSFC lepton pairs", "66 GeV < M_{Z_1}, M_{Z_2} < 116 GeV", "P_Tl>20,20,10 GeV"};
+    std::vector<const char*> binlabels{"total", "2j4l", "minimum 2 jets", "m_{jj} > 300", "|y_{j1}-y_{j2}| > 2", "minimum 4 leptons", "2 OSFC lepton pairs", "66 GeV < M_{Z_1}, M_{Z_2} < 116 GeV", "P_Tl>20,20,10 GeV"};
 
     for(uint i=0; i < n_evt_survive.size(); i++){
         h_cutflow->SetBinContent(i+1, n_evt_survive[i]);

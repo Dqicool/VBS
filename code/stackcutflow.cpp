@@ -124,7 +124,7 @@ void cutflowstack(const char* outfile){
             h_inc->SetFillColor(kRed);
             h_inc->SetLineColor(kBlack);
             h_inc->SetMarkerColor(kBlack);
-            h_inc->SetAxisRange(0,100,"Y");
+            h_inc->SetAxisRange(0,150,"Y");
             h_inc->GetYaxis()->SetTitle("Predicted events");
             h_inc->GetXaxis()->SetTitle("Selections");
             h_inc->Draw("TEXT");

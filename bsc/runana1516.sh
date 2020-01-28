@@ -1,7 +1,7 @@
 #!/bin/bash
 make ana
 SECONDS=0
-    #VBSHOME='/mnt/MainShare/Projects/Qichen/VBS'
+    VBSHOME='/mnt/SSD/VBS'
     EXE='/targets/analyse'
     DATA='/data/999_all/'
     OUT='/output/analyse_out/'

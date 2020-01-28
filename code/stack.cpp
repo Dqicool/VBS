@@ -73,10 +73,10 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             rests.push_back("output/draw_out/999_all/410142.Sherpa_NNPDF30NNLO_ttll_mll5.root");
             rests.push_back("output/draw_out/999_all/410472.PhPy8EG_A14_ttbar_hdamp258p75_dil.root");
 
-            // rests.push_back("output/draw_out/999_all/344295.Sherpa_Zee_4lMassFilter40GeV8GeV.root");
-            // rests.push_back("output/draw_out/999_all/344296.Sherpa_Zmumu_4lMassFilter40GeV8GeV.root");
+            // //rests.push_back("output/draw_out/999_all/344295.Sherpa_Zee_4lMassFilter40GeV8GeV.root");
+            // //rests.push_back("output/draw_out/999_all/344296.Sherpa_Zmumu_4lMassFilter40GeV8GeV.root");
             // // rests.push_back("output/draw_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
-            // rests.push_back("output/draw_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
+            // //rests.push_back("output/draw_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
             #endif
         files =         {WZs,       rests,      higgses,    tribosons,      signals,   gg4ls,       qq4ls};
         cata =          {"WZs",     "rests",    "higgses",  "tribosons",    "signals", "gg4ls",     "qq4ls"};
@@ -250,6 +250,11 @@ void plotProp(const char* outfile, const char* dist, bool truth){
             h_inc_det->Draw("E2,same");
             auto det_save_name = "plots/stack/det_" + (string)dist + "_stack.png";
             c6.SaveAs(&det_save_name[0]);
+        // output
+        double numnum, errerr;
+        numnum = h_inc_cut->IntegralAndError(1,1000, errerr);
+        cout<< numnum<<"\t"<<errerr;
+
 }
 
 int main()

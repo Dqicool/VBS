@@ -25,7 +25,9 @@ void m4lBinSizeEva()
     TFile* infile1 = TFile::Open("output/draw_out/Data1516.root", "read");
     TH1D * h_llll_m_data_cut = (TH1D*)infile1->Get("h_llll_m_pass_cut");
 
-    TFile* infile2 = TFile::Open("output/stack_out/m4l.root", "read");
+    TFile* infile2 = TFile::Open("output/stack_out/sig_m4l.root", "read");
+    TFile* infile3 = TFile::Open("output/stack_out/bak_m4l.root", "read");
+    TH1D * h_llll_m_bak_cut = (TH1D*)infile3->Get("llll_m_cut_h");
     TH1D * h_llll_m_cut = (TH1D*)infile2->Get("llll_m_cut_h");
     //cout<<(h_llll_m_cut->Integral())<<endl;
     auto nbin = h_llll_m_cut->GetNbinsX();
@@ -44,7 +46,10 @@ void m4lBinSizeEva()
     sepa = mulScalar(sepa, wbin);
     auto h_rebin_m4l_cut = h_llll_m_cut->Rebin(sepa.size()-1, "h_rebin_m4l_cut",&sepa[0]);
     auto h_rebin_llll_m_data_cut = h_llll_m_data_cut->Rebin(sepa.size()-1, "h_rebin_m4l_data_cut",&sepa[0]);
-    //cout<<h_rebin_m4l_cut->Integral()<<endl;
+    auto h_rebin_llll_m_bak_cut = h_llll_m_bak_cut->Rebin(sepa.size()-1, "h_rebin_m4l_bak_cut",&sepa[0]);
+    cout<<h_rebin_llll_m_data_cut->Integral()<<endl;
+    h_rebin_llll_m_data_cut->Add(h_rebin_llll_m_bak_cut, -1);
+    cout<<h_rebin_llll_m_data_cut->Integral()<<endl;
     h_rebin_m4l_cut->SetAxisRange(0,20,"Y");
     h_rebin_m4l_cut->SetStats(0);
     h_rebin_m4l_cut->Draw("");
@@ -66,11 +71,14 @@ void m4lBinSizeEva()
 void mjjBinSizeEva()
 {
     TH1::SetDefaultSumw2();
-    TFile* infile1 = TFile::Open("output/stack_out/mjj.root", "read");
+    TFile* infile1 = TFile::Open("output/stack_out/sig_mjj.root", "read");
     TH1D * h_jj_m_cut = (TH1D*)infile1->Get("jj_m_cut_h");
 
     TFile* infile2 = TFile::Open("output/draw_out/Data1516.root", "read");
     TH1D * h_mjj_data_cut = (TH1D*)infile2->Get("h_jj_m_pass_cut");
+
+    TFile* infile3 = TFile::Open("output/stack_out/bak_mjj.root", "read");
+    TH1D * h_mjj_bak_cut = (TH1D*)infile3->Get("jj_m_cut_h");
     //cout<<(h_jj_m_cut->Integral())<<endl;
     auto nbin = h_jj_m_cut->GetNbinsX();
     auto wbin = h_jj_m_cut->GetBinWidth(1);
@@ -90,6 +98,8 @@ void mjjBinSizeEva()
     sepa = pluScalar(sepa,xmin);
     auto h_rebin_mjj_cut = h_jj_m_cut->Rebin(sepa.size()-1, "h_rebin_mjj_cut",&sepa[0]);
     auto h_rebin_mjj_data_cut =  h_mjj_data_cut->Rebin(sepa.size()-1, "h_rebin_mjj_data_cut",&sepa[0]);
+    auto h_rebin_mjj_bak_cut =  h_mjj_bak_cut->Rebin(sepa.size()-1, "h_rebin_mjj_bak_cut",&sepa[0]);
+    h_rebin_mjj_data_cut->Add(h_rebin_mjj_bak_cut, -1);
     //cout<<h_rebin_mjj_cut->Integral()<<endl;
     h_rebin_mjj_cut->SetStats(0);
     h_rebin_mjj_cut->SetAxisRange(0,20,"Y");
@@ -110,11 +120,14 @@ void mjjBinSizeEva()
 
 void delphijjBinSizeEva(){
     TH1::SetDefaultSumw2();
-    TFile* infile = TFile::Open("output/stack_out/jjDelPhi.root", "read");
+    TFile* infile = TFile::Open("output/stack_out/sig_jjDelPhi.root", "read");
     TH1D * h_jj_delta_phi_cut = (TH1D*)infile->Get("jj_delta_phi_cut_h");
 
     TFile* infile2 = TFile::Open("output/draw_out/Data1516.root", "read");
     TH1D * h_jj_delta_phi_data_cut = (TH1D*)infile2->Get("h_jj_delta_phi_pass_cut");
+
+    TFile* infile3 = TFile::Open("output/stack_out/bak_jjDelPhi.root", "read");
+    TH1D * h_jj_delta_phi_bak_cut = (TH1D*)infile3->Get("jj_delta_phi_cut_h");
     //cout<<(h_jj_delta_phi_cut->Integral())<<endl;
     auto nbin = h_jj_delta_phi_cut->GetNbinsX();
     auto wbin = h_jj_delta_phi_cut->GetBinWidth(1);
@@ -143,6 +156,8 @@ void delphijjBinSizeEva(){
     sepa = pluScalar(sepa,xmin);
     auto h_rebin_delphijj_cut = h_jj_delta_phi_cut->Rebin(sepa.size()-1, "h_rebin_delphijj_cut",&sepa[0]);
     auto h_rebin_jj_delta_phi_data_cut = h_jj_delta_phi_data_cut->Rebin(sepa.size()-1, "h_rebin_delphijj_data_cut",&sepa[0]);
+    auto h_rebin_jj_delta_phi_bak_cut = h_jj_delta_phi_bak_cut->Rebin(sepa.size()-1, "h_rebin_delphijj_bak_cut",&sepa[0]);
+    h_rebin_jj_delta_phi_data_cut->Add(h_rebin_jj_delta_phi_bak_cut, -1);
     //cout<<h_rebin_delphijj_cut->Integral()<<endl;
     h_rebin_delphijj_cut->SetAxisRange(0,20,"Y");
     h_rebin_delphijj_cut->SetStats(0);

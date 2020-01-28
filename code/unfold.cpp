@@ -24,9 +24,9 @@ void distUnfold(const char* dist, const char* labeltex, TH1D* h_data)
         //filevec.push_back("output/resp_out/999_all/344297.Sherpa_Zee_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
         //filevec.push_back("output/resp_out/999_all/344298.Sherpa_Zmumu_3lPtFilter4GeV_4lMassVeto40GeV8GeV.root");
 
-        filevec.push_back("output/resp_out/999_all/345038.PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Zincl_MINLO.root");
-        filevec.push_back("output/resp_out/999_all/345039.PowhegPythia8EvtGen_NNPDF30_AZNLO_WpH125J_Wincl_MINLO.root");
-        filevec.push_back("output/resp_out/999_all/345040.PowhegPythia8EvtGen_NNPDF30_AZNLO_WmH125J_Wincl_MINLO.root");
+        // filevec.push_back("output/resp_out/999_all/345038.PowhegPythia8EvtGen_NNPDF30_AZNLO_ZH125J_Zincl_MINLO.root");
+        // filevec.push_back("output/resp_out/999_all/345039.PowhegPythia8EvtGen_NNPDF30_AZNLO_WpH125J_Wincl_MINLO.root");
+        // filevec.push_back("output/resp_out/999_all/345040.PowhegPythia8EvtGen_NNPDF30_AZNLO_WmH125J_Wincl_MINLO.root");
 
         filevec.push_back("output/resp_out/999_all/345060.PowhegPythia8EvtGen_NNLOPS_nnlo_30_ggH125_ZZ4l.root");
         filevec.push_back("output/resp_out/999_all/345706.Sherpa_222_NNPDF30NNLO_ggllll_130M4l.root");
@@ -67,10 +67,10 @@ void distUnfold(const char* dist, const char* labeltex, TH1D* h_data)
         auto h_true = resp_use.Htruth();
         auto h_fake = resp_use.Hfakes();
         RooUnfoldBayes unfoldself(&resp_use, h_meas, 2);
-        RooUnfoldBayes unfolddata(&resp_use, h_data, 2);
+        RooUnfoldBayes unfolddata(&resp_use, h_data, 1);
         auto cov = unfolddata.GetMeasuredCov();
         TH1D* h_unfold= (TH1D*) unfolddata.Hreco();
-        unfolddata.PrintTable (std::cout, h_true);
+        unfolddata.PrintTable (std::cout);
         
     //save
         string pic_name = "plots/unfold/" + (string)(const char*)dist;
@@ -86,29 +86,61 @@ void distUnfold(const char* dist, const char* labeltex, TH1D* h_data)
             pad1->cd();
             //h_unfold->SetAxisRange(0,25,"Y");
             h_unfold->SetTitle("");
-            h_unfold->SetLineColor(kBlack);
+            h_unfold->SetLineColorAlpha(kBlack,0);
             h_unfold->SetMarkerColor(kBlack);
-            h_unfold->SetFillColorAlpha(kBlack, 0.3);
+            h_unfold->SetFillColorAlpha(kBlack, 0.2);
             h_unfold->SetMarkerStyle(kFullCircle);
+            h_unfold->SetMarkerSize(2.0);
+            h_unfold->SetLineWidth(2.0);
             h_unfold->GetXaxis()->SetTitle(labeltex);
             h_unfold->GetYaxis()->SetTitle("Events");
-            
-            h_unfold->Draw("");
+            h_unfold->SetAxisRange(0,30,"Y");
+            h_unfold->Draw("E1");
             h_unfold->Draw("E2 same");
-            h_true->SetLineColor(kRed);
-            h_true->SetFillColorAlpha(kRed,1);
-            h_true->SetFillStyle(3004);
-            h_true->Draw("SAME");
-            h_true->Draw("SAME E2");
 
-            TLegend *legend = new TLegend(0.7, 0.7, 0.9, 0.9);
-            legend->AddEntry(h_unfold,"Unfolded","lepf");
-            legend->AddEntry(h_true,"Predicted truth","lepf");
+            h_data->SetLineColorAlpha(kBlack,0);
+            h_data->SetMarkerColor(kBlue);
+            h_data->SetFillColorAlpha(kBlue, 0.1);
+            h_data->SetMarkerStyle(kFullSquare);
+            h_data->SetMarkerSize(2.0);
+            h_data->SetLineWidth(2.0);
+            h_data->Draw("same E1");
+            h_data->Draw("E2 same");
+
+            h_meas->SetLineColor(kBlue);
+            h_meas->SetLineWidth(2);
+            h_meas->Draw("SAME HIST");
+            auto h_tmp1 = (TH1D* )h_meas->Clone("h_tmp");
+            h_tmp1->SetFillStyle(3004);
+            h_tmp1->SetFillColorAlpha(kBlue,1);
+            
+            h_tmp1->Draw("SAME E2");
+
+            h_true->SetLineColor(kBlack);
+            h_true->SetLineWidth(2);
+            h_true->Draw("SAME HIST");
+            auto h_tmp2 = (TH1D* )h_true->Clone("h_tmpp");
+            h_tmp2->SetFillStyle(3004);
+            h_tmp2->SetFillColorAlpha(kBlack,1);
+            h_tmp2->Draw("SAME E2");
+
+            
+            h_fake->SetLineColor(kGreen);
+            h_fake->SetLineWidth(2);
+            h_fake->Draw("HIST SAME");
+            
+
+            TLegend *legend = new TLegend(0.7, 0.55, 0.9, 0.9);
+            legend->AddEntry(h_unfold,"Unfold Data","lepf");
+            legend->AddEntry(h_tmp2,"Tru-level Pred","lepf");
+            legend->AddEntry(h_data, "Data","lepf");
+            legend->AddEntry(h_tmp1, "Det-level Pred","lepf");
+            legend->AddEntry(h_fake, "Pred Fake","l");
             legend->Draw();
 
             pad2->cd();
             TH1D* h_sub = new TH1D(*h_unfold);
-            TH1D* h_zero = new TH1D((*(TH1D*)h_true));
+            TH1D* h_zero = new TH1D((*(TH1D*)h_tmp2));
             //h_sub->SetAxisRange(-5,5,"Y");
             for(uint i=1; i<=h_unfold->GetNbinsX(); i++){
                 h_sub->SetBinContent(i, h_unfold->GetBinContent(i) / h_true->GetBinContent(i));
@@ -167,6 +199,10 @@ void distUnfold(const char* dist, const char* labeltex, TH1D* h_data)
             //h_resp->Draw("COLZ");
             //h_resp->Draw("TEXT SAME");
             c3->SaveAs(&resph_name[0]);
+            
+        double errall, err;
+        double all = h_true->IntegralAndError(1,4, errall,"");
+        cout<<all<<"\t"<<errall<<endl;
 }
 
 

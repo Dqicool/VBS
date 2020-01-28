@@ -2,7 +2,7 @@
 #define __CUTDET__
 #include"genAna.h"
 
-    auto proWeight = [&](double weight){
+    auto proWeight = [](double weight){
         return weight;///lumi
     };
 

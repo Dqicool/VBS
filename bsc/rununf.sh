@@ -4,8 +4,8 @@ make calResp
 make unfold
 
 targets/binSizeEva
-
-EXE='/targets/calResp'
+    VBSHOME='/mnt/SSD/VBS'
+    EXE='/targets/calResp'
     DATA='/output/analyse_out/999_all/'
     OUT='/output/resp_out/999_all/'
 

@@ -12,7 +12,7 @@
 
 #define PHI_X_MIN -TMath::Pi()
 #define PHI_X_MAX  TMath::Pi()
-#define PHI_N_BIN  1000
+#define PHI_N_BIN  8
 
 TH1D getHisto(ROOT::RDataFrame df, const char* filterr, const char* dist, const char* weight, int nbins, double xmin, double xmax)
 {
