@@ -6,6 +6,7 @@
         "cstdlib": "cpp"
     },
     "files.exclude": {
+        "**/._*": true,
         "**/.gitignore": true
     },
     "workbench.colorTheme": "Material Theme Palenight High Contrast",

@@ -1,3 +1,5 @@
 *.root
 samples/*
 .DS_Store
+*.hepmc
+*.hepmc.gz
