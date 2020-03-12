@@ -16,13 +16,13 @@ Rivet::Particles lepSel(Rivet::Particles lepton)
         //if (lepton_isTight[i] == 0)
         {
             if(lepton[i].abspid() == 11){
-                if(lepton[i].pt() > 7 && lepton[i].abseta() < 2.47){
+                if(lepton[i].pt() > 7*Rivet::GeV && lepton[i].abseta() < 2.47){
                     ret.push_back(lepton[i]);
                 }
             }
             else if(lepton[i].abspid() == 13)
             {
-                if(lepton[i].pt() > 7 && lepton[i].abseta() < 2.7){
+                if(lepton[i].pt() > 7*Rivet::GeV && lepton[i].abseta() < 2.7){
                     ret.push_back(lepton[i]);
                 }
             }
@@ -40,7 +40,7 @@ Rivet::FourMomenta jetSel(Rivet::Jets jet)
         if (jet[i].abseta() < 2.4 && jet[i].pt() > 30*Rivet::GeV){
             ret.push_back(jet[i].momentum());
         }
-        else if(jet[i].abseta() < 4.5 && jet[i].pt() > 40e3){
+        else if(jet[i].abseta() < 4.5 && jet[i].pt() > 40*Rivet::GeV){
             ret.push_back(jet[i].momentum());
         }
     } 
@@ -169,9 +169,8 @@ Rivet::FourMomenta getZ1Z2(std::vector<std::vector<Rivet::Particles>> lep_pairs_
 double getPtBala (Rivet::FourMomenta j1j2, Rivet::FourMomenta z1z2){
     double ret = -999;
     if(j1j2.size() >= 2 && z1z2.size() >= 2){
-        auto tot_lorentz = z1z2[0] + z1z2[1] + j1j2[0] + j1j2[2]; 
+        double zzjj_sys_pt = (z1z2[0] + z1z2[1] + j1j2[0] + j1j2[1]).pt(); 
         double zzjj_scaler_sum_pt =z1z2[0].pt()  + z1z2[1].pt() + j1j2[0].pt() + j1j2[1].pt();
-        double zzjj_sys_pt = tot_lorentz.pt();
         ret = std::abs(zzjj_sys_pt / zzjj_scaler_sum_pt);
     }
     return ret;

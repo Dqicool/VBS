@@ -1,11 +1,11 @@
 PWD = $(shell pwd)
 ROOTFLAGS = $(shell root-config --cflags)
 ROOTLIBS  = $(shell root-config --libs)
-ROOUNFDIR = $PWD/libs/RooUnfold
+ROOUNFDIR = /mnt/SSD/VBS/libs/RooUnfold
 
 UNFOLD_COMP_FLAG = -Wall -fPIC -pthread -std=c++17 -m64 -I/usr/include -DHAVE_TSVDUNFOLD=1 -DMAKEBUILD 
 UNFOLD_COMP_LIBS = -L$(ROOUNFDIR)/ -lRooUnfold_static  -L/usr/lib/root -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
-UNFOLD_COMP_AFTF = -I$(ROOUNFDIR)/src/ -I$(ROOUNFDIR)
+UNFOLD_COMP_AFTF = -I$(ROOUNFDIR)/src -I$(ROOUNFDIR)
 
 UNFOLD_LINK_LAGS =  -m64
 UNFOLD_LINK_LIBS = -L$(ROOUNFDIR)/ -lRooUnfold_static  -L/usr/lib/root -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
@@ -46,11 +46,4 @@ unfold: src/unfold.cpp
 	$(CXX) $(UNFOLD_LINK_FLAG) -g build/unfold.o -o build/unfold $(UNFOLD_LINK_LIBS)
 	rm -rf build/unfold.o
 
-a: src/genAna.h src/analambda.h
-	$(CXX) $(ROOTFLAGS) -g -c src/analambda.h -o src/analambda.o $(ROOTLIBS)
-	$(CXX) $(ROOTFLAGS) -g -c src/genAna.h -o src/genAna.o $(ROOTLIBS)
-	ar cq my.a src/genAna.o src/analambda.o
-
-getevtn: src/getEventNum.cpp
-	$(CXX) $(ROOTFLAGS) -g  src/getEventNum.cpp  -o build/getEventNum $(ROOTLIBS)
 

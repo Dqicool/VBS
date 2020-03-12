@@ -17,7 +17,6 @@ TH1D getDraw(const char* file, const char* filterr, const char* dist,  Color_t c
     return (*h);
 }
 
-
 void plotProp(const char* outfile, const char* dist, bool truth){
     ROOT::EnableImplicitMT(24);
     TH1::SetDefaultSumw2();

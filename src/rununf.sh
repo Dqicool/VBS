@@ -1,7 +1,8 @@
 #!/bin/bash
-make binSizeEva
-make calResp
-make unfold
+make binSizeEva &
+make calResp &
+make unfold &
+wait
 
 build/binSizeEva
 

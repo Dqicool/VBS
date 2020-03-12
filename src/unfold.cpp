@@ -9,6 +9,7 @@
 
 //#define UNFOLDSELF
 #define UNFLOLDDATA
+using namespace std;
 void distUnfold(const char* dist, const char* labeltex, TH1D* h_data)
 {   
 

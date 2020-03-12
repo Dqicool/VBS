@@ -1,6 +1,7 @@
 #!/bin/bash
-make draw
-make stack
+make draw &
+make stack &
+wait
 SECONDS=0
     EXE='/build/draw'
     DATA='/output/analyse_out/'

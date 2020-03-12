@@ -3,6 +3,8 @@
 
 #define NEVTSPERBIN 10
 
+using namespace std;
+
 std::vector<double> mulScalar(std::vector<double> mat, double x){
     std::vector<double> ret{};
     for(int i = 0; i < mat.size(); i++){

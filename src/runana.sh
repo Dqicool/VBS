@@ -49,7 +49,7 @@ SECONDS=0
         #echo "File2 ${arr2[1]}"
         #echo "File3 ${arr2[2]}"
         #echo "OutFile ${ADDR2[1]}.${ADDR2[2]}.root"
-        (`$VBSHOME/$EXE $VBSHOME$DATA${arr2[0]} $VBSHOME$DATA${arr2[1]} $VBSHOME$DATA${arr2[2]} $VBSHOME$OUT/999_all/${ADDR2[1]}.${ADDR2[2]}.root`) &
+        (`$VBSHOME/$EXE $VBSHOME$DATA${arr2[0]} $VBSHOME$DATA${arr2[1]} $VBSHOME$DATA${arr2[2]} $VBSHOME$OUT${ADDR2[1]}.${ADDR2[2]}.root`) &
         #echo "Done......"
         #echo "-----------------------------------"
         let ii+=1
