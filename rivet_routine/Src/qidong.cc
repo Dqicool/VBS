@@ -35,6 +35,12 @@ namespace Rivet {
 		_hist_Dphijj	= bookHisto1D("jjDphi", 200, -M_PI, M_PI);
 		_hist_xs		= bookHisto1D("xs", 1, -1, 1);
 		_hist_entry     = bookHisto1D("entry", 1, -1, 1);
+		_hist_ats       =  bookHisto1D("jjDphi", 200, -M_PI, M_PI);
+		_hist_aps       = bookHisto1D("jjDphi", 200, -M_PI, M_PI);
+		_hist_p0       = bookHisto1D("jjDphi", 200, -M_PI, M_PI);
+		_hist_p1       = bookHisto1D("jjDphi", 200, -M_PI, M_PI);
+		_hist_t1       = bookHisto1D("jjDphi", 200, -M_PI, M_PI);
+		_hist_t2       = bookHisto1D("jjDphi", 200, -M_PI, M_PI);
 	}
 
     // Do the analysis
@@ -56,12 +62,15 @@ namespace Rivet {
 			std::abs(j1j2[0].rapidity() - j1j2[1].rapidity()) < 2) vetoEvent;
 
 		std::vector<std::vector<Particles>> lep_pairs_comb = getLeptonPairsComb(leps);
-		FourMomenta Z1Z2 = getZ1Z2(lep_pairs_comb);
+		auto lepton_pair = getLepPair(lep_pairs_comb);
+		FourMomenta Z1Z2 = getZ1Z2(lepton_pair);
 		if	(Z1Z2.size() < 2 ||
 			Z1Z2[0].mass() < 70*GeV ||  Z1Z2[0].mass() > 110*GeV || 
-			Z1Z2[1].mass() < 21.1876*GeV ||  Z1Z2[1].mass() > 110*GeV) vetoEvent;
+			Z1Z2[1].mass() < 70*GeV ||  Z1Z2[1].mass() > 110*GeV) vetoEvent;
 
 		if	(getPtBala(j1j2, Z1Z2) > 0.5) vetoEvent;
+
+		CP_angles angles = getAngles(lepton_pair, Z1Z2);
 
 		//find weights
 
@@ -79,6 +88,12 @@ namespace Rivet {
 		_hist_Dphijj->fill(getJJDelPhi(j1j2), weight);
 		_hist_xs->fill(0, weight);
 		_hist_entry->fill(0,1.0);
+		_hist_ats->fill(angles.theta_star, weight);
+		_hist_aps->fill(angles.phi_star, weight);
+		_hist_p0->fill(angles.phi, weight);
+		_hist_p1->fill(angles.phi1, weight);
+		_hist_t1->fill(angles.theta1, weight);
+		_hist_t2->fill(angles.theta2, weight);
 	}
 
     /// Finalize
@@ -90,7 +105,7 @@ namespace Rivet {
 	}
 
     /// Histograms
-    Histo1DPtr _histJN, _histLN, _histLN_PASS, _histJN_PASS, _histJ1_pt, _histJ2_pt, _histZ1_m, _histZ2_m,_hist_M4l, _hist_Mjj, _hist_Dphijj, _hist_xs, _hist_entry;
+    Histo1DPtr _histJN, _histLN, _histLN_PASS, _histJN_PASS, _histJ1_pt, _histJ2_pt, _histZ1_m, _histZ2_m,_hist_M4l, _hist_Mjj, _hist_Dphijj, _hist_xs, _hist_entry, _hist_ats, _hist_aps, _hist_p0, _hist_p1, _hist_t1, _hist_t2;
     //@}
 
   	};

@@ -199,10 +199,26 @@ int main()
     plotProp("output/stack_out/mjj.root", "jj_m", 0);
     cout<<"jj_delta_phi"<<endl;
     plotProp("output/stack_out/jjDelPhi.root", "jj_dphi", 0);
+
+    plotProp("output/stack_out/ats.root", "Angle_theta_star", 0);
+    plotProp("output/stack_out/aps.root", "Angle_phi_star", 0);
+    plotProp("output/stack_out/p0.root", "Angle_phi0", 0);
+    plotProp("output/stack_out/p1.root", "Angle_phi1", 0);
+    plotProp("output/stack_out/t1.root", "Angle_theta1", 0);
+    plotProp("output/stack_out/t2.root", "Angle_theta2", 0);
+
+
     cout<<"llll_truthBorn_m"<<endl;
     plotProp("output/stack_out/llll_true_m.root", "llll_truthBorn_m", 1);
         cout<<"jj_truthBorn_m"<<endl;
     plotProp("output/stack_out/jj_true_m.root", "jj_truthBorn_m" , 1);
         cout<<"llll_truthBorn_m"<<endl;
     plotProp("output/stack_out/jj_true_delphi.root", "jj_truthBorn_dphi" ,1);
+
+    plotProp("output/stack_out/ats_true.root", "Angle_truthBorn_theta_star", 1);
+    plotProp("output/stack_out/aps_true.root", "Angle_truthBorn_phi_star", 1);
+    plotProp("output/stack_out/p0_true.root", "Angle_truthBorn_phi0", 1);
+    plotProp("output/stack_out/p1_true.root", "Angle_truthBorn_phi1", 1);
+    plotProp("output/stack_out/t1_true.root", "Angle_truthBorn_theta1", 1);
+    plotProp("output/stack_out/t2_true.root", "Angle_truthBorn_theta2", 1);
 }

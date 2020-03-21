@@ -9,9 +9,10 @@ EXE="docker run  --rm  -u `id -u $USER`:`id -g` -v `pwd`:`pwd` -w `pwd` hepstore
 
 
 mkdir -p $HEPMCHOME$OUT
-#rm -rf $HEPMCHOME$OUT/*
+rm -rf $HEPMCHOME$OUT/*.root
+rm -rf $HEPMCHOME$OUT/*.yoda
 for entry in `ls $HEPMCHOME$DATA`; do
-    $EXE $HEPMCHOME$DATA$entry -H $HEPMCHOME$OUT$entry.yoda &
+    $EXE $HEPMCHOME$DATA$entry -H $HEPMCHOME$OUT$entry.yoda > $entry.yoda.log &
 done
 wait
 

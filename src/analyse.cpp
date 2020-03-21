@@ -29,7 +29,14 @@ void analyse(char* in_file1, char* in_file2, char* in_file3, char* out_anaed_tre
                         Define("pass_CR",   passCR, {"event"}).
                         Define("passZZ", pass_z1z2, {"event"}).
                         Define("passSin", pass_sin, {"event"}).
-                        Define("passJJ", pass_j1j2, {"event"});
+                        Define("passJJ", pass_j1j2, {"event"}).
+                        Define("Angle_theta_star", findAngleThetaStar, {"event"}).
+                        Define("Angle_phi_star", findAnglePhiStar, {"event"}).
+                        Define("Angle_phi0", findAnglePhi0, {"event"}).
+                        Define("Angle_phi1", findAnglePhi1, {"event"}).
+                        Define("Angle_theta1", findAngleTheta1, {"event"}).
+                        Define("Angle_theta2", findAngleTheta2, {"event"});
+
 
         if(dframe.HasColumn("fid_weight")){
             ana =   ana.Define("truth", getTrue, {}).
@@ -44,13 +51,21 @@ void analyse(char* in_file1, char* in_file2, char* in_file3, char* out_anaed_tre
                         Define("centr_truthBorn",   findCent, {"event_truthBorn"}).
                         Define("pass_cut_truthBorn",passCut, {"event_truthBorn"}).
                         Define("pass_SR_truthBorn", passSR, {"event_truthBorn"}).
-                        Define("pass_CR_truthBorn", passCR, {"event_truthBorn"});
+                        Define("pass_CR_truthBorn", passCR, {"event_truthBorn"}).
+                        Define("Angle_truthBorn_theta_star", findAngleThetaStar, {"event_truthBorn"}).
+                        Define("Angle_truthBorn_phi_star", findAnglePhiStar, {"event_truthBorn"}).
+                        Define("Angle_truthBorn_phi0", findAnglePhi0, {"event_truthBorn"}).
+                        Define("Angle_truthBorn_phi1", findAnglePhi1, {"event_truthBorn"}).
+                        Define("Angle_truthBorn_theta1", findAngleTheta1, {"event_truthBorn"}).
+                        Define("Angle_truthBorn_theta2", findAngleTheta2, {"event_truthBorn"});
         }
     //save tree
         auto hehe = ana.GetColumnNames();
         if (ana.HasColumn("fid_weight")){
             hehe = { "weight", "jj_m", "jj_dphi", "jj_dy", "llll_m", "z1_m", "z2_m", "pt_bala", "centr", "pass_cut", "pass_SR", "pass_CR", 
-                     "fid_weight", "jj_truthBorn_m", "jj_truthBorn_dphi", "jj_truthBorn_dy",  "llll_truthBorn_m", "z1_truthBorn_m",   "z2_truthBorn_m",   "pt_truthBorn_bala","centr_truthBorn",  "pass_cut_truthBorn", "pass_SR_truthBorn", "pass_CR_truthBorn"};
+                     "Angle_theta_star", "Angle_phi_star", "Angle_phi0", "Angle_phi1", "Angle_theta1","Angle_theta2",
+                     "fid_weight", "jj_truthBorn_m", "jj_truthBorn_dphi", "jj_truthBorn_dy",  "llll_truthBorn_m", "z1_truthBorn_m",   "z2_truthBorn_m",   "pt_truthBorn_bala","centr_truthBorn",  "pass_cut_truthBorn", "pass_SR_truthBorn", "pass_CR_truthBorn",
+                     "Angle_truthBorn_theta_star", "Angle_truthBorn_phi_star", "Angle_truthBorn_phi0", "Angle_truthBorn_phi1", "Angle_truthBorn_theta1", "Angle_truthBorn_theta2"};
             #ifndef PRESERVEALL
             ana.Filter("pass_cut == 1 || pass_cut_truthBorn == 1").Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
             #else
@@ -58,7 +73,7 @@ void analyse(char* in_file1, char* in_file2, char* in_file3, char* out_anaed_tre
             #endif
         }
         else{
-            hehe = { "weight", "jj_m", "jj_dphi", "jj_dy", "llll_m", "z1_m", "z2_m", "pt_bala", "centr", "pass_cut", "pass_SR", "pass_CR"};
+            hehe = { "weight", "jj_m", "jj_dphi", "jj_dy", "llll_m", "z1_m", "z2_m", "pt_bala", "centr", "pass_cut", "pass_SR", "pass_CR", "Angle_theta_star", "Angle_phi_star", "Angle_phi0", "Angle_phi1", "Angle_theta1","Angle_theta2",};
             #ifndef PRESERVEALL
             ana.Filter("pass_cut == 1").Snapshot("SM4L_Nominal", out_anaed_tree, hehe);
             #else

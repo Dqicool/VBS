@@ -1,3 +1,4 @@
+#include <TROOT.h>
 #include <TH1.h>
 #include <TFile.h>
 #include <TTree.h>
@@ -11,10 +12,29 @@
 #include <Math/GenVector/PtEtaPhiM4D.h>
 #include <Math/GenVector/PtEtaPhiM4Dfwd.h>
 #include <Math/Vector4Dfwd.h>
+#include<Math/Vector3Dfwd.h>
+#include<Math/GenVector/Boost.h>
 #include <TChain.h>
 #include<TROOT.h>
 #include<TStyle.h>
 #include<TLatex.h>
+
+#include "TMatrixD.h"
+#include "TVectorD.h"
+#include "TMath.h"
+#include "Math/Point3D.h"
+#include "Math/Vector3D.h"
+#include "Math/Vector4D.h"
+#include "Math/GenVector/Rotation3D.h"
+#include "Math/GenVector/EulerAngles.h"
+#include "Math/GenVector/AxisAngle.h"
+#include "Math/GenVector/Quaternion.h"
+#include "Math/GenVector/LorentzRotation.h"
+#include "Math/GenVector/Boost.h"
+#include "Math/GenVector/Transform3D.h"
+#include "Math/GenVector/Plane3D.h"
+#include "Math/GenVector/VectorUtil.h"
+
 #define Z_MASS 91.1876e3
 #define GeV 1e3
 namespace qidong{
@@ -23,6 +43,26 @@ namespace qidong{
 
     class evt{
         public:
+            class CP_angles{
+                public:
+                    float theta_star;
+                    float phi_star;
+                    float phi;
+                    float phi1;
+                    float theta1;
+                    float theta2;
+                    void veto(){
+                        theta_star = -999;
+                        phi_star = -999;
+                        phi = -999;
+                        phi1 = -999;
+                        theta1 = -999;
+                        theta2 = -999;
+                    }
+                    CP_angles(){
+                        veto();
+                    }
+            };
             class results{
                 public:
                     float m_jj;
@@ -33,6 +73,8 @@ namespace qidong{
                     float m_z2;
                     float pt_bala;
                     float centra;
+                    CP_angles angles;
+                    
                     void veto(){
                         m_jj = -999;
                         m_jj = -999;
@@ -43,30 +85,31 @@ namespace qidong{
                         m_z2 = -999;
                         pt_bala = -999;
                         centra = -999;
+                        angles.veto();
                     }
             };
             class Djet{
-            public:
-                PtEtaPhiMVector mom;
-                float jvt;
-                bool is_truth;
-                Djet(float _pt, float _eta, float _phi, float _m, bool _is_truth, float _jvt=-999){
-                    mom = PtEtaPhiMVector(_pt, _eta, _phi, _m);
-                    if(_is_truth)   jvt = -999;
-                    else            jvt = _jvt;
-                }
-                float abseta(){
-                    return TMath::Abs(mom.eta());
-                }
-                float pt(){
-                    return mom.pt();
-                }
-                float rapidity(){
-                    return mom.Rapidity();
-                }
-                float E(){
-                    return mom.energy();
-                }
+                public:
+                    PtEtaPhiMVector mom;
+                    float jvt;
+                    bool is_truth;
+                    Djet(float _pt, float _eta, float _phi, float _m, bool _is_truth, float _jvt=-999){
+                        mom = PtEtaPhiMVector(_pt, _eta, _phi, _m);
+                        if(_is_truth)   jvt = -999;
+                        else            jvt = _jvt;
+                    }
+                    float abseta(){
+                        return TMath::Abs(mom.eta());
+                    }
+                    float pt(){
+                        return mom.pt();
+                    }
+                    float rapidity(){
+                        return mom.Rapidity();
+                    }
+                    float E(){
+                        return mom.energy();
+                    }
             };
             class Dlepton{
                 public:
@@ -124,6 +167,7 @@ namespace qidong{
             Jets                jets_pass;
             Leptons             leptons_pass;
 
+            std::vector<Leptons> lepton_pair;
             FourMomenta         j1j2;
             FourMomenta         z1z2;
 
@@ -342,15 +386,24 @@ namespace qidong{
                                             std::abs((pairs_b[1][0].mom + pairs_b[1][1].mom).mass() - Z_MASS);    
                 return comb_mass_diff_a < comb_mass_diff_b;
             }
-            FourMomenta getZ1Z2(std::vector<std::vector<Leptons>> lep_pairs_comb){
-                FourMomenta ret{};
+
+            std::vector<Leptons> getLepPair(std::vector<std::vector<Leptons>> lep_pairs_comb){
+                std::vector<Leptons> ret{};
                 if(lep_pairs_comb.size() >= 1){
                     for(uint i = 0; i < lep_pairs_comb.size(); i++){
                         std::sort(lep_pairs_comb[i].begin(), lep_pairs_comb[i].end(), lepsPairsMCriterion);
                     }
                     std::sort(lep_pairs_comb.begin(), lep_pairs_comb.end(), lepsPairsCombMCriterion);
-                    ret = {(lep_pairs_comb[0][0][0].mom + lep_pairs_comb[0][0][1].mom), 
-                            (lep_pairs_comb[0][1][0].mom + lep_pairs_comb[0][1][1].mom)};
+                    ret = lep_pairs_comb[0];
+                }
+                return ret;
+            }
+
+            FourMomenta getZ1Z2(std::vector<Leptons> lep_pairs){
+                FourMomenta ret{};
+                if(lep_pairs.size() >= 1){
+                    ret = {(lep_pairs[0][0].mom + lep_pairs[0][1].mom), 
+                            (lep_pairs[1][0].mom + lep_pairs[1][1].mom)};
                 }
                 return ret;
             }
@@ -383,11 +436,36 @@ namespace qidong{
             float getCentra (FourMomenta j1j2, FourMomenta z1z2){
                 return TMath::Abs(((j1j2[0] + j1j2[1]).Rapidity() - (z1z2[0] + z1z2[1]).Rapidity()) / (j1j2[0].Rapidity() - j1j2[1].Rapidity()));     
             }
+
+            CP_angles getAngles(std::vector<Leptons> lep_pairs, FourMomenta z1z2){
+                auto starret = new CP_angles();
+                auto ret = *starret;
+                Boost zz_rest = Boost((z1z2[0] + z1z2[1]).BoostToCM());
+                PtEtaPhiMVector q11 = zz_rest((lep_pairs[0][0].mom));
+                PtEtaPhiMVector q12 = zz_rest(lep_pairs[0][1].mom);
+                PtEtaPhiMVector q21 = zz_rest(lep_pairs[1][0].mom);
+                PtEtaPhiMVector q22 = zz_rest(lep_pairs[1][1].mom);
+                PtEtaPhiMVector q1  = zz_rest(z1z2[0]);
+                PtEtaPhiMVector q2  = zz_rest(z1z2[1]);
+                XYZVector n1hat  = q11.Vect().Cross(q12.Vect()) / std::sqrt((q11.Vect().Cross(q12.Vect())).mag2());
+                XYZVector n2hat  = q21.Vect().Cross(q22.Vect()) / std::sqrt((q21.Vect().Cross(q22.Vect())).mag2());
+                XYZVector nzhat(0.0,0.0,1.0);
+                XYZVector nschat = nzhat.Cross(q1.Vect()) / std::sqrt(nzhat.Cross(q1.Vect()).Mag2());
+                ret.theta_star = q1.theta();
+                ret.phi_star   = q1.phi();
+                ret.phi  = q1.Vect().Dot(n1hat.Cross(n2hat)) / std::abs(q1.Vect().Dot(n1hat.Cross(n2hat))) * (TMath::ACos(-n1hat.Dot(n2hat)));
+                ret.phi1 = q1.Vect().Dot(n1hat.Cross(nschat)) / std::abs(q1.Vect().Dot(n1hat.Cross(nschat))) * (TMath::ACos(n1hat.Dot(nschat)));
+                ret.theta1 = TMath::ACos(-(q2.Vect().Dot(q11.Vect())) / std::sqrt(q2.Vect().Mag2()) / std::sqrt(q11.Vect().Mag2()));
+                ret.theta2 = TMath::ACos(-(q1.Vect().Dot(q21.Vect())) / std::sqrt(q1.Vect().Mag2()) / std::sqrt(q21.Vect().Mag2()));
+                return ret;
+            }
+            
             evt(){
                 jets_raw = {};
                 leptons_raw = {};
                 jets_pass = {};
                 leptons_pass = {};
+                lepton_pair = {};
                 j1j2 = {};
                 z1z2 = {};
                 is_truth = 0;
@@ -435,8 +513,9 @@ namespace qidong{
                 //z1z2 sel
                     if(!veto){
                         pass_j1j2    = 1;
-                        z1z2 = getZ1Z2(getLeptonPairsComb(leptons_pass));
-                        if	(z1z2.size() < 2 || z1z2[0].mass() < 70*GeV ||  z1z2[0].mass() > 110*GeV || z1z2[1].mass() < 21.1876*GeV ||  z1z2[1].mass() > 110*GeV){
+                        lepton_pair = getLepPair(getLeptonPairsComb(leptons_pass));
+                        z1z2 = getZ1Z2(lepton_pair);
+                        if	(z1z2.size() < 2 || z1z2[0].mass() < 70*GeV ||  z1z2[0].mass() > 110*GeV || z1z2[1].mass() < 70*GeV ||  z1z2[1].mass() > 110*GeV){
                             res.veto();
                             veto = 1;
                         }
@@ -459,7 +538,7 @@ namespace qidong{
                             if (res.centra < 0.4){ pass_SR = 1; }
                             else { pass_CR = 1; }
                         }
-                        
+                        res.angles = getAngles(lepton_pair, z1z2);
                     }
                 
             }
@@ -498,6 +577,13 @@ namespace qidong{
                        _lep_isolations,
                        _jet_jvts);
         }
+        float findAngleThetaStar(evt event){ return event.res.angles.theta_star; }
+        float findAnglePhiStar(evt event){ return event.res.angles.phi_star; };
+        float findAnglePhi0(evt event){ return event.res.angles.phi; };
+        float findAnglePhi1(evt event){ return event.res.angles.phi1; };
+        float findAngleTheta1(evt event){ return event.res.angles.theta1; };
+        float findAngleTheta2(evt event){ return event.res.angles.theta2; };
+
         float findMJJ(evt event){ return event.res.m_jj; }
         float findDPhiJJ(evt event){ return event.res.dphi_jj;}
         float findDYJJ(evt event){ return event.res.dy_jj;}

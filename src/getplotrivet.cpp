@@ -1,5 +1,5 @@
 #include "genAna.h"
-
+using namespace std;
 void getdphijj(){
     TH1::SetDefaultSumw2();
     TFile* infile = TFile::Open("rivet_routine/Plots/EFT_INT_1E6.hepmc.yoda.root", "read");
@@ -19,10 +19,10 @@ void getdphijj(){
 }
 
 void play(){
-    TFile* in1 = TFile::Open("rivet_routine/Plots/SM_EW_1E5.hepmc.yoda.root", "read");
+    TFile* in1 = TFile::Open("rivet_routine/Plots/root_SM_EW_1E5.hepmc.yoda.root", "read");
     TFile* in2 = TFile::Open("output/stack_out/jj_true_delphi.root", "read");
     TH1D * h_phi_1 = (TH1D*)in1->Get("qidong/jjDphi");
-    TH1D * h_phi_2 = (TH1D*)in2->Get("jj_truthBorn_delta_phi_cut_h");
+    TH1D * h_phi_2 = (TH1D*)in2->Get("jj_truthBorn_dphi_cut_h");
 
     TCanvas c1("c1","",2000,2000);
     h_phi_1->SetMarkerStyle(23);
@@ -36,7 +36,7 @@ void play(){
 }
 
 void play2(){
-    TFile* in1 = TFile::Open("rivet_routine/Plots/SM_EW_1E5.hepmc.yoda.root", "read");
+    TFile* in1 = TFile::Open("rivet_routine/Plots/root_SM_EW_1E5.hepmc.yoda.root", "read");
     TFile* in2 = TFile::Open("output/stack_out/llll_true_m.root", "read");
     TH1D * h_phi_1 = (TH1D*)in1->Get("qidong/m4l");
     TH1D * h_phi_2 = (TH1D*)in2->Get("llll_truthBorn_m_cut_h");
@@ -53,7 +53,7 @@ void play2(){
     c1.SaveAs("tmp2.png");
 }
 void play3(){
-    TFile* in1 = TFile::Open("rivet_routine/Plots/SM_EW_1E5.hepmc.yoda.root", "read");
+    TFile* in1 = TFile::Open("rivet_routine/Plots/root_SM_EW_1E5.hepmc.yoda.root", "read");
     TFile* in2 = TFile::Open("output/stack_out/llll_true_m.root", "read");
     TH1D * h_phi_1 = (TH1D*)in1->Get("qidong/m4l");
     TH1D * h_phi_2 = (TH1D*)in2->Get("llll_truthBorn_m_cut_h");

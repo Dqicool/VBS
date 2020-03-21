@@ -3,8 +3,19 @@
 #include "Rivet/Projections/ChargedFinalState.hh"
 #include "Rivet/Projections/FastJets.hh"
 #include "Rivet/Math/Vector4.hh"
+#include "Rivet/Math/LorentzTrans.hh"
 #include <cmath>
 #define Z_MASS 91.1876*Rivet::GeV
+
+class CP_angles{
+    public:
+        double theta_star;
+        double phi_star;
+        double phi;
+        double phi1;
+        double theta1;
+        double theta2;
+};
 
 Rivet::Particles lepSel(Rivet::Particles lepton)
 {
@@ -153,15 +164,23 @@ bool lepsPairsCombMCriterion(std::vector<Rivet::Particles> pairs_a, std::vector<
     return comb_mass_diff_a < comb_mass_diff_b;
 }
 
-Rivet::FourMomenta getZ1Z2(std::vector<std::vector<Rivet::Particles>> lep_pairs_comb){
-    Rivet::FourMomenta ret{};
+std::vector<Rivet::Particles> getLepPair(std::vector<std::vector<Rivet::Particles>> lep_pairs_comb){
+    std::vector<Rivet::Particles> ret{};
     if(lep_pairs_comb.size() >= 1){
         for(uint i = 0; i < lep_pairs_comb.size(); i++){
             std::sort(lep_pairs_comb[i].begin(), lep_pairs_comb[i].end(), lepsPairsMCriterion);
         }
         std::sort(lep_pairs_comb.begin(), lep_pairs_comb.end(), lepsPairsCombMCriterion);
-        ret = {(lep_pairs_comb[0][0][0].momentum() + lep_pairs_comb[0][0][1].momentum()), 
-                (lep_pairs_comb[0][1][0].momentum() + lep_pairs_comb[0][1][1].momentum())};
+        ret = lep_pairs_comb[0];
+    }
+    return ret;
+}
+
+Rivet::FourMomenta getZ1Z2(std::vector<Rivet::Particles> lep_pairs){
+    Rivet::FourMomenta ret{};
+    if(lep_pairs.size() >= 1){
+        ret = {(lep_pairs[0][0].mom + lep_pairs[0][1].mom), 
+                (lep_pairs[1][0].mom + lep_pairs[1][1].mom)};
     }
     return ret;
 }
@@ -191,5 +210,28 @@ double getJJDelPhi(Rivet::FourMomenta j1j2){
             ret += 2*M_PI;
         }
     }
+    return ret;
+}
+
+CP_angles getAngles(std::vector<Rivet::Particles> lep_pairs, Rivet::FourMomenta z1z2){
+    auto starret = new CP_angles();
+    auto ret = *starret;
+    auto zz_rest = Rivet::LorentzTransform::mkFrameTransformFromBeta((z1z2[0] + z1z2[1]).betaVec());
+    auto q11 = zz_rest.transform(lep_pairs[0][0].momentum());
+    auto q12 = zz_rest.transform(lep_pairs[0][1].momentum());
+    auto q21 = zz_rest.transform(lep_pairs[1][0].momentum());
+    auto q22 = zz_rest.transform(lep_pairs[1][1].momentum());
+    auto q1  = zz_rest.transform(z1z2[0]);
+    auto q2  = zz_rest.transform(z1z2[1]);
+    auto n1hat  = q11.vector3().cross(q12.vector3()) / std::sqrt((q11.vector3().cross(q12.vector3())).mod2());
+    auto n2hat  = q21.vector3().cross(q22.vector3()) / std::sqrt((q21.vector3().cross(q22.vector3())).mod2());
+    Rivet::Vector3 nzhat(0.0, 0.0, 1.0);
+    auto nschat = nzhat.cross(q1.vector3()) / std::sqrt(nzhat.cross(q1.vector3()).mod2());
+    ret.theta_star = q1.theta();
+    ret.phi_star   = q1.phi();
+    ret.phi  = q1.vector3().dot(n1hat.cross(n2hat)) / std::abs(q1.vector3().dot(n1hat.cross(n2hat))) * (std::acos(-n1hat.dot(n2hat)));
+    ret.phi1 = q1.vector3().dot(n1hat.cross(nschat)) / std::abs(q1.vector3().dot(n1hat.cross(nschat))) * (std::acos(n1hat.dot(nschat)));
+    ret.theta1 = std::acos(-(q2.vector3().dot(q11.vector3())) / std::sqrt(q2.vector3().mod2()) / std::sqrt(q11.vector3().mod2()));
+    ret.theta2 = std::acos(-(q1.vector3().dot(q21.vector3())) / std::sqrt(q1.vector3().mod2()) / std::sqrt(q21.vector3().mod2()));
     return ret;
 }

@@ -63,13 +63,13 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "forward_list": "cpp"
+        "forward_list": "cpp",
+        "future": "cpp"
     },
     "files.exclude": {
         "**/._*": true,
         "**/.gitignore": true
     },
-    "workbench.colorTheme": "Material Theme Palenight High Contrast",
     "window.zoomLevel": 0,
     "editor.cursorStyle": "block",
     "editor.cursorBlinking": "smooth",

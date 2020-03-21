@@ -3,13 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/opt/root/include",
-                "/usr/include/c++/7",
-                "/usr/include/x86_64-linux-gnu/c++/7",
-                "${workspaceFolder}/RooUnfold/src",
-                "${workspaceFolder}/rivet_routine/Src",
-                "/opt/rocm/include/**"
+                "/usr/include/",
+                "${workspaceFolder}/src",
+                "/usr/include/c++/9.2.1",
+                "${workspaceFolder}/libs/RooUnfold/src",
+                "${workspaceFolder}/rivet_routine/Src"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

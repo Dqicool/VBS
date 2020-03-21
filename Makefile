@@ -1,7 +1,9 @@
 PWD = $(shell pwd)
 ROOTFLAGS = $(shell root-config --cflags)
-ROOTLIBS  = $(shell root-config --libs)
+ROOTLIBS  = -L/usr/lib/root -lGenVector -lEve -lEG -lGeom -lGed -lRGL -lGui -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lMathMore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic
 ROOUNFDIR = /mnt/SSD/VBS/libs/RooUnfold
+
+CXX = c++
 
 UNFOLD_COMP_FLAG = -Wall -fPIC -pthread -std=c++17 -m64 -I/usr/include -DHAVE_TSVDUNFOLD=1 -DMAKEBUILD 
 UNFOLD_COMP_LIBS = -L$(ROOUNFDIR)/ -lRooUnfold_static  -L/usr/lib/root -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lROOTVecOps -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lROOTDataFrame -pthread -lm -ldl -rdynamic -lUnfold -lRooFit -lRooFitCore -lThread -lMinuit -lFoam -lMathMore -lHtml
